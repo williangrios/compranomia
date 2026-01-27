@@ -1,0 +1,164 @@
+// app/(auth)/verify-email.tsx
+import { useState } from 'react'
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  ActivityIndicator,
+} from 'react-native'
+import { useRouter, useLocalSearchParams } from 'expo-router'
+import { Ionicons } from '@expo/vector-icons'
+import { useAuth } from '@/contexts/AuthContext'
+import { colors, components } from '@/theme'
+import { validators } from '@/utils/validators'
+import { ErrorMessage } from '@/components/ui/ErrorMessage'
+
+interface ApiError {
+  message: string
+  field?: string
+}
+
+export default function VerifyEmail() {
+  const router = useRouter()
+  const { verifyEmail, user } = useAuth()
+  const params = useLocalSearchParams()
+  const email = (params.email as string) || user?.email || ''
+
+  const [code, setCode] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+  const [apiErrors, setApiErrors] = useState<ApiError[] | null>(null)
+  const [localError, setLocalError] = useState('')
+
+  async function handleVerify() {
+    try {
+      setLocalError('')
+      setApiErrors(null)
+      setIsLoading(true)
+
+      // Validações locais
+      if (!code) {
+        setLocalError('Código é obrigatório')
+        return
+      }
+
+      if (!validators.verificationCode(code)) {
+        setLocalError('Código deve ter 6 dígitos')
+        return
+      }
+
+      console.log('📤 handleVerify - Verificando email:', { email, code })
+
+      await verifyEmail(email, code)
+
+      console.log('✅ handleVerify - Email verificado com sucesso!')
+      // AuthContext vai redirecionar automaticamente baseado no role:
+      // - Consumer sem endereço → complete-address
+      // - Seller ou Consumer com endereço → (tabs)
+    } catch (error: any) {
+      console.error('❌ handleVerify - Erro capturado:', error)
+      console.error('❌ handleVerify - error.errors:', error.errors)
+
+      // Capturar erros da API (já formatados pelo AuthContext)
+      if (error.errors && Array.isArray(error.errors)) {
+        console.log('✅ Setando apiErrors:', error.errors)
+        setApiErrors(error.errors)
+      } else {
+        console.log('❌ Erro sem estrutura correta, usando GenericError')
+        setApiErrors([{ message: 'GenericError' }])
+      }
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  return (
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <ScrollView
+        contentContainerStyle={components.auth.scrollContainer}
+        keyboardShouldPersistTaps="handled"
+      >
+        <View style={components.auth.container}>
+          {/* Header */}
+          <View style={components.auth.header}>
+            <Ionicons name="mail" size={64} color={colors.primary} />
+            <Text style={components.auth.title}>Confirmar email</Text>
+            <Text style={components.auth.subtitle}>
+              Digite o código de 6 dígitos enviado para{'\n'}
+              {email || 'seu email'}
+            </Text>
+          </View>
+
+          {/* Form */}
+          <View style={components.auth.formContainer}>
+            {/* Código */}
+            <View>
+              <Text style={components.input.label}>Código de verificação</Text>
+              <TextInput
+                style={[
+                  components.input.container,
+                  components.input.text,
+                  localError && components.input.error,
+                  { textAlign: 'center', fontSize: 24, letterSpacing: 8 },
+                ]}
+                value={code}
+                onChangeText={(text) => {
+                  // Apenas números
+                  const cleaned = text.replace(/\D/g, '')
+                  setCode(cleaned)
+                  setLocalError('')
+                  setApiErrors(null)
+                }}
+                placeholder="000000"
+                keyboardType="number-pad"
+                maxLength={6}
+                autoFocus
+              />
+              {localError && (
+                <Text style={components.auth.errorText}>{localError}</Text>
+              )}
+            </View>
+
+            {/* Erros da API */}
+            <ErrorMessage errors={apiErrors} />
+
+            {/* Botão Verificar */}
+            <TouchableOpacity
+              style={components.auth.buttonPrimary}
+              onPress={handleVerify}
+              disabled={isLoading || code.length !== 6}
+              activeOpacity={0.8}
+            >
+              {isLoading ? (
+                <ActivityIndicator color={colors.textInverse} />
+              ) : (
+                <Text style={components.auth.buttonText}>Verificar</Text>
+              )}
+            </TouchableOpacity>
+
+            {/* Reenviar código */}
+            <TouchableOpacity>
+              <Text style={[components.auth.linkText, { textAlign: 'center' }]}>
+                Não recebeu? Reenviar código
+              </Text>
+            </TouchableOpacity>
+          </View>
+
+          {/* Voltar */}
+          <TouchableOpacity
+            style={components.auth.linkContainer}
+            onPress={() => router.back()}
+          >
+            <Text style={components.auth.linkTextSmall}>Voltar</Text>
+          </TouchableOpacity>
+        </View>
+      </ScrollView>
+    </KeyboardAvoidingView>
+  )
+}
