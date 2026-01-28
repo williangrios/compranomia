@@ -29,9 +29,9 @@ export default function CompleteAddress() {
   const router = useRouter()
   const { user, updateUser } = useAuth()
 
-  const [cep, setCep] = useState('')
+  const [cep, setCep] = useState('3559932')
   const [street, setStreet] = useState('')
-  const [number, setNumber] = useState('')
+  const [number, setNumber] = useState('950')
   const [complement, setComplement] = useState('')
   const [neighborhood, setNeighborhood] = useState('')
   const [city, setCity] = useState('')

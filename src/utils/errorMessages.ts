@@ -18,6 +18,7 @@ export const errorMessages: Record<string, string> = {
   InvalidCredentials: 'Email ou senha incorretos.',
   UserNotFound: 'Usuário não encontrado.',
   BlockedUser: 'Usuário bloqueado. Entre em contato com o suporte.',
+  TooManyLogin: 'Muitas tentativas de login, tente novamente em 3 minutos.',
 
   // Nickname
   ProvideNickName: 'Apelido é obrigatório.',

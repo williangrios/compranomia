@@ -5,6 +5,7 @@ export interface User {
   id: string
   email: string
   nickName: string
+  category: string
   name: string
   role: UserRole
   tenant: string

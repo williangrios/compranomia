@@ -26,8 +26,8 @@ export default function SignIn() {
   const router = useRouter()
   const { signIn } = useAuth()
 
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
+  const [email, setEmail] = useState('williangrios@yahoo.com.br')
+  const [password, setPassword] = useState('123123')
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [apiErrors, setApiErrors] = useState<ApiError[] | null>(null)

@@ -30,10 +30,10 @@ export default function SignUp() {
   const role = (params.role as string) || 'consumer'
   const isSeller = role === 'seller'
 
-  const [email, setEmail] = useState('')
-  const [password, setPassword] = useState('')
-  const [passwordConfirmation, setPasswordConfirmation] = useState('')
-  const [nickName, setNickName] = useState('')
+  const [email, setEmail] = useState('williangrios@yahoo.com.br')
+  const [password, setPassword] = useState('123123')
+  const [passwordConfirmation, setPasswordConfirmation] = useState('123123')
+  const [nickName, setNickName] = useState('bill')
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [apiErrors, setApiErrors] = useState<ApiError[] | null>(null)
