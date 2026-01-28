@@ -1,0 +1,241 @@
+import { useState, useEffect } from 'react'
+import {
+  View,
+  Text,
+  TextInput,
+  TouchableOpacity,
+  ScrollView,
+  KeyboardAvoidingView,
+  Platform,
+  ActivityIndicator,
+} from 'react-native'
+import { ErrorMessage } from '@/components/ui/ErrorMessage'
+import { SuccessMessage } from '@/components/ui/SuccessMessage'
+import { profileService } from '@/services/profile.service'
+import { useAuth } from '@/contexts/AuthContext'
+import { colors, components } from '@/theme'
+import { formatters } from '@/utils/formatters'
+
+interface ApiError {
+  message: string
+  field?: string
+}
+
+interface FormErrors {
+  name?: string
+  doc?: string
+  birthDate?: string
+}
+
+export default function PersonalData() {
+  const { user, updateUser } = useAuth()
+
+  const [name, setName] = useState('')
+  const [doc, setDoc] = useState('')
+  const [birthDate, setBirthDate] = useState('')
+  const [whatsapp, setWhatsapp] = useState('')
+  const [phoneNumber, setPhoneNumber] = useState('')
+  const [isLoading, setIsLoading] = useState(false)
+
+  const [apiErrors, setApiErrors] = useState<ApiError[] | null>(null)
+  const [success, setSuccess] = useState<{ message: string } | null>(null)
+  const [errors, setErrors] = useState<FormErrors>({})
+
+  useEffect(() => {
+    if (user) {
+      setName(user.name || '')
+      setDoc(user.doc ? formatters.cpf(user.doc) : '')
+      setBirthDate(user.birthDate ? formatters.date(user.birthDate) : '')
+      setWhatsapp(user.whatsapp || '')
+      setPhoneNumber(user.phoneNumber || '')
+    }
+  }, [user])
+
+  async function handleSubmit() {
+    try {
+      setErrors({})
+      setApiErrors(null)
+      setSuccess(null)
+      setIsLoading(true)
+
+      const newErrors: FormErrors = {}
+
+      if (!name.trim()) {
+        newErrors.name = 'Nome é obrigatório'
+      }
+
+      if (!doc.trim()) {
+        newErrors.doc = 'CPF é obrigatório'
+      }
+
+      if (Object.keys(newErrors).length > 0) {
+        setErrors(newErrors)
+        return
+      }
+
+      const response = await profileService.updatePersonalData({
+        name: name.trim(),
+        doc: formatters.cleanCPF(doc),
+        birthDate: birthDate ? formatters.cleanDate(birthDate) : null,
+        whatsapp: whatsapp.trim(),
+        phoneNumber: phoneNumber.trim(),
+      })
+
+      updateUser(response.user)
+
+      setSuccess({
+        message: 'Dados atualizados com sucesso',
+      })
+    } catch (error: any) {
+      console.error('❌ handleSubmit - Erro capturado:', error)
+
+      setSuccess(null)
+
+      if (error?.errors && Array.isArray(error.errors)) {
+        setApiErrors(error.errors)
+      } else {
+        setApiErrors([{ message: 'GenericError' }])
+      }
+    } finally {
+      setIsLoading(false)
+    }
+  }
+
+  return (
+    <KeyboardAvoidingView
+      style={{ flex: 1 }}
+      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
+    >
+      <View style={{ flex: 1, backgroundColor: colors.background }}>
+        <ScrollView
+          contentContainerStyle={{ padding: 16 }}
+          keyboardShouldPersistTaps="handled"
+        >
+          {/* Nome */}
+          <View style={{ marginBottom: 16 }}>
+            <Text style={components.input.label}>Nome Completo</Text>
+            <TextInput
+              style={[
+                components.input.container,
+                components.input.text,
+                errors.name && components.input.error,
+              ]}
+              value={name}
+              onChangeText={(text) => {
+                setName(text)
+                setErrors((prev) => ({ ...prev, name: undefined }))
+                setApiErrors(null)
+                setSuccess(null)
+              }}
+              placeholder="Seu nome completo"
+              autoCapitalize="words"
+            />
+            {errors.name && (
+              <Text style={components.auth.errorText}>{errors.name}</Text>
+            )}
+          </View>
+
+          {/* CPF */}
+          <View style={{ marginBottom: 16 }}>
+            <Text style={components.input.label}>CPF</Text>
+            <TextInput
+              style={[
+                components.input.container,
+                components.input.text,
+                errors.doc && components.input.error,
+              ]}
+              value={doc}
+              onChangeText={(text) => {
+                setDoc(formatters.cpf(text))
+                setErrors((prev) => ({ ...prev, doc: undefined }))
+                setApiErrors(null)
+                setSuccess(null)
+              }}
+              placeholder="000.000.000-00"
+              keyboardType="number-pad"
+              maxLength={14}
+            />
+            {errors.doc && (
+              <Text style={components.auth.errorText}>{errors.doc}</Text>
+            )}
+          </View>
+
+          {/* Data de nascimento */}
+          <View style={{ marginBottom: 16 }}>
+            <Text style={components.input.label}>
+              Data de Nascimento (opcional)
+            </Text>
+            <TextInput
+              style={[components.input.container, components.input.text]}
+              value={birthDate}
+              onChangeText={(text) => {
+                setBirthDate(formatters.date(text))
+                setErrors((prev) => ({
+                  ...prev,
+                  birthDate: undefined,
+                }))
+                setApiErrors(null)
+                setSuccess(null)
+              }}
+              placeholder="DD/MM/AAAA"
+              keyboardType="number-pad"
+              maxLength={10}
+            />
+          </View>
+
+          {/* WhatsApp */}
+          <View style={{ marginBottom: 16 }}>
+            <Text style={components.input.label}>WhatsApp (opcional)</Text>
+            <TextInput
+              style={[components.input.container, components.input.text]}
+              value={whatsapp}
+              onChangeText={(text) => {
+                setWhatsapp(formatters.phone(text))
+                setApiErrors(null)
+                setSuccess(null)
+              }}
+              placeholder="(00) 00000-0000"
+              keyboardType="phone-pad"
+              maxLength={15}
+            />
+          </View>
+
+          {/* Telefone */}
+          <View style={{ marginBottom: 16 }}>
+            <Text style={components.input.label}>Telefone (opcional)</Text>
+            <TextInput
+              style={[components.input.container, components.input.text]}
+              value={phoneNumber}
+              onChangeText={(text) => {
+                setPhoneNumber(formatters.phone(text))
+                setApiErrors(null)
+                setSuccess(null)
+              }}
+              placeholder="(00) 00000-0000"
+              keyboardType="phone-pad"
+              maxLength={15}
+            />
+          </View>
+
+          {/* Feedback */}
+          <SuccessMessage success={success} />
+          <ErrorMessage errors={apiErrors} />
+
+          {/* Botão salvar */}
+          <TouchableOpacity
+            style={components.auth.buttonPrimary}
+            onPress={handleSubmit}
+            disabled={isLoading}
+            activeOpacity={0.8}
+          >
+            {isLoading ? (
+              <ActivityIndicator color={colors.textInverse} />
+            ) : (
+              <Text style={components.auth.buttonText}>Salvar Dados</Text>
+            )}
+          </TouchableOpacity>
+        </ScrollView>
+      </View>
+    </KeyboardAvoidingView>
+  )
+}
