@@ -2,6 +2,7 @@
 import React, { createContext, useState, useEffect, useContext } from 'react'
 import { useRouter, useSegments } from 'expo-router'
 import { authService } from '@/services/auth.service'
+import api from '@/services/api'
 import { User } from '@/types'
 import { Country, Tenant, UserRole } from '@wrcb/cb-common'
 import { formatApiError } from '@/utils/errorHandler'
@@ -19,6 +20,11 @@ interface AuthContextData {
     role: UserRole
   }) => Promise<void>
   verifyEmail: (email: string, code: string) => Promise<void>
+  updatePassword: (data: {
+    currentPassword: string
+    newPassword: string
+    newPasswordConfirmation: string
+  }) => Promise<void>
   logout: () => Promise<void>
   refreshUser: () => Promise<void>
   updateUser: (user: User) => void
@@ -32,44 +38,21 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const router = useRouter()
   const segments = useSegments()
 
-  // Verificar autenticação ao iniciar app
   useEffect(() => {
     checkAuth()
   }, [])
 
-  // Navegar baseado em autenticação
   useEffect(() => {
-    console.log('🧭 Navigation effect TRIGGERED:', {
-      isLoading,
-      user: !!user,
-      userId: user?.id,
-      isEmailVerified: user?.isEmailVerified,
-      isAddressDataProvided: user?.isAddressDataProvided,
-      role: user?.role,
-      segments,
-      timestamp: new Date().toISOString(),
-    })
-
-    if (isLoading) {
-      console.log('⏳ Ainda carregando, aguardando...')
-      return
-    }
+    if (isLoading) return
 
     const inAuthGroup = segments[0] === '(auth)'
-    const inTabsGroup = segments[0] === '(tabs)'
 
-    console.log('📍 Grupos:', { inAuthGroup, inTabsGroup })
-
-    // 1. Não autenticado → welcome
     if (!user && !inAuthGroup) {
-      console.log('🚀 Redirecionando para (auth)/welcome')
       router.replace('/(auth)/welcome')
       return
     }
 
-    // 2. Email não verificado → verify-email
     if (user && !user.isEmailVerified && !inAuthGroup) {
-      console.log('🚀 Redirecionando para (auth)/verify-email')
       router.replace({
         pathname: '/(auth)/verify-email',
         params: { email: user.email },
@@ -77,89 +60,75 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return
     }
 
-    // 3. Consumer sem endereço → complete-address
-    // ✅ REMOVER !inAuthGroup
     if (
       user &&
       user.isEmailVerified &&
       user.role === UserRole.Consumer &&
       !user.isAddressDataProvided
     ) {
-      console.log('🚀 Redirecionando para (auth)/complete-address')
       router.replace('/(auth)/complete-address')
       return
     }
 
-    // 4. Usuário completo em auth → tabs
     if (
       user &&
       user.isEmailVerified &&
       (user.role === UserRole.Seller || user.isAddressDataProvided) &&
       inAuthGroup
     ) {
-      console.log('🚀 Redirecionando para (tabs)')
       router.replace('/(tabs)')
-      return
     }
-
-    console.log('⚠️ Nenhuma condição de navegação atendida')
   }, [user, segments, isLoading])
 
   async function checkAuth() {
     try {
-      console.log('🔍 checkAuth: Iniciando...')
+      console.log('[AuthContext] checkAuth - Starting...')
       setIsLoading(true)
-
       const cachedUser = await authService.getCachedUser()
-      console.log('👤 Cached user:', cachedUser)
 
       if (cachedUser) {
+        console.log(
+          '[AuthContext] checkAuth - Found cached user:',
+          cachedUser.id,
+        )
         setUser(cachedUser)
-        console.log('✅ User setado do cache')
 
-        // Validar com backend (sem bloquear)
         authService
           .getCurrentUser()
           .then((freshUser) => {
-            console.log('🔄 Fresh user from API:', freshUser)
             if (freshUser) {
+              console.log('[AuthContext] checkAuth - Got fresh user')
               setUser(freshUser)
             } else {
+              console.log('[AuthContext] checkAuth - No fresh user, clearing')
               setUser(null)
-              console.log('❌ Fresh user null')
             }
           })
-          .catch((err) => {
-            console.log('❌ Erro ao buscar fresh user:', err)
+          .catch(() => {
+            console.log('[AuthContext] checkAuth - Error getting fresh user')
             setUser(null)
           })
       } else {
+        console.log('[AuthContext] checkAuth - No cached user')
         setUser(null)
-        console.log('❌ Sem cached user')
       }
-    } catch (error) {
-      console.error('❌ checkAuth error:', error)
-      setUser(null)
     } finally {
       setIsLoading(false)
-      console.log('✅ checkAuth: Finalizado')
     }
   }
 
   async function signIn(email: string, password: string) {
     try {
-      console.log('📤 AuthContext.signIn - Chamando authService')
-
+      console.log('[AuthContext] signIn - Starting...')
       const { user } = await authService.signIn({
         email,
         password,
         tenant: Tenant.Compranomia,
       })
-
-      console.log('✅ AuthContext.signIn - Sucesso')
+      console.log('[AuthContext] signIn - Setting user state')
       setUser(user)
     } catch (error: any) {
-      console.error('❌ signIn error:', error)
+      console.error('[AuthContext] signIn - Error:', error)
       throw formatApiError(error)
     }
   }
@@ -172,75 +141,73 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     role: UserRole
   }) {
     try {
-      console.log('📤 AuthContext.signUp - Chamando authService')
-
+      console.log('[AuthContext] signUp - Starting...')
       const { user } = await authService.signUp({
         ...data,
         country: Country.Brasil,
         tenant: Tenant.Compranomia,
       })
-
-      console.log('✅ AuthContext.signUp - Sucesso')
+      console.log('[AuthContext] signUp - Setting user state')
       setUser(user)
     } catch (error: any) {
-      console.error('❌ signUp error:', error)
+      console.error('[AuthContext] signUp - Error:', error)
       throw formatApiError(error)
     }
   }
 
   async function verifyEmail(email: string, code: string) {
     try {
-      console.log('📤 AuthContext.verifyEmail - Chamando authService')
-
+      console.log('[AuthContext] verifyEmail - Starting...')
       const { user } = await authService.verifyEmail({
         email,
         code,
         tenant: Tenant.Compranomia,
       })
-
-      console.log('✅ AuthContext.verifyEmail - User recebido:', {
-        id: user.id,
-        email: user.email,
-        isEmailVerified: user.isEmailVerified,
-        role: user.role,
-        isAddressDataProvided: user.isAddressDataProvided,
-      })
-
-      console.log('📝 AuthContext.verifyEmail - Atualizando state do user...')
+      console.log('[AuthContext] verifyEmail - Setting user state')
       setUser(user)
-
-      console.log('⏳ AuthContext.verifyEmail - Aguardando state atualizar...')
-      await new Promise((resolve) => setTimeout(resolve, 200))
-
-      console.log('✅ AuthContext.verifyEmail - Concluído!')
     } catch (error: any) {
-      console.error('❌ verifyEmail error:', error)
+      console.error('[AuthContext] verifyEmail - Error:', error)
+      throw formatApiError(error)
+    }
+  }
+
+  async function updatePassword(data: {
+    currentPassword: string
+    newPassword: string
+    newPasswordConfirmation: string
+  }) {
+    try {
+      console.log('[AuthContext] updatePassword - Starting...')
+      await api.put('/api/auth/updateuserpassword', data)
+      console.log('[AuthContext] updatePassword - Success')
+    } catch (error: any) {
+      console.error('[AuthContext] updatePassword - Error:', error)
       throw formatApiError(error)
     }
   }
 
   async function logout() {
-    try {
-      await authService.logout()
-      setUser(null)
-      router.replace('/(auth)/welcome')
-    } catch (error) {
-      console.error('logout error:', error)
-    }
+    console.log('[AuthContext] logout - Starting...')
+    await authService.logout()
+    setUser(null)
+    router.replace('/(auth)/welcome')
   }
 
   async function refreshUser() {
     try {
+      console.log('[AuthContext] refreshUser - Starting...')
       const freshUser = await authService.getCurrentUser()
       if (freshUser) {
+        console.log('[AuthContext] refreshUser - Got fresh user')
         setUser(freshUser)
       }
     } catch (error) {
-      console.error('refreshUser error:', error)
+      console.error('[AuthContext] refreshUser - Error:', error)
     }
   }
 
   function updateUser(updatedUser: User) {
+    console.log('[AuthContext] updateUser - Updating:', updatedUser.id)
     setUser(updatedUser)
     authService.updateCachedUser(updatedUser)
   }
@@ -254,6 +221,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         signIn,
         signUp,
         verifyEmail,
+        updatePassword,
         logout,
         refreshUser,
         updateUser,
@@ -265,11 +233,5 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 }
 
 export function useAuth() {
-  const context = useContext(AuthContext)
-
-  if (!context) {
-    throw new Error('useAuth must be used within AuthProvider')
-  }
-
-  return context
+  return useContext(AuthContext)
 }

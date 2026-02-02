@@ -1,5 +1,6 @@
 // src/utils/constants.ts
-import { Tenant } from '@wrcb/cb-common'
+import { Tenant, TenantDataService, UserTags } from '@wrcb/cb-common'
+import { isUserTag } from './typeGuards/isUserTag'
 
 // src/utils/constants.ts
 
@@ -12,3 +13,18 @@ export const STORAGE_KEYS = {
   USER_DATA: '@compranomia:userData',
   SELECTED_ADDRESS: '@compranomia:selectedAddress',
 } as const
+
+export const COMPRANOMIA_USER_CATEGORIES =
+  TenantDataService.getCategoriesForTenant(Tenant.Compranomia)
+
+export const COMPRANOMIA_TAGS: UserTags[] =
+  TenantDataService.getAllTagsForTenant(Tenant.Compranomia).filter(isUserTag)
+
+export const PHARMACY_TAGS = [
+  UserTags.Medicines,
+  UserTags.GenericMedicines,
+  UserTags.Supplements,
+  UserTags.Vitamins,
+  UserTags.FirstAid,
+  UserTags.NaturalProducts,
+]

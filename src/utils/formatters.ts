@@ -65,21 +65,56 @@ export const formatters = {
    * Formata data DD/MM/AAAA
    */
   date(value: string): string {
-    const cleaned = value.replace(/\D/g, '').slice(0, 8)
+    if (!value) return ''
 
-    if (cleaned.length <= 2) return cleaned
-    if (cleaned.length <= 4) {
-      return `${cleaned.slice(0, 2)}/${cleaned.slice(2)}`
+    // Aceita:
+    // - 1985-05-18
+    // - 1985-05-18T00:00:00.000Z
+    const isoMatch = value.match(/^(\d{4})-(\d{2})-(\d{2})/)
+
+    if (!isoMatch) {
+      return ''
     }
 
-    return `${cleaned.slice(0, 2)}/${cleaned.slice(2, 4)}/${cleaned.slice(4)}`
+    const [, year, month, day] = isoMatch
+
+    return `${day}/${month}/${year}`
+  },
+
+  dateMask(value: string): string {
+    if (!value) return ''
+
+    const numbers = value.replace(/\D/g, '').slice(0, 8)
+
+    const day = numbers.slice(0, 2)
+    const month = numbers.slice(2, 4)
+    const year = numbers.slice(4, 8)
+
+    if (numbers.length <= 2) return day
+    if (numbers.length <= 4) return `${day}/${month}`
+
+    return `${day}/${month}/${year}`
   },
 
   /**
    * Remove formatação da data
    */
-  cleanDate(value: string): string {
-    return value.replace(/\D/g, '')
+  cleanDate(date: string): string | null {
+    if (!date) return null
+
+    // Esperado: DD/MM/YYYY
+    const parts = date.split('/')
+
+    if (parts.length !== 3) return null
+
+    const [day, month, year] = parts
+
+    if (day.length !== 2 || month.length !== 2 || year.length !== 4) {
+      return null
+    }
+
+    // Retorna ISO 8601 (YYYY-MM-DD)
+    return `${year}-${month}-${day}`
   },
 
   /**

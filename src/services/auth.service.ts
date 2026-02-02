@@ -9,18 +9,21 @@ export const authService = {
    * Sign Up - Criar nova conta
    */
   async signUp(data: SignUpData): Promise<{ user: User }> {
-    console.log('🚀 authService.signUp - Data enviada:', data)
-
+    console.log('[authService] signUp - Data enviada:', data)
     const response = await api.post('/api/auth/signup', data)
-
-    console.log('✅ authService.signUp - Resposta:', response.data)
+    console.log('[authService] signUp - Resposta:', response.data)
 
     if (response.data.status === 'success') {
       const user = response.data.data.user
+      const token = response.data.data.token // ← precisa pegar o token aqui
+
+      console.log('[authService] signUp - Token received:', !!token)
+      if (token) {
+        await storageService.saveAuthToken(token)
+      }
       await storageService.saveUserData(user)
       return { user }
     }
-
     throw new Error(response.data.message || 'SignUpFailed')
   },
 
@@ -28,17 +31,22 @@ export const authService = {
    * Sign In - Fazer login
    */
   async signIn(data: SignInData): Promise<{ user: User }> {
+    console.log('[authService] signIn - Data enviada:', data)
     const response = await api.post('/api/auth/signin', data)
+    console.log('[authService] signIn - Resposta:', response.data)
 
     if (response.data.status === 'success') {
       const user = response.data.data.user
+      const token = response.data.data.token // ← precisa pegar o token aqui
 
-      // Salvar dados localmente
+      console.log('[authService] signIn - Token received:', !!token)
+      if (token) {
+        await storageService.saveAuthToken(token)
+      }
       await storageService.saveUserData(user)
-
+      console.log('[authService] signIn - User and token saved')
       return { user }
     }
-
     throw new Error(response.data.message || 'SignInFailed')
   },
 
@@ -46,17 +54,21 @@ export const authService = {
    * Verify Email - Confirmar email com código
    */
   async verifyEmail(data: VerifyEmailData): Promise<{ user: User }> {
+    console.log('[authService] verifyEmail - Data enviada:', data)
     const response = await api.post('/api/auth/verifyemail', data)
+    console.log('[authService] verifyEmail - Resposta:', response.data)
 
     if (response.data.status === 'success') {
       const user = response.data.data.user
+      const token = response.data.data.token
 
-      // Atualizar dados localmente
+      console.log('[authService] verifyEmail - Token received:', !!token)
+      if (token) {
+        await storageService.saveAuthToken(token)
+      }
       await storageService.saveUserData(user)
-
       return { user }
     }
-
     throw new Error(response.data.message || 'VerifyEmailFailed')
   },
 
@@ -65,21 +77,20 @@ export const authService = {
    */
   async getCurrentUser(): Promise<User | null> {
     try {
+      console.log('[authService] getCurrentUser - Fetching...')
       const response = await api.get('/api/auth/currentuser')
+      console.log('[authService] getCurrentUser - Response:', response.data)
 
       if (response.data.status === 'success') {
         const user = response.data.data.currentUser
-
         if (user) {
-          // Atualizar cache local
           await storageService.saveUserData(user)
           return user
         }
       }
-
       return null
     } catch (error) {
-      console.error('getCurrentUser error:', error)
+      console.error('[authService] getCurrentUser error:', error)
       return null
     }
   },
@@ -89,14 +100,14 @@ export const authService = {
    */
   async logout(): Promise<void> {
     try {
-      // Tentar fazer logout no backend (se houver rota)
+      console.log('[authService] logout - Starting...')
       await api.post('/api/auth/signout')
     } catch (error) {
-      console.error('Logout error:', error)
+      console.error('[authService] logout error:', error)
     } finally {
-      // Limpar dados locais independentemente
       await storageService.clearAuth()
       apiCache.clear()
+      console.log('[authService] logout - Complete')
     }
   },
 

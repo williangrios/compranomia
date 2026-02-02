@@ -4,9 +4,6 @@ import {
   Text,
   TextInput,
   TouchableOpacity,
-  ScrollView,
-  KeyboardAvoidingView,
-  Platform,
   ActivityIndicator,
 } from 'react-native'
 import { ErrorMessage } from '@/components/ui/ErrorMessage'
@@ -15,6 +12,8 @@ import { profileService } from '@/services/profile.service'
 import { useAuth } from '@/contexts/AuthContext'
 import { colors, components } from '@/theme'
 import { formatters } from '@/utils/formatters'
+import { Screen } from '@/components/layout/Screen'
+import { formatApiError } from '@/utils/errorHandler'
 
 interface ApiError {
   message: string
@@ -87,155 +86,135 @@ export default function PersonalData() {
         message: 'Dados atualizados com sucesso',
       })
     } catch (error: any) {
-      console.error('❌ handleSubmit - Erro capturado:', error)
+      console.error('❌ PersonalData error:', error)
 
-      setSuccess(null)
-
-      if (error?.errors && Array.isArray(error.errors)) {
-        setApiErrors(error.errors)
-      } else {
-        setApiErrors([{ message: 'GenericError' }])
-      }
+      const formatted = formatApiError(error)
+      setApiErrors(formatted.errors)
     } finally {
       setIsLoading(false)
     }
   }
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <View style={{ flex: 1, backgroundColor: colors.background }}>
-        <ScrollView
-          contentContainerStyle={{ padding: 16 }}
-          keyboardShouldPersistTaps="handled"
-        >
-          {/* Nome */}
-          <View style={{ marginBottom: 16 }}>
-            <Text style={components.input.label}>Nome Completo</Text>
-            <TextInput
-              style={[
-                components.input.container,
-                components.input.text,
-                errors.name && components.input.error,
-              ]}
-              value={name}
-              onChangeText={(text) => {
-                setName(text)
-                setErrors((prev) => ({ ...prev, name: undefined }))
-                setApiErrors(null)
-                setSuccess(null)
-              }}
-              placeholder="Seu nome completo"
-              autoCapitalize="words"
-            />
-            {errors.name && (
-              <Text style={components.auth.errorText}>{errors.name}</Text>
-            )}
-          </View>
-
-          {/* CPF */}
-          <View style={{ marginBottom: 16 }}>
-            <Text style={components.input.label}>CPF</Text>
-            <TextInput
-              style={[
-                components.input.container,
-                components.input.text,
-                errors.doc && components.input.error,
-              ]}
-              value={doc}
-              onChangeText={(text) => {
-                setDoc(formatters.cpf(text))
-                setErrors((prev) => ({ ...prev, doc: undefined }))
-                setApiErrors(null)
-                setSuccess(null)
-              }}
-              placeholder="000.000.000-00"
-              keyboardType="number-pad"
-              maxLength={14}
-            />
-            {errors.doc && (
-              <Text style={components.auth.errorText}>{errors.doc}</Text>
-            )}
-          </View>
-
-          {/* Data de nascimento */}
-          <View style={{ marginBottom: 16 }}>
-            <Text style={components.input.label}>
-              Data de Nascimento (opcional)
-            </Text>
-            <TextInput
-              style={[components.input.container, components.input.text]}
-              value={birthDate}
-              onChangeText={(text) => {
-                setBirthDate(formatters.date(text))
-                setErrors((prev) => ({
-                  ...prev,
-                  birthDate: undefined,
-                }))
-                setApiErrors(null)
-                setSuccess(null)
-              }}
-              placeholder="DD/MM/AAAA"
-              keyboardType="number-pad"
-              maxLength={10}
-            />
-          </View>
-
-          {/* WhatsApp */}
-          <View style={{ marginBottom: 16 }}>
-            <Text style={components.input.label}>WhatsApp (opcional)</Text>
-            <TextInput
-              style={[components.input.container, components.input.text]}
-              value={whatsapp}
-              onChangeText={(text) => {
-                setWhatsapp(formatters.phone(text))
-                setApiErrors(null)
-                setSuccess(null)
-              }}
-              placeholder="(00) 00000-0000"
-              keyboardType="phone-pad"
-              maxLength={15}
-            />
-          </View>
-
-          {/* Telefone */}
-          <View style={{ marginBottom: 16 }}>
-            <Text style={components.input.label}>Telefone (opcional)</Text>
-            <TextInput
-              style={[components.input.container, components.input.text]}
-              value={phoneNumber}
-              onChangeText={(text) => {
-                setPhoneNumber(formatters.phone(text))
-                setApiErrors(null)
-                setSuccess(null)
-              }}
-              placeholder="(00) 00000-0000"
-              keyboardType="phone-pad"
-              maxLength={15}
-            />
-          </View>
-
-          {/* Feedback */}
-          <SuccessMessage success={success} />
-          <ErrorMessage errors={apiErrors} />
-
-          {/* Botão salvar */}
-          <TouchableOpacity
-            style={components.auth.buttonPrimary}
-            onPress={handleSubmit}
-            disabled={isLoading}
-            activeOpacity={0.8}
-          >
-            {isLoading ? (
-              <ActivityIndicator color={colors.textInverse} />
-            ) : (
-              <Text style={components.auth.buttonText}>Salvar Dados</Text>
-            )}
-          </TouchableOpacity>
-        </ScrollView>
+    <Screen>
+      {/* Nome */}
+      <View style={{ marginBottom: 16 }}>
+        <Text style={components.input.label}>Nome Completo</Text>
+        <TextInput
+          style={[
+            components.input.container,
+            components.input.text,
+            errors.name && components.input.error,
+          ]}
+          value={name}
+          onChangeText={(text) => {
+            setName(text)
+            setErrors((prev) => ({ ...prev, name: undefined }))
+            setApiErrors(null)
+            setSuccess(null)
+          }}
+          placeholder="Seu nome completo"
+          autoCapitalize="words"
+        />
+        {errors.name && (
+          <Text style={components.auth.errorText}>{errors.name}</Text>
+        )}
       </View>
-    </KeyboardAvoidingView>
+
+      {/* CPF */}
+      <View style={{ marginBottom: 16 }}>
+        <Text style={components.input.label}>CPF</Text>
+        <TextInput
+          style={[
+            components.input.container,
+            components.input.text,
+            errors.doc && components.input.error,
+          ]}
+          value={doc}
+          onChangeText={(text) => {
+            setDoc(formatters.cpf(text))
+            setErrors((prev) => ({ ...prev, doc: undefined }))
+            setApiErrors(null)
+            setSuccess(null)
+          }}
+          placeholder="000.000.000-00"
+          keyboardType="number-pad"
+          maxLength={14}
+        />
+        {errors.doc && (
+          <Text style={components.auth.errorText}>{errors.doc}</Text>
+        )}
+      </View>
+
+      {/* Data de nascimento */}
+      <View style={{ marginBottom: 16 }}>
+        <Text style={components.input.label}>
+          Data de Nascimento (opcional)
+        </Text>
+        <TextInput
+          style={[components.input.container, components.input.text]}
+          value={birthDate}
+          onChangeText={(text) => {
+            setBirthDate(formatters.dateMask(text))
+            setErrors((prev) => ({ ...prev, birthDate: undefined }))
+            setApiErrors(null)
+            setSuccess(null)
+          }}
+          placeholder="DD/MM/AAAA"
+          keyboardType="number-pad"
+          maxLength={10}
+        />
+      </View>
+
+      {/* WhatsApp */}
+      <View style={{ marginBottom: 16 }}>
+        <Text style={components.input.label}>WhatsApp (opcional)</Text>
+        <TextInput
+          style={[components.input.container, components.input.text]}
+          value={whatsapp}
+          onChangeText={(text) => {
+            setWhatsapp(formatters.phone(text))
+            setApiErrors(null)
+            setSuccess(null)
+          }}
+          placeholder="(00) 00000-0000"
+          keyboardType="phone-pad"
+          maxLength={15}
+        />
+      </View>
+
+      {/* Telefone */}
+      <View style={{ marginBottom: 16 }}>
+        <Text style={components.input.label}>Telefone (opcional)</Text>
+        <TextInput
+          style={[components.input.container, components.input.text]}
+          value={phoneNumber}
+          onChangeText={(text) => {
+            setPhoneNumber(formatters.phone(text))
+            setApiErrors(null)
+            setSuccess(null)
+          }}
+          placeholder="(00) 00000-0000"
+          keyboardType="phone-pad"
+          maxLength={15}
+        />
+      </View>
+
+      <SuccessMessage success={success} />
+      <ErrorMessage errors={apiErrors} />
+
+      <TouchableOpacity
+        style={components.auth.buttonPrimary}
+        onPress={handleSubmit}
+        disabled={isLoading}
+        activeOpacity={0.8}
+      >
+        {isLoading ? (
+          <ActivityIndicator color={colors.textInverse} />
+        ) : (
+          <Text style={components.auth.buttonText}>Salvar Dados</Text>
+        )}
+      </TouchableOpacity>
+    </Screen>
   )
 }

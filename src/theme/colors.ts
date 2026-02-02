@@ -6,6 +6,7 @@ export const colors = {
 
   // Fundos
   background: '#FFFFFF',
+  backgroundSecondary: '#CCCCCC',
   surface: '#F9FAFB',
 
   // Texto
@@ -17,5 +18,6 @@ export const colors = {
   border: '#E5E7EB',
   disabled: '#D1D5DB',
   error: '#DC2626',
+  danger: '#e05d5d',
   success: '#16A34A',
 }

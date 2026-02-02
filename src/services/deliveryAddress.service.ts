@@ -8,9 +8,6 @@ import {
 } from '@/types'
 
 export const deliveryAddressService = {
-  /**
-   * Create Delivery Address
-   */
   async create(
     data: CreateDeliveryAddressData,
   ): Promise<{ deliveryAddress: DeliveryAddress }> {
@@ -18,100 +15,51 @@ export const deliveryAddressService = {
       '/api/business/compranomia/delivery-address',
       data,
     )
-
-    if (response.data.status === 'success') {
-      return { deliveryAddress: response.data.data.deliveryAddress }
-    }
-
-    throw new Error(response.data.message || 'CreateAddressFailed')
+    return response.data.data
   },
 
-  /**
-   * List all delivery addresses
-   */
   async list(): Promise<{ deliveryAddresses: DeliveryAddress[] }> {
     const response = await api.get('/api/business/compranomia/delivery-address')
-
-    if (response.data.status === 'success') {
-      return { deliveryAddresses: response.data.data.deliveryAddresses }
-    }
-
-    throw new Error(response.data.message || 'ListAddressesFailed')
+    console.log('endereços-----------', response.data.data)
+    return response.data.data
   },
 
-  /**
-   * Get single delivery address
-   */
   async getById(id: string): Promise<{ deliveryAddress: DeliveryAddress }> {
     const response = await api.get(
       `/api/business/compranomia/delivery-address/${id}`,
     )
-
-    if (response.data.status === 'success') {
-      return { deliveryAddress: response.data.data.deliveryAddress }
-    }
-
-    throw new Error(response.data.message || 'GetAddressFailed')
+    return response.data.data
   },
 
-  /**
-   * Update delivery address
-   */
   async update(
     id: string,
     data: UpdateDeliveryAddressData,
   ): Promise<{ deliveryAddress: DeliveryAddress }> {
-    const response = await api.put(
+    const response = await api.patch(
       `/api/business/compranomia/delivery-address/${id}`,
       data,
     )
-
-    if (response.data.status === 'success') {
-      return { deliveryAddress: response.data.data.deliveryAddress }
-    }
-
-    throw new Error(response.data.message || 'UpdateAddressFailed')
+    return response.data.data
   },
 
-  /**
-   * Delete delivery address
-   */
   async delete(id: string): Promise<void> {
-    const response = await api.delete(
-      `/api/business/compranomia/delivery-address/${id}`,
-    )
-
-    if (response.data.status !== 'success') {
-      throw new Error(response.data.message || 'DeleteAddressFailed')
-    }
+    await api.delete(`/api/business/compranomia/delivery-address/${id}`) // ← CORRIGIDO: era template tag
   },
 
-  /**
-   * Set address as default
-   */
   async setDefault(id: string): Promise<{ deliveryAddress: DeliveryAddress }> {
     const response = await api.patch(
       `/api/business/compranomia/delivery-address/${id}/set-default`,
     )
-
-    if (response.data.status === 'success') {
-      return { deliveryAddress: response.data.data.deliveryAddress }
-    }
-
-    throw new Error(response.data.message || 'SetDefaultFailed')
+    return response.data.data
   },
 
-  /**
-   * Get address by CEP (ViaCEP API)
-   */
   async getAddressByCEP(cep: string): Promise<ViaCEPResponse> {
     const cleanCEP = cep.replace(/\D/g, '')
-
     if (cleanCEP.length !== 8) {
       throw new Error('CEP inválido')
     }
 
-    const response = await fetch(`https://viacep.com.br/ws/${cleanCEP}/json/`)
+    const response = await fetch(`https://viacep.com.br/ws/${cleanCEP}/json/`) // ← CORRIGIDO: era template tag
 
     if (!response.ok) {
       throw new Error('Erro ao buscar CEP')

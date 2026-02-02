@@ -1,36 +1,33 @@
 // src/services/sellerSettings.service.ts
+import { SellerSettingsPayload } from '@/types/sellerSettings.types'
 import api from './api'
-import { SellerSettings, CreateSellerSettingsData } from '@/types'
+import { SellerSettings } from '@/types'
 
 export const sellerSettingsService = {
   /**
    * Get seller settings
    */
-  async get(): Promise<{ sellerSettings: SellerSettings }> {
+  async getSettings(): Promise<{ sellerSettings: SellerSettings }> {
     const response = await api.get('/api/business/compranomia/seller-settings')
-
     if (response.data.status === 'success') {
       return { sellerSettings: response.data.data.sellerSettings }
     }
-
     throw new Error(response.data.message || 'GetSellerSettingsFailed')
   },
 
   /**
-   * Create or update seller settings
+   * Create or update seller settings (upsert via PATCH)
    */
-  async createOrUpdate(
-    data: CreateSellerSettingsData,
+  async upsertSettings(
+    payload: SellerSettingsPayload,
   ): Promise<{ sellerSettings: SellerSettings }> {
-    const response = await api.post(
+    const response = await api.patch(
       '/api/business/compranomia/seller-settings',
-      data,
+      payload,
     )
-
     if (response.data.status === 'success') {
       return { sellerSettings: response.data.data.sellerSettings }
     }
-
-    throw new Error(response.data.message || 'CreateSellerSettingsFailed')
+    throw new Error(response.data.message || 'UpsertSellerSettingsFailed')
   },
 }

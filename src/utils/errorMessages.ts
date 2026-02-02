@@ -2,7 +2,7 @@
 
 export const errorMessages: Record<string, string> = {
   // Erros gerais
-  GenericError: 'Ocorreu um erro. Tente novamente.',
+  GenericError: 'Ocorreu um erro. Tente novamente....',
   ConnectionError: 'Erro de conexão. Verifique sua internet.',
   TimeoutError: 'Tempo de espera esgotado. Tente novamente.',
 
@@ -19,6 +19,7 @@ export const errorMessages: Record<string, string> = {
   UserNotFound: 'Usuário não encontrado.',
   BlockedUser: 'Usuário bloqueado. Entre em contato com o suporte.',
   TooManyLogin: 'Muitas tentativas de login, tente novamente em 3 minutos.',
+  CurrentPasswordWrong: 'Senha atual incorreta;',
 
   // Nickname
   ProvideNickName: 'Apelido é obrigatório.',
@@ -59,6 +60,12 @@ export const errorMessages: Record<string, string> = {
   Unauthorized: 'Não autorizado.',
   NotAuthorized: 'Você não tem permissão para acessar este recurso.',
   NotFound: 'Não encontrado.',
+
+  // Cadastro
+  InvalidDocument: 'CPF inválido.',
+
+  // Cadastro de vendedor
+  ProfilePhotoRequired: 'Selecione uma foto de perfil.',
 
   // Rate limit
   TooManyRequests: 'Muitas tentativas. Aguarde um momento.',

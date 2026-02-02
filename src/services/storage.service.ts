@@ -9,7 +9,8 @@ export const storageService = {
   },
 
   async getAuthToken(): Promise<string | null> {
-    return await AsyncStorage.getItem(STORAGE_KEYS.AUTH_TOKEN)
+    const token = await AsyncStorage.getItem(STORAGE_KEYS.AUTH_TOKEN)
+    return token
   },
 
   async removeAuthToken(): Promise<void> {

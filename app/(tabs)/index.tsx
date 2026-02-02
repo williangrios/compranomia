@@ -16,7 +16,7 @@ export default function Home() {
             color: colors.textPrimary,
           }}
         >
-          Bem-vindo ao Compranomia! 🛒
+          Bem-vindo ao Compranomia! 🛒sdf
         </Text>
         <Text
           style={{ fontSize: 16, color: colors.textSecondary, marginTop: 8 }}

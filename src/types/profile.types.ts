@@ -1,4 +1,5 @@
 // src/types/profile.types.ts
+
 export interface UpdateUserPersonalData {
   name: string
   doc: string
@@ -11,7 +12,6 @@ export interface UpdateUserBusinessData {
   nickName: string
   bio?: string
   category?: string
-  tags?: string[]
   iSpeakLanguages?: string[]
   location?: {
     coordinates: [number, number]
@@ -27,7 +27,8 @@ export interface SellerSettings {
   preparationTime: number
   cutoffTime: string
   exceptions: ScheduleException[]
-  isActive: boolean
+  sellerActive: boolean
+  adminActive: boolean
   createdAt: string
   updatedAt: string
 }
@@ -37,12 +38,14 @@ export interface DeliveryRange {
   maxKm: number
   fee: number
   freeAbove: number
+  averageDeliveryTime: number
 }
 
 export interface DaySchedule {
   dayOfWeek: number // 0 = Domingo, 6 = Sábado
   isOpen: boolean
   periods: TimePeriod[]
+  cutoffTime?: string // "HH:MM" — opcional, null/undefined se fechado
 }
 
 export interface TimePeriod {
@@ -60,6 +63,6 @@ export interface CreateSellerSettingsData {
   deliveryRanges: DeliveryRange[]
   schedule: DaySchedule[]
   preparationTime: number
-  cutoffTime: string
   exceptions?: ScheduleException[]
+  sellerActive?: boolean
 }

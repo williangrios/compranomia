@@ -4,7 +4,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { colors } from '@/theme'
 
 interface ProfileMenuItemProps {
-  icon: keyof typeof Ionicons.glyphMap
+  icon?: keyof typeof Ionicons.glyphMap // ← agora opcional
   title: string
   subtitle?: string
   onPress: () => void
@@ -34,25 +34,28 @@ export function ProfileMenuItem({
       onPress={onPress}
       activeOpacity={0.7}
     >
-      <View
-        style={{
-          width: 40,
-          height: 40,
-          borderRadius: 20,
-          backgroundColor: isDestructive
-            ? colors.error + '20'
-            : colors.primary + '20',
-          alignItems: 'center',
-          justifyContent: 'center',
-          marginRight: 12,
-        }}
-      >
-        <Ionicons
-          name={icon}
-          size={20}
-          color={isDestructive ? colors.error : colors.primary}
-        />
-      </View>
+      {/* Icone — só renderiza se fornecido */}
+      {icon && (
+        <View
+          style={{
+            width: 40,
+            height: 40,
+            borderRadius: 20,
+            backgroundColor: isDestructive
+              ? colors.error + '20'
+              : colors.primary + '20',
+            alignItems: 'center',
+            justifyContent: 'center',
+            marginRight: 12,
+          }}
+        >
+          <Ionicons
+            name={icon}
+            size={20}
+            color={isDestructive ? colors.error : colors.primary}
+          />
+        </View>
+      )}
 
       <View style={{ flex: 1 }}>
         <Text

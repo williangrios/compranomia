@@ -1,11 +1,10 @@
-// app/(tabs)/profile/index.tsx
-import { View, ScrollView, Text, Alert } from 'react-native'
+import { View, Text, Alert } from 'react-native'
 import { useRouter } from 'expo-router'
-import { Header } from '@/components/ui/Header'
 import { ProfileMenuItem } from '@/components/profile/ProfileMenuItem'
 import { useAuth } from '@/contexts/AuthContext'
 import { UserRole } from '@wrcb/cb-common'
 import { colors } from '@/theme'
+import { Screen } from '@/components/layout/Screen'
 
 export default function Profile() {
   const router = useRouter()
@@ -27,126 +26,105 @@ export default function Profile() {
   }
 
   return (
-    <View style={{ flex: 1, backgroundColor: colors.background }}>
-      <ScrollView>
-        {/* User Info */}
+    <Screen>
+      {/* User Info */}
+      <View
+        style={{
+          padding: 20,
+          backgroundColor: colors.surface,
+          borderBottomWidth: 1,
+          borderBottomColor: colors.border,
+          alignItems: 'center',
+          marginBottom: 20,
+        }}
+      >
         <View
           style={{
-            padding: 20,
-            backgroundColor: colors.surface,
-            borderBottomWidth: 1,
-            borderBottomColor: colors.border,
+            width: 80,
+            height: 80,
+            borderRadius: 40,
+            backgroundColor: colors.primary + '20',
             alignItems: 'center',
+            justifyContent: 'center',
+            marginBottom: 12,
           }}
         >
-          <View
-            style={{
-              width: 80,
-              height: 80,
-              borderRadius: 40,
-              backgroundColor: colors.primary + '20',
-              alignItems: 'center',
-              justifyContent: 'center',
-              marginBottom: 12,
-            }}
-          >
-            <Text style={{ fontSize: 32, color: colors.primary }}>
-              {user?.name?.charAt(0).toUpperCase() ||
-                user?.nickName?.charAt(0).toUpperCase() ||
-                '?'}
-            </Text>
-          </View>
+          <Text style={{ fontSize: 32, color: colors.primary }}>
+            {user?.name?.charAt(0).toUpperCase() ||
+              user?.nickName?.charAt(0).toUpperCase() ||
+              '?'}
+          </Text>
+        </View>
+
+        <Text
+          style={{
+            fontSize: 20,
+            fontWeight: 'bold',
+            color: colors.textPrimary,
+            marginBottom: 4,
+          }}
+        >
+          {user?.name || user?.nickName}
+        </Text>
+
+        <Text style={{ fontSize: 14, color: colors.textSecondary }}>
+          {user?.email}
+        </Text>
+
+        <View
+          style={{
+            marginTop: 8,
+            paddingHorizontal: 12,
+            paddingVertical: 4,
+            backgroundColor: colors.primary + '20',
+            borderRadius: 12,
+          }}
+        >
           <Text
             style={{
-              fontSize: 20,
-              fontWeight: 'bold',
-              color: colors.textPrimary,
-              marginBottom: 4,
+              fontSize: 12,
+              fontWeight: '600',
+              color: colors.primary,
             }}
           >
-            {user?.name || user?.nickName}
+            {isSeller ? 'Vendedor' : 'Cliente'}
           </Text>
-          <Text style={{ fontSize: 14, color: colors.textSecondary }}>
-            {user?.email}
-          </Text>
-          {isSeller && (
-            <View
-              style={{
-                marginTop: 8,
-                paddingHorizontal: 12,
-                paddingVertical: 4,
-                backgroundColor: colors.primary + '20',
-                borderRadius: 12,
-              }}
-            >
-              <Text
-                style={{
-                  fontSize: 12,
-                  fontWeight: '600',
-                  color: colors.primary,
-                }}
-              >
-                Vendedor
-              </Text>
-            </View>
-          )}
         </View>
+      </View>
 
-        {/* Menu Items */}
-        <View style={{ marginTop: 20 }}>
-          <ProfileMenuItem
-            icon="location"
-            title="Endereços"
-            subtitle="Gerenciar endereços de entrega"
-            onPress={() => router.push('/profile/addresses')}
-          />
+      {/* Menu Items */}
+      <ProfileMenuItem
+        icon="person"
+        title="Dados Pessoais"
+        subtitle="Nome, CPF, telefone"
+        onPress={() => router.push('/profile/personal-data')}
+        showBadge={!user?.isPersonalDataProvided}
+      />
 
-          <ProfileMenuItem
-            icon="person"
-            title="Dados Pessoais"
-            subtitle="Nome, CPF, telefone"
-            onPress={() => router.push('/profile/personal-data')}
-            showBadge={!user?.isPersonalDataProvided}
-          />
+      <ProfileMenuItem
+        icon="location"
+        title="Endereços"
+        subtitle="Gerenciar meus endereços de entrega"
+        onPress={() => router.push('/profile/addresses')}
+      />
 
-          <ProfileMenuItem
-            icon="lock-closed"
-            title="Alterar senha"
-            subtitle="Alterar sua senha de acesso"
-            onPress={() => router.push('/profile/update-password')}
-            showBadge={!user?.isPersonalDataProvided}
-          />
+      <ProfileMenuItem
+        icon="lock-closed"
+        title="Alterar senha"
+        subtitle="Alterar sua senha de acesso"
+        onPress={() => router.push('/profile/update-password')}
+        showBadge={!user?.isPersonalDataProvided}
+      />
 
-          {isSeller && (
-            <>
-              <ProfileMenuItem
-                icon="storefront"
-                title="Perfil do Negócio"
-                subtitle="Bio, categoria, localização"
-                onPress={() => router.push('/profile/business-profile')}
-                showBadge={!user?.isBusinessDataProvided}
-              />
-
-              <ProfileMenuItem
-                icon="settings"
-                title="Configurações do Vendedor"
-                subtitle="Horários, taxas de entrega"
-                onPress={() => router.push('/profile/seller-settings')}
-              />
-            </>
-          )}
-        </View>
-
-        {/* Logout */}
-        <View style={{ marginTop: 20, marginBottom: 40 }}>
-          <ProfileMenuItem
-            icon="log-out"
-            title="Sair"
-            onPress={handleLogout}
-            isDestructive
-          />
-        </View>
-      </ScrollView>
-    </View>
+      {/* Logout */}
+      <View>
+        <ProfileMenuItem
+          icon="log-out"
+          title="Sair"
+          onPress={handleLogout}
+          isDestructive
+        />
+      </View>
+    </Screen>
   )
 }

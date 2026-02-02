@@ -2,23 +2,19 @@
 import { View, Text, ScrollView } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { Header } from '@/components/ui/Header'
-import { useAuth } from '@/contexts/AuthContext'
-import { UserRole } from '@wrcb/cb-common'
 import { colors } from '@/theme'
+import { useAuth } from '@/contexts/AuthContext'
 
 export default function Orders() {
   const { user } = useAuth()
-  const isSeller = user?.role === UserRole.Seller
-
   return (
     <View style={{ flex: 1, backgroundColor: colors.background }}>
       <Header />
-
       <ScrollView contentContainerStyle={{ padding: 16 }}>
         {/* Empty State */}
         <View style={{ alignItems: 'center', paddingVertical: 60 }}>
           <Ionicons
-            name="receipt-outline"
+            name="cart-outline"
             size={64}
             color={colors.textSecondary}
           />
@@ -31,7 +27,7 @@ export default function Orders() {
               marginBottom: 8,
             }}
           >
-            {isSeller ? 'Nenhum pedido recebido' : 'Nenhum pedido realizado'}
+            Nenhuma compra realizada
           </Text>
           <Text
             style={{
@@ -41,9 +37,7 @@ export default function Orders() {
               paddingHorizontal: 40,
             }}
           >
-            {isSeller
-              ? 'Quando você receber pedidos, eles aparecerão aqui'
-              : 'Quando você fizer pedidos, eles aparecerão aqui'}
+            Quando você fizer pedidos, eles aparecerão aqui
           </Text>
         </View>
 
