@@ -1,0 +1,147 @@
+import { useEffect, useState } from 'react'
+import {
+  View,
+  Text,
+  ScrollView,
+  TouchableOpacity,
+  ActivityIndicator,
+  RefreshControl,
+} from 'react-native'
+import { useRouter } from 'expo-router'
+import { Ionicons } from '@expo/vector-icons'
+import { useSafeAreaInsets } from 'react-native-safe-area-context'
+import { ErrorMessage } from '@/components/ui/ErrorMessage'
+import { colors } from '@/theme'
+import { Screen } from '@/components/layout/Screen'
+import { SellerProduct } from '@/types/sellerProduct'
+import { sellerProductService } from '@/services/sellerProduct.service'
+import { SellerProductCard } from '@/components/product/SellerProductCard'
+
+interface ApiError {
+  message: string
+  field?: string
+}
+
+export default function Products() {
+  const router = useRouter()
+  const insets = useSafeAreaInsets()
+
+  const [products, setProducts] = useState<SellerProduct[]>([])
+  const [isLoading, setIsLoading] = useState(true)
+  const [isRefreshing, setIsRefreshing] = useState(false)
+  const [apiErrors, setApiErrors] = useState<ApiError[] | null>(null)
+
+  useEffect(() => {
+    loadProducts()
+  }, [])
+
+  async function loadProducts() {
+    try {
+      setIsLoading(true)
+      setApiErrors(null)
+
+      const response = await sellerProductService.list()
+
+      setProducts(
+        Array.isArray(response?.sellerProducts) ? response.sellerProducts : [],
+      )
+    } catch (error: unknown) {
+      console.error('Error loading products:', error)
+      setProducts([])
+
+      if (error instanceof Error) {
+        setApiErrors([{ message: error.message }])
+      } else {
+        setApiErrors([{ message: 'GenericError' }])
+      }
+    } finally {
+      setIsLoading(false)
+      setIsRefreshing(false)
+    }
+  }
+
+  if (isLoading) {
+    return (
+      <View
+        style={{
+          flex: 1,
+          backgroundColor: colors.background,
+          alignItems: 'center',
+          justifyContent: 'center',
+        }}
+      >
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    )
+  }
+
+  return (
+    <View style={{ flex: 1, backgroundColor: colors.background }}>
+      <ScrollView
+        contentContainerStyle={{ padding: 16, paddingBottom: 120 }}
+        refreshControl={
+          <RefreshControl
+            refreshing={isRefreshing}
+            onRefresh={() => {
+              setIsRefreshing(true)
+              loadProducts()
+            }}
+          />
+        }
+      >
+        <ErrorMessage errors={apiErrors} />
+
+        {products.length === 0 ? (
+          <View style={{ alignItems: 'center', paddingVertical: 40 }}>
+            <Ionicons
+              name="cube-outline"
+              size={64}
+              color={colors.textSecondary}
+            />
+            <Text
+              style={{
+                fontSize: 16,
+                color: colors.textSecondary,
+                marginTop: 16,
+                textAlign: 'center',
+              }}
+            >
+              Nenhum produto cadastradosdf
+            </Text>
+          </View>
+        ) : (
+          products.map((product) => (
+            <SellerProductCard
+              key={product.id}
+              product={product}
+              onEdit={() =>
+                router.push(`/dashboard/products/edit/${product.id}`)
+              }
+              onToggleActive={() => {}}
+            />
+          ))
+        )}
+      </ScrollView>
+
+      {/* FAB */}
+      <TouchableOpacity
+        onPress={() => router.push('/dashboard/products/add')}
+        activeOpacity={0.85}
+        style={{
+          position: 'absolute',
+          right: 20,
+          bottom: insets.bottom + 80,
+          width: 56,
+          height: 56,
+          borderRadius: 28,
+          backgroundColor: colors.primary,
+          alignItems: 'center',
+          justifyContent: 'center',
+          elevation: 6,
+        }}
+      >
+        <Ionicons name="add" size={28} color={colors.textInverse} />
+      </TouchableOpacity>
+    </View>
+  )
+}
