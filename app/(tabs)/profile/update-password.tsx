@@ -12,11 +12,8 @@ import { SuccessMessage } from '@/components/ui/SuccessMessage'
 import { colors, components } from '@/theme'
 import { Screen } from '@/components/layout/Screen'
 import { useAuth } from '@/contexts/AuthContext'
-
-interface ApiError {
-  message: string
-  field?: string
-}
+import { ApiError } from '@/types'
+import { getApiErrors } from '@/utils/getApiErrors'
 
 interface FormErrors {
   password?: string
@@ -72,7 +69,7 @@ export default function UpdatePassword() {
 
       setSuccess({ message: 'Senha atualizada com sucesso' })
     } catch (error: any) {
-      setApiErrors(error.errors)
+      setApiErrors(getApiErrors(error))
     } finally {
       setIsLoading(false)
     }

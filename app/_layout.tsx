@@ -1,9 +1,10 @@
 // app/_layout.tsx
-import 'react-native-gesture-handler' // 👈 Só isso já basta
+import 'react-native-gesture-handler'
 import { Stack } from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
 import { useEffect } from 'react'
 import { AuthProvider } from '@/contexts/AuthContext'
+import { AddressProvider } from '@/contexts/AddressContext' // ← ADICIONA
 import { StatusBar } from 'expo-status-bar'
 import { NotificationProvider } from '@/contexts/NotificationContext'
 
@@ -20,14 +21,16 @@ export default function RootLayout() {
 
   return (
     <AuthProvider>
-      <NotificationProvider>
-        <StatusBar style="auto" />
-        <Stack screenOptions={{ headerShown: false }}>
-          <Stack.Screen name="index" />
-          <Stack.Screen name="(auth)" />
-          <Stack.Screen name="(tabs)" />
-        </Stack>
-      </NotificationProvider>
+      <AddressProvider>
+        <NotificationProvider>
+          <StatusBar style="auto" />
+          <Stack screenOptions={{ headerShown: false }}>
+            <Stack.Screen name="index" />
+            <Stack.Screen name="(auth)" />
+            <Stack.Screen name="(tabs)" />
+          </Stack>
+        </NotificationProvider>
+      </AddressProvider>
     </AuthProvider>
   )
 }

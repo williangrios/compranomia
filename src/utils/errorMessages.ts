@@ -17,6 +17,7 @@ export const errorMessages: Record<string, string> = {
     'A confirmação de senha deve ter entre 6 e 30 caracteres.',
   InvalidCredentials: 'Email ou senha incorretos.',
   UserNotFound: 'Usuário não encontrado.',
+  NotFoundEmail: 'Email não encontrado.',
   BlockedUser: 'Usuário bloqueado. Entre em contato com o suporte.',
   TooManyLogin: 'Muitas tentativas de login, tente novamente em 3 minutos.',
   CurrentPasswordWrong: 'Senha atual incorreta;',

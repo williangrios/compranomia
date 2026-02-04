@@ -18,6 +18,7 @@ import { validators } from '@/utils/validators'
 import { Tenant } from '@wrcb/cb-common'
 import { ErrorMessage } from '@/components/ui/ErrorMessage'
 import api from '@/services/api'
+import { getApiErrors } from '@/utils/getApiErrors'
 
 interface ApiError {
   message: string
@@ -68,20 +69,7 @@ export default function ForgotPassword() {
         },
       ])
     } catch (error: any) {
-      console.error('❌ handleSubmit - Erro capturado:', error)
-      console.error('❌ handleSubmit - error.response:', error.response)
-
-      // Capturar erros da API
-      if (
-        error.response?.data?.errors &&
-        Array.isArray(error.response.data.errors)
-      ) {
-        console.log('✅ Setando apiErrors:', error.response.data.errors)
-        setApiErrors(error.response.data.errors)
-      } else {
-        console.log('❌ Erro sem estrutura correta, usando GenericError')
-        setApiErrors([{ message: 'GenericError' }])
-      }
+      setApiErrors(getApiErrors(error))
     } finally {
       setIsLoading(false)
     }

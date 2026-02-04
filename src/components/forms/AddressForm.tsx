@@ -1,4 +1,4 @@
-// app/(tabs)/dashboard/business-address.tsx
+// components/forms/AddressForm.tsx
 import { useState, useEffect } from 'react'
 import {
   View,
@@ -9,12 +9,12 @@ import {
 } from 'react-native'
 import { ErrorMessage } from '@/components/ui/ErrorMessage'
 import { SuccessMessage } from '@/components/ui/SuccessMessage'
-import { LocationPickerModal } from '@/components/modals/LocationPickerModal'
-import { profileService } from '@/services/profile.service'
-import { useAuth } from '@/contexts/AuthContext'
+import { deliveryAddressService } from '@/services/deliveryAddress.service'
+import { AddressType } from '@/types'
 import { colors, components } from '@/theme'
 import { formatters } from '@/utils/formatters'
-import { Screen } from '@/components/layout/Screen'
+import { validators } from '@/utils/validators'
+import { Tenant } from '@wrcb/cb-common'
 import { useAddressSearch } from '@/hooks/useAddressSearch'
 import { useGeocode } from '@/hooks/useGeocode'
 import { getApiErrors } from '@/utils/getApiErrors'
@@ -25,21 +25,28 @@ interface ApiError {
 }
 
 interface FormErrors {
-  postalCode?: string
+  cep?: string
   street?: string
   number?: string
   neighborhood?: string
-  city?: string
-  state?: string
-  country?: string
 }
 
-export default function BusinessAddress() {
-  const { user, updateUser } = useAuth()
-  const { searchByCEP, isLoading: isLoadingCEP } = useAddressSearch()
-  const { geocode } = useGeocode()
+interface AddressFormProps {
+  addressId?: string
+  isDefault?: boolean
+  onSuccess?: () => void
+  submitButtonText?: string
+}
 
-  const [postalCode, setPostalCode] = useState('')
+export function AddressForm({
+  addressId,
+  isDefault = false,
+  onSuccess,
+  submitButtonText,
+}: AddressFormProps) {
+  const isEditMode = !!addressId
+
+  const [cep, setCep] = useState('')
   const [street, setStreet] = useState('')
   const [number, setNumber] = useState('')
   const [complement, setComplement] = useState('')
@@ -47,50 +54,75 @@ export default function BusinessAddress() {
   const [city, setCity] = useState('')
   const [state, setState] = useState('')
   const [country, setCountry] = useState('Brasil')
-  const [isLoading, setIsLoading] = useState(false)
+  const [reference, setReference] = useState('')
+  const [label, setLabel] = useState<AddressType>(AddressType.Casa)
 
   // ✅ NOVO: Estado para coordenadas
   const [coordinates, setCoordinates] = useState<[number, number] | null>(null)
   const [showLocationPicker, setShowLocationPicker] = useState(false)
 
+  const { searchByCEP, isLoading: isLoadingCEP } = useAddressSearch()
+  const { geocode } = useGeocode()
+
+  const [isFetching, setIsFetching] = useState(false)
+  const [isLoading, setIsLoading] = useState(false)
   const [apiErrors, setApiErrors] = useState<ApiError[] | null>(null)
   const [success, setSuccess] = useState<{ message: string } | null>(null)
   const [errors, setErrors] = useState<FormErrors>({})
 
   useEffect(() => {
-    if (user) {
-      setPostalCode(user.postalCode ? formatters.cep(user.postalCode) : '')
-      setStreet(user.street || '')
-      setNumber(user.number || '')
-      setComplement(user.complement || '')
-      setNeighborhood(user.neighborhood || '')
-      setCity(user.city || '')
-      setState(user.state || '')
-      setCountry(user.country || 'Brasil')
-
-      // ✅ NOVO: Carrega coordenadas existentes
-      if (user.location?.coordinates) {
-        setCoordinates(user.location.coordinates as [number, number])
-      }
+    if (isEditMode && addressId) {
+      loadAddress()
     }
-  }, [user])
+  }, [addressId])
+
+  async function loadAddress() {
+    if (!addressId) return
+
+    try {
+      setIsFetching(true)
+      const { deliveryAddress } =
+        await deliveryAddressService.getById(addressId)
+
+      setCep(formatters.cep(deliveryAddress.cep))
+      setStreet(deliveryAddress.street)
+      setNumber(deliveryAddress.number)
+      setComplement(deliveryAddress.complement || '')
+      setNeighborhood(deliveryAddress.neighborhood)
+      setCity(deliveryAddress.city)
+      setState(deliveryAddress.state)
+      setReference(deliveryAddress.reference || '')
+      setLabel(deliveryAddress.label)
+
+      // ✅ NOVO: Carrega coordenadas se existirem
+      // Nota: DeliveryAddress não tem location no schema atual
+      // Se adicionar no futuro, descomentar:
+      // if (deliveryAddress.location?.coordinates) {
+      //   setCoordinates(deliveryAddress.location.coordinates as [number, number])
+      // }
+    } catch (error: unknown) {
+      setApiErrors(getApiErrors(error))
+    } finally {
+      setIsFetching(false)
+    }
+  }
 
   // ✅ NOVO: Geocodifica após buscar CEP
-  async function handleCEPSearch(cepValue: string) {
-    const result = await searchByCEP(cepValue)
+  async function handleCEPSearch(value: string) {
+    const result = await searchByCEP(value)
 
     if (result) {
       setStreet(result.street)
       setNeighborhood(result.neighborhood)
       setCity(result.city)
       setState(result.state)
-      setErrors((prev) => ({ ...prev, postalCode: undefined }))
+      setErrors((prev) => ({ ...prev, cep: undefined }))
 
       // ✅ Tenta geocodificar em background (silencioso)
       tryGeocode(
-        formatters.cleanCEP(cepValue),
+        formatters.cleanCEP(value),
         result.street,
-        number || '0',
+        '', // número ainda não foi preenchido
         result.city,
         result.state,
       )
@@ -98,7 +130,7 @@ export default function BusinessAddress() {
       setCity('')
       setState('')
       setCoordinates(null)
-      setErrors((prev) => ({ ...prev, postalCode: 'CEP não encontrado' }))
+      setErrors((prev) => ({ ...prev, cep: 'CEP não encontrado' }))
     }
   }
 
@@ -113,7 +145,7 @@ export default function BusinessAddress() {
     const coords = await geocode({
       cep: cepValue,
       street: streetValue,
-      number: numberValue,
+      number: numberValue || '0',
       city: cityValue,
       state: stateValue,
     })
@@ -128,10 +160,10 @@ export default function BusinessAddress() {
 
   // ✅ NOVO: Tenta geocodificar novamente quando número é preenchido
   useEffect(() => {
-    if (postalCode && street && number && city && state && !coordinates) {
-      tryGeocode(formatters.cleanCEP(postalCode), street, number, city, state)
+    if (cep && street && number && city && state && !coordinates) {
+      tryGeocode(formatters.cleanCEP(cep), street, number, city, state)
     }
-  }, [number])
+  }, [number]) // Roda quando número muda
 
   async function handleSubmit() {
     try {
@@ -139,38 +171,14 @@ export default function BusinessAddress() {
       setApiErrors(null)
       setSuccess(null)
 
+      // Validações
       const newErrors: FormErrors = {}
-
-      if (!postalCode.trim()) {
-        newErrors.postalCode = 'CEP é obrigatório'
-      }
-
-      if (!street.trim()) {
-        newErrors.street = 'Rua é obrigatória'
-      }
-
-      if (!number.trim()) {
-        newErrors.number = 'Número é obrigatório'
-      }
-
-      if (!neighborhood.trim()) {
-        newErrors.neighborhood = 'Bairro é obrigatório'
-      }
-
-      if (!city.trim()) {
-        newErrors.city = 'Cidade é obrigatória'
-      }
-
-      if (!state.trim()) {
-        newErrors.state = 'Estado é obrigatório'
-      }
-
-      if (!country.trim()) {
-        newErrors.country = 'País é obrigatório'
-      }
-
-      if (!coordinates) newErrors.postalCode = 'CEP não encontrado'
-      if (errors.postalCode) {
+      if (!validators.cep(cep)) newErrors.cep = 'CEP inválido'
+      if (!street) newErrors.street = 'Rua é obrigatória'
+      if (!number) newErrors.number = 'Número é obrigatório'
+      if (!neighborhood) newErrors.neighborhood = 'Bairro é obrigatório'
+      if (!coordinates) newErrors.cep = 'CEP não encontrado'
+      if (errors.cep) {
         return
       }
 
@@ -180,10 +188,6 @@ export default function BusinessAddress() {
       }
 
       // ✅ NOVO: Se não tem coordenadas, abre modal
-      if (!coordinates) {
-        setShowLocationPicker(true)
-        return
-      }
 
       // Prossegue com salvamento
       await saveAddress()
@@ -192,31 +196,44 @@ export default function BusinessAddress() {
     }
   }
 
-  // ✅ NOVO: Função separada para salvar
+  // ✅ NOVO: Função separada para salvar (reutilizada após modal)
   async function saveAddress() {
     try {
       setIsLoading(true)
 
-      const response = await profileService.updateAddress({
-        postalCode: formatters.cleanCEP(postalCode),
-        street: street.trim(),
-        number: number.trim(),
-        complement: complement.trim(),
-        neighborhood: neighborhood.trim(),
-        city: city.trim(),
-        state: state.trim(),
-        country: country.trim(),
+      const addressData = {
+        label,
+        cep: formatters.cleanCEP(cep),
+        street,
+        number,
+        complement,
+        neighborhood,
+        city,
+        state,
+        reference,
         // ✅ NOVO: Adiciona coordenadas
         ...(coordinates && {
           location: { coordinates },
         }),
-      })
+      }
 
-      updateUser(response.user)
+      if (isEditMode && addressId) {
+        await deliveryAddressService.update(addressId, addressData)
+        setSuccess({ message: 'Endereço atualizado com sucesso' })
+      } else {
+        await deliveryAddressService.create({
+          ...addressData,
+          isDefault,
+          tenant: Tenant.Compranomia,
+        })
+        setSuccess({ message: 'Endereço cadastrado com sucesso' })
+      }
 
-      setSuccess({
-        message: 'Endereço atualizado com sucesso',
-      })
+      if (onSuccess) {
+        setTimeout(() => {
+          onSuccess()
+        }, 1500)
+      }
     } catch (error: any) {
       setApiErrors(getApiErrors(error))
     } finally {
@@ -224,22 +241,44 @@ export default function BusinessAddress() {
     }
   }
 
-  return (
-    <Screen>
-      <View
-        style={{
-          backgroundColor: colors.primary + '10',
-          padding: 16,
-          borderRadius: 12,
-          marginBottom: 24,
-        }}
-      >
-        <Text style={{ color: colors.textPrimary, fontSize: 14 }}>
-          📍 Informe o endereço da sua loja para que os clientes possam
-          encontrar você facilmente.
-        </Text>
-      </View>
+  // ✅ NOVO: Callback do modal
+  function handleLocationConfirm(
+    coords: [number, number],
+    address?: { city: string; state: string },
+  ) {
+    setCoordinates(coords)
 
+    // ✅ NOVO: Atualiza cidade e estado se vier do reverse geocoding
+    if (address) {
+      setCity(address.city)
+      setState(address.state)
+      console.log('✅ Cidade/Estado atualizados:', address)
+    }
+
+    setShowLocationPicker(false)
+
+    // Salva automaticamente após confirmar localização
+    setTimeout(() => {
+      saveAddress()
+    }, 100)
+  }
+
+  const addressLabels = [
+    AddressType.Casa,
+    AddressType.Trabalho,
+    AddressType.Outro,
+  ]
+
+  if (isFetching) {
+    return (
+      <View style={{ padding: 40, alignItems: 'center' }}>
+        <ActivityIndicator size="large" color={colors.primary} />
+      </View>
+    )
+  }
+
+  return (
+    <>
       {/* CEP */}
       <View style={{ marginBottom: 16 }}>
         <Text style={components.input.label}>CEP *</Text>
@@ -248,13 +287,13 @@ export default function BusinessAddress() {
             style={[
               components.input.container,
               components.input.text,
-              errors.postalCode && components.input.error,
+              errors.cep && components.input.error,
             ]}
-            value={postalCode}
+            value={cep}
             onChangeText={(text) => {
               const formatted = formatters.cep(text)
-              setPostalCode(formatted)
-              setErrors((prev) => ({ ...prev, postalCode: undefined }))
+              setCep(formatted)
+              setErrors((prev) => ({ ...prev, cep: undefined }))
               setApiErrors(null)
               setSuccess(null)
 
@@ -273,8 +312,8 @@ export default function BusinessAddress() {
             />
           )}
         </View>
-        {errors.postalCode && (
-          <Text style={components.auth.errorText}>{errors.postalCode}</Text>
+        {errors.cep && (
+          <Text style={components.auth.errorText}>{errors.cep}</Text>
         )}
       </View>
 
@@ -296,6 +335,7 @@ export default function BusinessAddress() {
           }}
           placeholder="Nome da rua"
           autoCapitalize="words"
+          editable={true}
         />
         <Text
           style={{ fontSize: 12, color: colors.textSecondary, marginTop: 4 }}
@@ -323,7 +363,7 @@ export default function BusinessAddress() {
             setApiErrors(null)
             setSuccess(null)
           }}
-          placeholder="Número"
+          placeholder="123"
           keyboardType="number-pad"
         />
         {errors.number && (
@@ -337,12 +377,8 @@ export default function BusinessAddress() {
         <TextInput
           style={[components.input.container, components.input.text]}
           value={complement}
-          onChangeText={(text) => {
-            setComplement(text)
-            setApiErrors(null)
-            setSuccess(null)
-          }}
-          placeholder="Apto, bloco, etc."
+          onChangeText={setComplement}
+          placeholder="Apto, bloco, etc"
           autoCapitalize="words"
         />
       </View>
@@ -363,7 +399,7 @@ export default function BusinessAddress() {
             setApiErrors(null)
             setSuccess(null)
           }}
-          placeholder="Bairro"
+          placeholder="Seu bairro"
           autoCapitalize="words"
         />
         <Text
@@ -376,6 +412,57 @@ export default function BusinessAddress() {
         )}
       </View>
 
+      {/* Referência */}
+      <View style={{ marginBottom: 16 }}>
+        <Text style={components.input.label}>Referência (opcional)</Text>
+        <TextInput
+          style={[components.input.container, components.input.text]}
+          value={reference}
+          onChangeText={setReference}
+          placeholder="Próximo ao mercado..."
+          maxLength={200}
+        />
+      </View>
+
+      {/* Tipo */}
+      <View style={{ marginBottom: 16 }}>
+        <Text style={components.input.label}>Este endereço é</Text>
+        <View style={{ flexDirection: 'row', gap: 8, flexWrap: 'wrap' }}>
+          {addressLabels.map((option) => (
+            <TouchableOpacity
+              key={option}
+              style={[
+                components.auth.buttonSecondary,
+                {
+                  flex: 1,
+                  minWidth: 100,
+                  backgroundColor:
+                    label === option ? colors.primary : colors.background,
+                  borderColor:
+                    label === option ? colors.primary : colors.border,
+                },
+              ]}
+              onPress={() => setLabel(option)}
+              activeOpacity={0.85}
+            >
+              <Text
+                style={[
+                  components.auth.buttonTextSecondary,
+                  {
+                    color:
+                      label === option
+                        ? colors.textInverse
+                        : colors.textPrimary,
+                  },
+                ]}
+              >
+                {option}
+              </Text>
+            </TouchableOpacity>
+          ))}
+        </View>
+      </View>
+
       {/* Cidade */}
       <View style={{ marginBottom: 16 }}>
         <Text style={components.input.label}>Cidade *</Text>
@@ -383,7 +470,6 @@ export default function BusinessAddress() {
           style={[
             components.input.container,
             components.input.text,
-            errors.city && components.input.error,
             { backgroundColor: colors.disabled },
           ]}
           value={city}
@@ -394,9 +480,6 @@ export default function BusinessAddress() {
         >
           Preenchido automaticamente pelo CEP
         </Text>
-        {errors.city && (
-          <Text style={components.auth.errorText}>{errors.city}</Text>
-        )}
       </View>
 
       {/* Estado */}
@@ -406,7 +489,6 @@ export default function BusinessAddress() {
           style={[
             components.input.container,
             components.input.text,
-            errors.state && components.input.error,
             { backgroundColor: colors.disabled },
           ]}
           value={state}
@@ -417,26 +499,27 @@ export default function BusinessAddress() {
         >
           Preenchido automaticamente pelo CEP
         </Text>
-        {errors.state && (
-          <Text style={components.auth.errorText}>{errors.state}</Text>
-        )}
       </View>
 
       <SuccessMessage success={success} />
       <ErrorMessage errors={apiErrors} />
 
+      {/* Botão Submit */}
       <TouchableOpacity
         style={components.auth.buttonPrimary}
         onPress={handleSubmit}
         disabled={isLoading}
-        activeOpacity={0.8}
+        activeOpacity={0.85}
       >
         {isLoading ? (
           <ActivityIndicator color={colors.textInverse} />
         ) : (
-          <Text style={components.auth.buttonText}>Salvar Endereço</Text>
+          <Text style={components.auth.buttonText}>
+            {submitButtonText ||
+              (isEditMode ? 'Salvar Alterações' : 'Salvar Endereço')}
+          </Text>
         )}
       </TouchableOpacity>
-    </Screen>
+    </>
   )
 }

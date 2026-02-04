@@ -1,4 +1,3 @@
-// src/components/profile/AddressCard.tsx
 import { View, Text, TouchableOpacity, Alert } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { DeliveryAddress } from '@/types'
@@ -64,6 +63,7 @@ export function AddressCard({
           >
             {address.label}
           </Text>
+
           {address.isDefault && (
             <View
               style={{
@@ -89,10 +89,25 @@ export function AddressCard({
 
         {/* Actions */}
         <View style={{ flexDirection: 'row', gap: 12 }}>
-          <TouchableOpacity onPress={onEdit}>
+          <TouchableOpacity
+            onPress={onEdit}
+            activeOpacity={0.7}
+            style={{
+              padding: 8,
+              borderRadius: 20,
+            }}
+          >
             <Ionicons name="pencil" size={20} color={colors.primary} />
           </TouchableOpacity>
-          <TouchableOpacity onPress={handleDelete}>
+
+          <TouchableOpacity
+            onPress={handleDelete}
+            activeOpacity={0.7}
+            style={{
+              padding: 8,
+              borderRadius: 20,
+            }}
+          >
             <Ionicons name="trash" size={20} color={colors.error} />
           </TouchableOpacity>
         </View>
@@ -109,9 +124,11 @@ export function AddressCard({
         {address.street}, {address.number}
         {address.complement && ` - ${address.complement}`}
       </Text>
+
       <Text style={{ fontSize: 14, color: colors.textSecondary }}>
         {address.neighborhood} - {address.city}/{address.state}
       </Text>
+
       <Text style={{ fontSize: 14, color: colors.textSecondary }}>
         CEP: {address.cep}
       </Text>
@@ -134,19 +151,33 @@ export function AddressCard({
         <TouchableOpacity
           style={{
             marginTop: 12,
-            paddingVertical: 8,
-            paddingHorizontal: 12,
-            backgroundColor: colors.primary + '10',
+            paddingVertical: 10,
+            paddingHorizontal: 16,
+            backgroundColor: colors.primary,
             borderRadius: 8,
-            alignSelf: 'flex-start',
+            alignItems: 'center',
+            flexDirection: 'row',
+            justifyContent: 'center',
+            gap: 6,
+            shadowColor: colors.primary,
+            shadowOffset: { width: 0, height: 2 },
+            shadowOpacity: 0.2,
+            shadowRadius: 4,
+            elevation: 3,
           }}
           onPress={onSetDefault}
+          activeOpacity={0.8}
         >
+          <Ionicons
+            name="checkmark-circle"
+            size={16}
+            color={colors.textInverse}
+          />
           <Text
             style={{
-              fontSize: 12,
+              fontSize: 14,
               fontWeight: '600',
-              color: colors.primary,
+              color: colors.textInverse,
             }}
           >
             Definir como padrão

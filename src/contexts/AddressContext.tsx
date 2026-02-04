@@ -1,17 +1,21 @@
+// src/contexts/AddressContext.tsx
 import React, { createContext, useContext, useEffect, useState } from 'react'
 import { storageService } from '@/services/storage.service'
-import api from '@/services/api'
+import { deliveryAddressService } from '@/services/deliveryAddress.service'
 
 export interface DeliveryAddress {
   id: string
   label: string
   street: string
   number: string
+  complement?: string
   neighborhood: string
   city: string
   state: string
   cep: string
+  reference?: string
   isDefault: boolean
+  isActive: boolean
 }
 
 interface AddressContextData {
@@ -35,14 +39,33 @@ export function AddressProvider({ children }: { children: React.ReactNode }) {
   }, [])
 
   async function loadFromStorage() {
-    const stored = await storageService.getSelectedAddress()
-    if (stored) setAddressState(stored)
-    setIsLoading(false)
+    try {
+      const stored = await storageService.getSelectedAddress()
+      if (stored) {
+        setAddressState(stored)
+      }
+    } catch (error) {
+      console.error('Error loading address from storage:', error)
+    } finally {
+      setIsLoading(false)
+    }
   }
 
   async function setAddress(address: DeliveryAddress) {
-    setAddressState(address)
-    await storageService.saveSelectedAddress(address)
+    try {
+      // 1. Marca como padrão no backend
+      await deliveryAddressService.setDefault(address.id)
+
+      // 2. Atualiza localmente
+      const updatedAddress = { ...address, isDefault: true }
+      setAddressState(updatedAddress)
+
+      // 3. Salva no AsyncStorage
+      await storageService.saveSelectedAddress(updatedAddress)
+    } catch (error) {
+      console.error('Error setting default address:', error)
+      throw error // Propaga erro para o componente tratar
+    }
   }
 
   async function clearAddress() {
@@ -51,16 +74,24 @@ export function AddressProvider({ children }: { children: React.ReactNode }) {
   }
 
   async function refreshAddressFromApi() {
-    const response = await api.get('/api/business/compranomia/delivery-address')
+    try {
+      const response = await deliveryAddressService.list()
 
-    if (response.data.status === 'success') {
-      const defaultAddress = response.data.data.addresses.find(
+      // Busca o endereço padrão na lista
+      const defaultAddress = response.deliveryAddresses.find(
         (a: DeliveryAddress) => a.isDefault,
       )
 
       if (defaultAddress) {
-        await setAddress(defaultAddress)
+        // Atualiza local sem chamar backend novamente
+        setAddressState(defaultAddress)
+        await storageService.saveSelectedAddress(defaultAddress)
+      } else {
+        // Se não tem padrão, limpa
+        await clearAddress()
       }
+    } catch (error) {
+      console.error('Error refreshing address from API:', error)
     }
   }
 
@@ -80,5 +111,11 @@ export function AddressProvider({ children }: { children: React.ReactNode }) {
 }
 
 export function useAddress() {
-  return useContext(AddressContext)
+  const context = useContext(AddressContext)
+
+  if (!context) {
+    throw new Error('useAddress must be used within AddressProvider')
+  }
+
+  return context
 }

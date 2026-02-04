@@ -13,7 +13,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { colors, components } from '@/theme'
 import { formatters } from '@/utils/formatters'
 import { Screen } from '@/components/layout/Screen'
-import { formatApiError } from '@/utils/errorHandler'
+import { getApiErrors } from '@/utils/getApiErrors'
 
 interface ApiError {
   message: string
@@ -35,7 +35,6 @@ export default function PersonalData() {
   const [whatsapp, setWhatsapp] = useState('')
   const [phoneNumber, setPhoneNumber] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-
   const [apiErrors, setApiErrors] = useState<ApiError[] | null>(null)
   const [success, setSuccess] = useState<{ message: string } | null>(null)
   const [errors, setErrors] = useState<FormErrors>({})
@@ -67,6 +66,10 @@ export default function PersonalData() {
         newErrors.doc = 'CPF é obrigatório'
       }
 
+      if (!birthDate.trim()) {
+        newErrors.doc = 'Data de nascimento é obrigatória'
+      }
+
       if (Object.keys(newErrors).length > 0) {
         setErrors(newErrors)
         return
@@ -86,10 +89,7 @@ export default function PersonalData() {
         message: 'Dados atualizados com sucesso',
       })
     } catch (error: any) {
-      console.error('❌ PersonalData error:', error)
-
-      const formatted = formatApiError(error)
-      setApiErrors(formatted.errors)
+      setApiErrors(getApiErrors(error))
     } finally {
       setIsLoading(false)
     }
@@ -148,9 +148,7 @@ export default function PersonalData() {
 
       {/* Data de nascimento */}
       <View style={{ marginBottom: 16 }}>
-        <Text style={components.input.label}>
-          Data de Nascimento (opcional)
-        </Text>
+        <Text style={components.input.label}>Data de Nascimento</Text>
         <TextInput
           style={[components.input.container, components.input.text]}
           value={birthDate}

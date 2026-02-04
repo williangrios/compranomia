@@ -16,6 +16,7 @@ import { ErrorMessage } from '@/components/ui/ErrorMessage'
 import { SuccessMessage } from '@/components/ui/SuccessMessage'
 import { sellerSettingsService } from '@/services/sellerSettings.service'
 import { colors, components } from '@/theme'
+import { getApiErrors } from '@/utils/getApiErrors'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -430,8 +431,7 @@ export default function SellerSettings() {
 
       setSuccess({ message: 'Configurações salvas com sucesso' })
     } catch (error: any) {
-      const msg = error.message || 'Erro ao salvar configurações'
-      setApiErrors([{ message: msg }])
+      setApiErrors(getApiErrors(error))
     } finally {
       setIsLoading(false)
     }

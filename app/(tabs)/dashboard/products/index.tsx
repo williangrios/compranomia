@@ -16,6 +16,7 @@ import { Screen } from '@/components/layout/Screen'
 import { SellerProduct } from '@/types/sellerProduct'
 import { sellerProductService } from '@/services/sellerProduct.service'
 import { SellerProductCard } from '@/components/product/SellerProductCard'
+import { getApiErrors } from '@/utils/getApiErrors'
 
 interface ApiError {
   message: string
@@ -46,14 +47,8 @@ export default function Products() {
         Array.isArray(response?.sellerProducts) ? response.sellerProducts : [],
       )
     } catch (error: unknown) {
-      console.error('Error loading products:', error)
       setProducts([])
-
-      if (error instanceof Error) {
-        setApiErrors([{ message: error.message }])
-      } else {
-        setApiErrors([{ message: 'GenericError' }])
-      }
+      setApiErrors(getApiErrors(error))
     } finally {
       setIsLoading(false)
       setIsRefreshing(false)

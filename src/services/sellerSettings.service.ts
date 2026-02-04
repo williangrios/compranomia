@@ -12,6 +12,7 @@ export const sellerSettingsService = {
     if (response.data.status === 'success') {
       return { sellerSettings: response.data.data.sellerSettings }
     }
+    console.log('-----------------', response.data.message)
     throw new Error(response.data.message || 'GetSellerSettingsFailed')
   },
 

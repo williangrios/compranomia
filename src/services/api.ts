@@ -1,8 +1,7 @@
 import axios from 'axios'
 import { API_URL } from '@/utils/constants'
 import { storageService } from './storage.service'
-
-console.log('[API] Base URL:', API_URL)
+import { translateError } from '@/utils/errorMessages'
 
 const api = axios.create({
   baseURL: API_URL,
@@ -43,19 +42,17 @@ api.interceptors.request.use(
 )
 
 api.interceptors.response.use(
-  (response) => {
-    return response
-  },
-  async (error) => {
-    if (error.response) {
-      console.error('← Status:', error.response.status)
-      console.error('← Data:', error.response.data)
-    } else {
-      console.error('← Network / Axios error:', error.message)
-    }
+  (response) => response,
+  (error) => {
+    const data = error?.response?.data
 
-    if (error.response?.status === 401) {
-      await storageService.clearAuth()
+    if (data?.errors && Array.isArray(data.errors)) {
+      error.normalizedErrors = data.errors.map((err: any) => ({
+        field: err.field,
+        message: translateError(err.message),
+      }))
+    } else {
+      error.normalizedErrors = [{ message: translateError('GenericError') }]
     }
 
     return Promise.reject(error)

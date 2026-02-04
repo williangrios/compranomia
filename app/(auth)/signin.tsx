@@ -16,6 +16,7 @@ import { colors, components } from '@/theme'
 import { validators } from '@/utils/validators'
 import { useAuth } from '@/contexts/AuthContext'
 import { ErrorMessage } from '@/components/ui/ErrorMessage'
+import { getApiErrors } from '@/utils/getApiErrors'
 
 interface ApiError {
   message: string
@@ -60,25 +61,9 @@ export default function SignIn() {
         setErrors(newErrors)
         return
       }
-
-      console.log('📤 handleSignIn - Chamando signIn do AuthContext')
-
       await signIn(email.toLowerCase().trim(), password)
-
-      console.log('✅ handleSignIn - Login sucesso')
-      // AuthContext vai redirecionar automaticamente
     } catch (error: any) {
-      console.error('❌ handleSignIn - Erro capturado:', error)
-      console.error('❌ handleSignIn - error.errors:', error.errors)
-
-      // Capturar erros da API (já formatados pelo AuthContext)
-      if (error.errors && Array.isArray(error.errors)) {
-        console.log('✅ Setando apiErrors:', error.errors)
-        setApiErrors(error.errors)
-      } else {
-        console.log('❌ Erro sem estrutura correta, usando GenericError')
-        setApiErrors([{ message: 'GenericError' }])
-      }
+      setApiErrors(getApiErrors(error))
     } finally {
       setIsLoading(false)
     }

@@ -16,14 +16,12 @@ import { Screen } from '@/components/layout/Screen'
 import { ErrorMessage } from '@/components/ui/ErrorMessage'
 import { SuccessMessage } from '@/components/ui/SuccessMessage'
 import { colors, components } from '@/theme'
-
 import { productEnrichmentService } from '@/services/productEnrichment.service'
 import { sellerProductService } from '@/services/sellerProduct.service'
-
 import { MeasurementUnit, UserTags } from '@wrcb/cb-common'
 import { COMPRANOMIA_TAGS, PHARMACY_TAGS } from '@/utils/constants'
-import { formatApiError } from '@/utils/errorHandler'
 import { sortByLabel, userTagsLabels } from '@/utils/enumLabels/userTags.labels'
+import { getApiErrors } from '@/utils/getApiErrors'
 
 interface ApiError {
   message: string
@@ -158,8 +156,7 @@ export default function AddProduct() {
 
       setSuccess({ message: 'Dados preenchidos automaticamente pela IA' })
     } catch (error: any) {
-      const formatted = formatApiError(error)
-      setApiErrors(formatted.errors)
+      setApiErrors(getApiErrors(error))
     } finally {
       setIsEnriching(false)
     }
@@ -199,8 +196,7 @@ export default function AddProduct() {
       setSuccess({ message: 'Produto criado com sucesso' })
       setTimeout(() => router.back(), 800)
     } catch (error: any) {
-      const formatted = formatApiError(error)
-      setApiErrors(formatted.errors)
+      setApiErrors(getApiErrors(error))
     } finally {
       setIsSubmitting(false)
     }

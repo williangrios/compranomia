@@ -21,6 +21,7 @@ import { colors, components } from '@/theme'
 import { validators } from '@/utils/validators'
 import { Language, UserCategory } from '@wrcb/cb-common'
 import { getCategoriesList, getCategoryName } from '@/utils/businessCategories'
+import { getApiErrors } from '@/utils/getApiErrors'
 
 interface ApiError {
   message: string
@@ -76,8 +77,7 @@ export default function BusinessProfile() {
         setCategory(userData.category || '')
         setProfilePhoto(userData.profilePhoto || '')
       } catch (error) {
-        console.error('Error loading user data:', error)
-        setApiErrors([{ message: 'Não foi possível carregar seus dados' }])
+        setApiErrors([{ message: 'NotFoundData' }])
       } finally {
         setIsLoadingData(false)
       }
@@ -98,8 +98,8 @@ export default function BusinessProfile() {
 
     if (!bio.trim()) {
       newErrors.bio = 'Biografia é obrigatória'
-    } else if (bio.length > 2000) {
-      newErrors.bio = 'Máximo 2000 caracteres'
+    } else if (bio.length > 300) {
+      newErrors.bio = 'Máximo 300 caracteres'
     }
 
     if (!category) {
@@ -115,9 +115,7 @@ export default function BusinessProfile() {
     return Object.keys(newErrors).length === 0
   }
 
-  // Handle submit
   async function handleSubmit() {
-    // Limpar mensagens anteriores
     setApiErrors(null)
     setSuccessMessage(null)
 
@@ -126,7 +124,6 @@ export default function BusinessProfile() {
     try {
       setIsLoading(true)
 
-      // SEMPRE enviar Português
       const iSpeakLanguages = [Language.Português]
 
       // Se tem foto nova, usa FormData
@@ -136,6 +133,12 @@ export default function BusinessProfile() {
         formData.append('bio', bio.trim())
         formData.append('category', category)
 
+        // ✅ CORRETO: Enviar array como JSON string
+        formData.append('iSpeakLanguages', JSON.stringify(iSpeakLanguages))
+
+        // Tags vazio como array vazio
+        formData.append('tags', JSON.stringify([]))
+
         // @ts-ignore - React Native FormData aceita file object
         formData.append('profilePhoto', {
           uri: profilePhotoFile.uri,
@@ -143,9 +146,12 @@ export default function BusinessProfile() {
           type: profilePhotoFile.type,
         })
 
-        // Arrays
-        iSpeakLanguages.forEach((lang) => {
-          formData.append('iSpeakLanguages', lang)
+        console.log('📤 Enviando FormData:', {
+          nickName: nickName.trim(),
+          bio: bio.trim(),
+          category,
+          iSpeakLanguages,
+          hasPhoto: true,
         })
 
         const { user: updatedUser } =
@@ -159,20 +165,17 @@ export default function BusinessProfile() {
             bio: bio.trim(),
             category,
             iSpeakLanguages,
+            // tags: [], // ✅ Adiciona tags vazio
           })
         updateUser(updatedUser)
       }
 
-      // Mostrar mensagem de sucesso
       setSuccessMessage({
         status: 'success',
         message: 'Perfil atualizado com sucesso',
       })
     } catch (error: any) {
-      // Extrair mensagem de erro
-      const errorMessage = error.message || 'Erro ao atualizar perfil'
-
-      setApiErrors([{ message: errorMessage }])
+      setApiErrors(getApiErrors(error))
     } finally {
       setIsLoading(false)
     }
@@ -296,14 +299,14 @@ export default function BusinessProfile() {
               setSuccessMessage(null)
             }}
             multiline
-            maxLength={2000}
+            maxLength={300}
             placeholder="Conte sobre seu negócio..."
             placeholderTextColor={colors.textSecondary}
           />
           <Text
             style={{ fontSize: 12, color: colors.textSecondary, marginTop: 4 }}
           >
-            {bio.length}/2000 caracteres
+            {bio.length}/300 caracteres
           </Text>
           {errors.bio && (
             <Text style={{ fontSize: 12, color: colors.danger, marginTop: 4 }}>
@@ -312,7 +315,6 @@ export default function BusinessProfile() {
           )}
         </View>
 
-        {/* Categoria */}
         {/* Categoria */}
         <View style={{ marginBottom: 16 }}>
           <Text style={components.input.label}>Categoria *</Text>

@@ -43,7 +43,7 @@ export const deliveryAddressService = {
   },
 
   async delete(id: string): Promise<void> {
-    await api.delete(`/api/business/compranomia/delivery-address/${id}`) // ← CORRIGIDO: era template tag
+    await api.delete(`/api/business/compranomia/delivery-address/${id}`) // ← CORRIGIDO
   },
 
   async setDefault(id: string): Promise<{ deliveryAddress: DeliveryAddress }> {
@@ -51,26 +51,5 @@ export const deliveryAddressService = {
       `/api/business/compranomia/delivery-address/${id}/set-default`,
     )
     return response.data.data
-  },
-
-  async getAddressByCEP(cep: string): Promise<ViaCEPResponse> {
-    const cleanCEP = cep.replace(/\D/g, '')
-    if (cleanCEP.length !== 8) {
-      throw new Error('CEP inválido')
-    }
-
-    const response = await fetch(`https://viacep.com.br/ws/${cleanCEP}/json/`) // ← CORRIGIDO: era template tag
-
-    if (!response.ok) {
-      throw new Error('Erro ao buscar CEP')
-    }
-
-    const data: ViaCEPResponse = await response.json()
-
-    if (data.erro) {
-      throw new Error('CEP não encontrado')
-    }
-
-    return data
   },
 }
