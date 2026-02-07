@@ -6,13 +6,14 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   RefreshControl,
+  Alert,
 } from 'react-native'
 import { useRouter } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { ErrorMessage } from '@/components/ui/ErrorMessage'
 import { colors } from '@/theme'
-import { Screen } from '@/components/layout/Screen'
+import { productStyles as styles } from '@/styles/product.styles'
 import { SellerProduct } from '@/types/sellerProduct'
 import { sellerProductService } from '@/services/sellerProduct.service'
 import { SellerProductCard } from '@/components/product/SellerProductCard'
@@ -40,11 +41,11 @@ export default function Products() {
     try {
       setIsLoading(true)
       setApiErrors(null)
-
       const response = await sellerProductService.list()
-
       setProducts(
-        Array.isArray(response?.sellerProducts) ? response.sellerProducts : [],
+        Array.isArray(response?.data?.sellerProducts)
+          ? response.data.sellerProducts
+          : [],
       )
     } catch (error: unknown) {
       setProducts([])
@@ -55,16 +56,32 @@ export default function Products() {
     }
   }
 
+  function handleDelete(product: SellerProduct) {
+    Alert.alert(
+      'Excluir produto',
+      `Deseja realmente excluir "${product.name || product.productCatalog?.name || 'este produto'}"?`,
+      [
+        { text: 'Cancelar', style: 'cancel' },
+        {
+          text: 'Excluir',
+          style: 'destructive',
+          onPress: async () => {
+            try {
+              setApiErrors(null)
+              await sellerProductService.delete(product.id)
+              loadProducts()
+            } catch (error: unknown) {
+              setApiErrors(getApiErrors(error))
+            }
+          },
+        },
+      ],
+    )
+  }
+
   if (isLoading) {
     return (
-      <View
-        style={{
-          flex: 1,
-          backgroundColor: colors.background,
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
+      <View style={styles.loadingContainer}>
         <ActivityIndicator size="large" color={colors.primary} />
       </View>
     )
@@ -87,22 +104,13 @@ export default function Products() {
         <ErrorMessage errors={apiErrors} />
 
         {products.length === 0 ? (
-          <View style={{ alignItems: 'center', paddingVertical: 40 }}>
+          <View style={styles.emptyContainer}>
             <Ionicons
               name="cube-outline"
               size={64}
               color={colors.textSecondary}
             />
-            <Text
-              style={{
-                fontSize: 16,
-                color: colors.textSecondary,
-                marginTop: 16,
-                textAlign: 'center',
-              }}
-            >
-              Nenhum produto cadastradosdf
-            </Text>
+            <Text style={styles.emptyText}>Nenhum produto cadastrado</Text>
           </View>
         ) : (
           products.map((product) => (
@@ -112,7 +120,7 @@ export default function Products() {
               onEdit={() =>
                 router.push(`/dashboard/products/edit/${product.id}`)
               }
-              onToggleActive={() => {}}
+              onDelete={() => handleDelete(product)}
             />
           ))
         )}

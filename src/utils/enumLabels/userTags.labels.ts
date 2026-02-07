@@ -132,11 +132,9 @@ export const userTagsLabels: Record<UserTags, string> = {
   Livestock: 'Criação de animais',
 
   // =========================
-  // 🚚 SERVIÇOS
+  // Outros
   // =========================
-  FastDelivery: 'Entrega rápida',
-  FreeDelivery: 'Entrega grátis',
-  Open24Hours: 'Aberto 24 horas',
+  Other: 'Outros',
 
   [UserTags.CityTour]: '',
   [UserTags.CulturalTour]: '',

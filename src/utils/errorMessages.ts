@@ -56,6 +56,7 @@ export const errorMessages: Record<string, string> = {
   UnauthorizedToUpdateAddress:
     'Você não tem permissão para atualizar este endereço.',
   CannotUpdateInactiveAddress: 'Não é possível atualizar um endereço inativo.',
+  CannotDeleteDefaultAddress: 'Não se pode deletar o endereço padrão',
 
   // Autorização
   Unauthorized: 'Não autorizado.',
@@ -64,6 +65,13 @@ export const errorMessages: Record<string, string> = {
 
   // Cadastro
   InvalidDocument: 'CPF inválido.',
+
+  // Cadastro de produtos
+  SellerAlreadySellsThisProduct: 'Sua loja já tem esse item cadastrado',
+  SellerNotFound: 'Vendedor não encontrado',
+  SellerProductNotFound: 'Produto não encontrado',
+  UnauthorizedToDeleteSellerProduct: 'Não autorizado a deletar esse produto',
+  ProductCatalogNotFound: 'Produto não encontrado',
 
   // Cadastro de vendedor
   ProfilePhotoRequired: 'Selecione uma foto de perfil.',

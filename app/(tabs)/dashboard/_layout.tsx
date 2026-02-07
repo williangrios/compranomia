@@ -32,6 +32,49 @@ export default function DashboardLayout() {
           title: 'Configurações do negócio',
         }}
       />
+
+      {/* ===== Produtos ===== */}
+      <Stack.Screen
+        name="products/index"
+        options={{
+          title: 'Produtos',
+        }}
+      />
+
+      <Stack.Screen
+        name="products/add"
+        options={{
+          title: 'Adicionar produto',
+        }}
+      />
+
+      <Stack.Screen
+        name="products/new"
+        options={{
+          title: 'Adicionar produto',
+        }}
+      />
+
+      <Stack.Screen
+        name="products/adopt"
+        options={{
+          title: 'Adicionar produto',
+        }}
+      />
+
+      <Stack.Screen
+        name="products/search"
+        options={{
+          title: 'Buscar produto',
+        }}
+      />
+
+      <Stack.Screen
+        name="products/edit/[id]"
+        options={{
+          title: 'Editar produto',
+        }}
+      />
     </Stack>
   )
 }

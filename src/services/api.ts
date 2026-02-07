@@ -45,7 +45,9 @@ api.interceptors.response.use(
   (response) => response,
   (error) => {
     const data = error?.response?.data
-
+    console.log('erro que chegou------', data)
+    console.log('erro que chegou------', error?.response?.data)
+    console.log('erro que chegou------', error)
     if (data?.errors && Array.isArray(data.errors)) {
       error.normalizedErrors = data.errors.map((err: any) => ({
         field: err.field,
