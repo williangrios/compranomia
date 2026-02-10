@@ -17,6 +17,7 @@ export interface SellerProduct {
   isActive: boolean
   originalImages?: string[]
   processedImages?: string[]
+  discountPercent?: number
   productCatalog?: {
     id: string
     name: string
@@ -29,5 +30,11 @@ export interface SellerProduct {
     barcode?: string
     originalImages?: string[]
     processedImages?: string[]
+  }
+  seller?: {
+    id: string
+    nickName: string
+    name: string
+    profilePhoto: string
   }
 }

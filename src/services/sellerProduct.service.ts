@@ -1,3 +1,4 @@
+import { MeasurementUnit, UserTags } from '@wrcb/cb-common'
 import { API_URL } from '@/utils/constants'
 import api from './api'
 import { storageService } from './storage.service'
@@ -20,6 +21,12 @@ interface CreatePayload {
 
 interface AdoptPayload {
   productCatalogId?: string
+  name: string
+  description: string
+  brand: string
+  baseWeight: number
+  measurementUnit: MeasurementUnit
+  productCategory: UserTags
   barcode?: string
   price: number
   stock: number
@@ -29,20 +36,28 @@ interface AdoptPayload {
 }
 
 interface UpdatePayload {
+  name: string
+  description: string
+  brand: string
+  baseWeight: number
+  measurementUnit: MeasurementUnit
+  productCategory: UserTags
+  barcode?: string
   price?: number
   stock?: number
   step?: number
   minStockAlert?: number
   promotionalPrice?: number | null
-  name?: string
-  description?: string
-  brand?: string
-  baseWeight?: number
+  isActive?: boolean
 }
 
 export const sellerProductService = {
-  async list() {
-    const { data } = await api.get('/api/business/compranomia/seller-product')
+  async list(includeInactive = true) {
+    const { data } = await api.get('/api/business/compranomia/seller-product', {
+      params: {
+        includeInactive: includeInactive ? 'true' : 'false',
+      },
+    })
     return data
   },
 
@@ -174,12 +189,10 @@ export const sellerProductService = {
   },
 
   async update(id: string, payload: UpdatePayload) {
-    console.log('inicou update product')
     const { data } = await api.patch(
       `/api/business/compranomia/seller-product/${id}`,
       payload,
     )
-    console.log('retorno update product--------', data)
     return data
   },
 

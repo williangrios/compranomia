@@ -16,7 +16,9 @@ import { colors, components } from '@/theme'
 import { sellerProductService } from '@/services/sellerProduct.service'
 import { productStyles as styles } from '@/styles/product.styles'
 import { getApiErrors } from '@/utils/getApiErrors'
-import { MeasurementUnit } from '@wrcb/cb-common'
+import { MeasurementUnit, UserTags } from '@wrcb/cb-common'
+import { sortByLabel, userTagsLabels } from '@/utils/enumLabels/userTags.labels'
+import { COMPRANOMIA_TAGS, DEFAULT_IMAGE } from '@/utils/constants'
 
 interface ApiError {
   message: string
@@ -35,12 +37,14 @@ interface FormData {
   description: string
   brand: string
   baseWeight: string
+  productCategory: UserTags | ''
   price: string
   stock: string
   step: string
   minStockAlert: string
   promotionalPrice: string
   measurementUnit: MeasurementUnit
+  isActive: boolean
 }
 
 interface CatalogData {
@@ -70,8 +74,6 @@ const UNIT_TYPES: MeasurementUnit[] = [
   MeasurementUnit.Pct,
 ]
 
-const DEFAULT_IMAGE = 'https://static.compranomia.com/defaults/product.png'
-
 export function SellerProductForm({
   productCatalogId,
   sellerProductId,
@@ -90,12 +92,14 @@ export function SellerProductForm({
     description: '',
     brand: '',
     baseWeight: '',
+    productCategory: '',
     price: '',
     stock: '0',
     step: '1',
     minStockAlert: '0',
     promotionalPrice: '',
     measurementUnit: MeasurementUnit.Un,
+    isActive: true,
   })
 
   const [errors, setErrors] = useState<FormErrors>({})
@@ -109,6 +113,8 @@ export function SellerProductForm({
       loadCatalogForAdopt(productCatalogId)
     }
   }, [sellerProductId, productCatalogId])
+
+  const sortedTags = sortByLabel(COMPRANOMIA_TAGS, userTagsLabels)
 
   async function loadSellerProduct(id: string) {
     try {
@@ -130,12 +136,14 @@ export function SellerProductForm({
         price: String(sp.price),
         stock: String(sp.stock),
         step: String(sp.step ?? 1),
+        productCategory: sp.productCategory,
         minStockAlert: sp.minStockAlert ? String(sp.minStockAlert) : '',
         promotionalPrice: sp.promotionalPrice
           ? String(sp.promotionalPrice)
           : '',
         measurementUnit:
           (sp.measurementUnit as MeasurementUnit) ?? MeasurementUnit.Un,
+        isActive: sp.isActive ?? true,
       })
 
       if (sp.promotionalPrice && sp.promotionalPrice < sp.price) {
@@ -164,6 +172,7 @@ export function SellerProductForm({
         ...prev,
         name: cat.name || '',
         description: cat.description || '',
+        productCategory: cat.productCategory,
         brand: cat.brand || '',
         baseWeight: cat.baseWeight ? String(cat.baseWeight) : '',
         step: String(cat.step ?? 1),
@@ -238,22 +247,32 @@ export function SellerProductForm({
             ? parseInt(form.minStockAlert)
             : undefined,
           promotionalPrice: promoPrice,
-          name: form.name.trim() || undefined,
-          description: form.description.trim() || undefined,
-          brand: form.brand.trim() || undefined,
-          baseWeight: form.baseWeight ? parseFloat(form.baseWeight) : undefined,
+          name: form.name.trim(),
+          description: form.description.trim(),
+          brand: form.brand.trim(),
+          productCategory: form.productCategory as UserTags,
+          baseWeight: parseFloat(form.baseWeight),
+          measurementUnit: form.measurementUnit,
+          isActive: form.isActive,
         })
         setSuccess({ message: 'Produto atualizado com sucesso' })
       } else if (isAdoptMode && productCatalogId) {
         await sellerProductService.adopt({
           productCatalogId,
           price: parseFloat(form.price),
+
           stock: parseInt(form.stock),
           step: parseFloat(form.step),
           minStockAlert: form.minStockAlert
             ? parseInt(form.minStockAlert)
             : undefined,
           promotionalPrice: promoPrice,
+          name: form.name,
+          description: form.description,
+          brand: form.brand,
+          baseWeight: form.baseWeight ? parseFloat(form.baseWeight) : 0,
+          measurementUnit: form.measurementUnit,
+          productCategory: form.productCategory as UserTags,
         })
         setSuccess({ message: 'Produto adotado com sucesso' })
       }
@@ -299,12 +318,6 @@ export function SellerProductForm({
               style={styles.searchResultImage}
             />
             <View style={styles.searchResultInfo}>
-              <Text style={styles.searchResultName} numberOfLines={2}>
-                {catalog.name}
-              </Text>
-              {catalog.brand && (
-                <Text style={styles.searchResultBrand}>{catalog.brand}</Text>
-              )}
               {catalog.barcode && (
                 <Text style={styles.searchResultCategory}>
                   Cód: {catalog.barcode}
@@ -357,6 +370,29 @@ export function SellerProductForm({
               placeholder="Ex: 500"
               keyboardType="numeric"
             />
+          </View>
+
+          <View style={styles.fieldWrapper}>
+            <Text style={components.input.label}>Categoria</Text>
+            <View style={[components.input.container, { padding: 0 }]}>
+              <Picker<UserTags>
+                selectedValue={
+                  form.productCategory ? form.productCategory : undefined
+                }
+                onValueChange={(v) =>
+                  setForm((prev) => ({ ...prev, productCategory: v }))
+                }
+              >
+                <Picker.Item label="Selecione" value={undefined} />
+                {sortedTags.map((tag) => (
+                  <Picker.Item
+                    key={tag}
+                    value={tag}
+                    label={userTagsLabels[tag] ?? tag}
+                  />
+                ))}
+              </Picker>
+            </View>
           </View>
         </>
       )}
@@ -514,6 +550,16 @@ export function SellerProductForm({
         {errors.step && (
           <Text style={components.auth.errorText}>{errors.step}</Text>
         )}
+      </View>
+
+      <View style={styles.switchRow}>
+        <Text style={styles.switchLabel}>
+          Produto ativo (visível para clientes)
+        </Text>
+        <Switch
+          value={form.isActive}
+          onValueChange={(v) => setForm((prev) => ({ ...prev, isActive: v }))}
+        />
       </View>
 
       <SuccessMessage success={success} />

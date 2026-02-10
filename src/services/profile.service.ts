@@ -8,6 +8,7 @@ export const profileService = {
    */
   async getCurrentUserData(): Promise<{ user: User }> {
     const response = await api.get('/api/auth/getcurrentuserdata')
+    console.log('buscou no banco---', response.data.data.user)
     if (response.data.status === 'success') {
       return { user: response.data.data.user }
     }

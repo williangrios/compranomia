@@ -17,6 +17,7 @@ import { colors, components } from '@/theme'
 import { sellerProductService } from '@/services/sellerProduct.service'
 import { productStyles as styles } from '@/styles/product.styles'
 import { getApiErrors } from '@/utils/getApiErrors'
+import { DEFAULT_IMAGE } from '@/utils/constants'
 
 interface CatalogProduct {
   id: string
@@ -33,8 +34,6 @@ interface ApiError {
   message: string
   field?: string
 }
-
-const DEFAULT_IMAGE = 'https://static.compranomia.com/defaults/product.png'
 
 export default function SearchCatalog() {
   const router = useRouter()
@@ -92,8 +91,10 @@ export default function SearchCatalog() {
           <Text style={styles.searchResultName} numberOfLines={2}>
             {item.name}
           </Text>
-          {item.brand && (
-            <Text style={styles.searchResultBrand}>{item.brand}</Text>
+          {item.description && (
+            <Text style={styles.searchResultDescription}>
+              {item.description}
+            </Text>
           )}
           {item.barcode && (
             <Text style={styles.searchResultCategory}>Cód: {item.barcode}</Text>

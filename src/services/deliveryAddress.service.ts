@@ -20,7 +20,6 @@ export const deliveryAddressService = {
 
   async list(): Promise<{ deliveryAddresses: DeliveryAddress[] }> {
     const response = await api.get('/api/business/compranomia/delivery-address')
-    console.log('endereços-----------', response.data.data)
     return response.data.data
   },
 

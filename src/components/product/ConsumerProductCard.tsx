@@ -5,14 +5,14 @@ import { colors } from '@/theme'
 import { productStyles as styles } from '@/styles/product.styles'
 import { SellerProduct } from '@/types/sellerProduct'
 import { UserTags, MeasurementUnit } from '@wrcb/cb-common'
+import { DEFAULT_IMAGE } from '@/utils/constants'
 
 interface Props {
   product: SellerProduct
   onAddToCart?: (quantity: number) => void
 }
 
-const DEFAULT_IMAGE = 'https://static.compranomia.com/defaults/product.png'
-const MEDICINE_IMAGE = require('@/assets/medicine.png')
+const MEDICINE_IMAGE = require('../../../assets/medicine.png')
 
 const MEDICINE_TAGS: string[] = [UserTags.Medicines, UserTags.GenericMedicines]
 
@@ -55,13 +55,11 @@ export function ConsumerProductCard({ product, onAddToCart }: Props) {
       )
     : 0
 
-  const isOutOfStock = product.stock <= 0
-
   const [quantity, setQuantity] = useState(0)
 
   function handleIncrement() {
     const next = quantity + increment
-    if (next > product.stock) return
+    // if (next > product.stock) return
     setQuantity(next)
   }
 
@@ -160,75 +158,55 @@ export function ConsumerProductCard({ product, onAddToCart }: Props) {
 
         {/* Footer: quantidade + adicionar */}
         <View style={styles.consumerCardFooter}>
-          {isOutOfStock ? (
-            <Text style={styles.consumerCardOutOfStock}>
-              Produto indisponível
+          {/* Controle de quantidade */}
+          <View style={styles.consumerCardQuantityRow}>
+            <TouchableOpacity
+              style={styles.consumerCardQuantityButton}
+              onPress={handleDecrement}
+              disabled={quantity <= 0}
+              activeOpacity={0.8}
+            >
+              <Ionicons name="remove" size={20} color={colors.textInverse} />
+            </TouchableOpacity>
+
+            <Text style={styles.consumerCardQuantityText}>
+              {formatQuantity()}
             </Text>
-          ) : (
-            <>
-              {/* Controle de quantidade */}
-              <View style={styles.consumerCardQuantityRow}>
-                <TouchableOpacity
-                  style={[
-                    styles.consumerCardQuantityButton,
-                    quantity <= 0 && styles.consumerCardQuantityButtonDisabled,
-                  ]}
-                  onPress={handleDecrement}
-                  disabled={quantity <= 0}
-                  activeOpacity={0.8}
-                >
-                  <Ionicons
-                    name="remove"
-                    size={20}
-                    color={colors.textInverse}
-                  />
-                </TouchableOpacity>
 
-                <Text style={styles.consumerCardQuantityText}>
-                  {formatQuantity()}
-                </Text>
+            <TouchableOpacity
+              style={styles.consumerCardQuantityButton}
+              onPress={handleIncrement}
+              activeOpacity={0.8}
+            >
+              <Ionicons name="add" size={20} color={colors.textInverse} />
+            </TouchableOpacity>
+          </View>
 
-                <TouchableOpacity
-                  style={[
-                    styles.consumerCardQuantityButton,
-                    quantity + increment > product.stock &&
-                      styles.consumerCardQuantityButtonDisabled,
-                  ]}
-                  onPress={handleIncrement}
-                  disabled={quantity + increment > product.stock}
-                  activeOpacity={0.8}
-                >
-                  <Ionicons name="add" size={20} color={colors.textInverse} />
-                </TouchableOpacity>
-              </View>
-
-              {/* Botão adicionar */}
-              <TouchableOpacity
-                style={[
-                  styles.consumerCardAddButton,
-                  quantity <= 0 && { backgroundColor: colors.disabled },
-                ]}
-                onPress={handleAddToCart}
-                disabled={quantity <= 0}
-                activeOpacity={0.8}
-              >
-                <Ionicons
-                  name="cart-outline"
-                  size={18}
-                  color={colors.textInverse}
-                />
-                <Text style={styles.consumerCardAddButtonText}>
-                  {quantity > 0
-                    ? `R$ ${(displayPrice * (isUnitBased ? quantity : quantity / step)).toFixed(2)}`
-                    : 'Adicionar'}
-                </Text>
-              </TouchableOpacity>
-            </>
-          )}
+          {/* Botão adicionar */}
+          <TouchableOpacity
+            style={[
+              styles.consumerCardAddButton,
+              quantity <= 0 && { backgroundColor: colors.disabled },
+            ]}
+            onPress={handleAddToCart}
+            disabled={quantity <= 0}
+            activeOpacity={0.8}
+          >
+            <Ionicons
+              name="cart-outline"
+              size={18}
+              color={colors.textInverse}
+            />
+            <Text style={styles.consumerCardAddButtonText}>
+              {quantity > 0
+                ? `R$ ${(displayPrice * (isUnitBased ? quantity : quantity / step)).toFixed(2)}`
+                : 'Adicionar'}
+            </Text>
+          </TouchableOpacity>
         </View>
 
         {/* Aviso de variação para granel */}
-        {!isUnitBased && !isOutOfStock && (
+        {!isUnitBased && (
           <Text
             style={[
               styles.consumerCardUnit,

@@ -17,6 +17,8 @@ import { SuccessMessage } from '@/components/ui/SuccessMessage'
 import { sellerSettingsService } from '@/services/sellerSettings.service'
 import { colors, components } from '@/theme'
 import { getApiErrors } from '@/utils/getApiErrors'
+import { userTagsLabels, sortByLabel } from '@/utils/enumLabels/userTags.labels'
+import { PaymentMethod, UserTags } from '@wrcb/cb-common'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -56,6 +58,7 @@ interface FormErrors {
     }
   }
   preparationTime?: string
+  acceptedPaymentMethods?: string
 }
 
 // ─── Constants ────────────────────────────────────────────────────────────────
@@ -164,6 +167,10 @@ export default function SellerSettings() {
   const [preparationTime, setPreparationTime] = useState('30')
   const [sellerActive, setSellerActive] = useState(true)
   const [adminActive, setAdminActive] = useState(true)
+  const [tags, setTags] = useState<UserTags[]>([])
+  const [acceptedPaymentMethods, setAcceptedPaymentMethods] = useState<
+    PaymentMethod[]
+  >([])
   const [isLoading, setIsLoading] = useState(false)
   const [isLoadingData, setIsLoadingData] = useState(true)
   const [apiErrors, setApiErrors] = useState<ApiError[] | null>(null)
@@ -173,6 +180,8 @@ export default function SellerSettings() {
   // Modal: editar períodos + cutoffTime de um dia
   const [periodsModalDay, setPeriodsModalDay] = useState<number | null>(null)
 
+  const translatedCategories = sortByLabel(tags, userTagsLabels)
+
   // ── Load data ───────────────────────────────────────────────────────────────
   useEffect(() => {
     async function loadSettings() {
@@ -180,8 +189,13 @@ export default function SellerSettings() {
         setIsLoadingData(true)
         const { sellerSettings } = await sellerSettingsService.getSettings()
         setAdminActive(sellerSettings.adminActive)
-
+        setTags(
+          (sellerSettings.tags || []).filter((tag: string): tag is UserTags =>
+            Object.values(UserTags).includes(tag as UserTags),
+          ),
+        )
         if (sellerSettings) {
+          setAcceptedPaymentMethods(sellerSettings.acceptedPaymentMethods || [])
           setDeliveryRanges(sellerSettings.deliveryRanges)
           // Garante que cada dia tem cutoffTime (compatibilidade com dados antigos)
           setSchedule(
@@ -397,6 +411,11 @@ export default function SellerSettings() {
     const prep = parseInt(preparationTime, 10)
     if (isNaN(prep) || prep < 0) newErrors.preparationTime = 'Deve ser ≥ 0'
 
+    if (acceptedPaymentMethods.length === 0) {
+      // pode usar um novo campo em FormErrors ou simplesmente um alert
+      newErrors.acceptedPaymentMethods =
+        'Selecione pelo menos uma forma de pagamento'
+    }
     setErrors(newErrors)
     return Object.keys(newErrors).length === 0
   }
@@ -425,6 +444,7 @@ export default function SellerSettings() {
         })),
         preparationTime: parseInt(preparationTime, 10),
         sellerActive,
+        acceptedPaymentMethods,
       }
 
       await sellerSettingsService.upsertSettings(payload)
@@ -794,6 +814,143 @@ export default function SellerSettings() {
             </Text>
           )}
         </View>
+
+        {/* Tags selecionadas */}
+        <Text style={components.input.label}>Seções</Text>
+        {translatedCategories.length > 0 ? (
+          <View style={{ marginBottom: 16 }}>
+            <View
+              style={{
+                flexDirection: 'row',
+                flexWrap: 'wrap',
+                gap: 8,
+                marginTop: 8,
+              }}
+            >
+              {translatedCategories.map((tag) => (
+                <View
+                  key={tag}
+                  style={{
+                    paddingHorizontal: 12,
+                    paddingVertical: 6,
+                    backgroundColor: colors.primary + '20',
+                    borderRadius: 16,
+                  }}
+                >
+                  <Text
+                    style={{
+                      fontSize: 12,
+                      fontWeight: '600',
+                      color: colors.primary,
+                    }}
+                  >
+                    {userTagsLabels[tag] || tag}
+                  </Text>
+                </View>
+              ))}
+            </View>
+          </View>
+        ) : (
+          <Text
+            style={{
+              fontSize: 12,
+              fontWeight: '600',
+              color: colors.primary,
+            }}
+          >
+            Você ainda não tem produtos à venda
+          </Text>
+        )}
+
+        {/* ─── FORMAS DE PAGAMENTO ──────────────────────────────────────── */}
+        <Text
+          style={{
+            fontSize: 16,
+            fontWeight: '600',
+            color: colors.textPrimary,
+            marginBottom: 12,
+          }}
+        >
+          Formas de Pagamento Aceitas
+        </Text>
+
+        {[
+          {
+            key: PaymentMethod.Pix,
+            label: 'Pix',
+            icon: 'qr-code-outline' as const,
+          },
+          {
+            key: PaymentMethod.Cash,
+            label: 'Dinheiro',
+            icon: 'cash-outline' as const,
+          },
+          {
+            key: PaymentMethod.CreditCard,
+            label: 'Cartão de Crédito',
+            icon: 'card-outline' as const,
+          },
+          // { key: PaymentMethod.DebitCard, label: 'Cartão de Débito', icon: 'card-outline' as const },
+          // { key: PaymentMethod.MealCard, label: 'Vale Refeição', icon: 'restaurant-outline' as const },
+        ].map((method) => {
+          const isSelected = acceptedPaymentMethods.includes(method.key)
+          return (
+            <TouchableOpacity
+              key={method.key}
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+                paddingVertical: 14,
+                borderBottomWidth: 1,
+                borderBottomColor: colors.border,
+              }}
+              onPress={() => {
+                setAcceptedPaymentMethods((prev) =>
+                  isSelected
+                    ? prev.filter((m) => m !== method.key)
+                    : [...prev, method.key],
+                )
+                clearMessages()
+              }}
+              activeOpacity={0.7}
+            >
+              <View
+                style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}
+              >
+                <Ionicons
+                  name={method.icon}
+                  size={22}
+                  color={isSelected ? colors.primary : colors.textSecondary}
+                />
+                <Text
+                  style={{
+                    fontSize: 15,
+                    color: isSelected
+                      ? colors.textPrimary
+                      : colors.textSecondary,
+                    fontWeight: isSelected ? '600' : '400',
+                  }}
+                >
+                  {method.label}
+                </Text>
+              </View>
+              <Ionicons
+                name={isSelected ? 'checkbox' : 'square-outline'}
+                size={24}
+                color={isSelected ? colors.primary : colors.textSecondary}
+              />
+            </TouchableOpacity>
+          )
+        })}
+
+        {errors.acceptedPaymentMethods && (
+          <Text style={[components.auth.errorText, { marginTop: 8 }]}>
+            {errors.acceptedPaymentMethods}
+          </Text>
+        )}
+
+        <View style={{ marginBottom: 24 }} />
 
         {/* ─── SELLER ACTIVE TOGGLE ─────────────────────────────────────────── */}
         <View style={{ marginBottom: 24 }}>

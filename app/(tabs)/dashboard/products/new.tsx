@@ -30,6 +30,7 @@ interface ApiError {
 }
 
 interface FormErrors {
+  image?: string
   name?: string
   description?: string
   productCategory?: string
@@ -189,6 +190,10 @@ export default function NewProduct() {
   function validate(): boolean {
     const newErrors: FormErrors = {}
 
+    if (!image) {
+      newErrors.image = 'Selecione uma imagem para o produto'
+    }
+
     if (!form.name.trim()) newErrors.name = 'Nome é obrigatório'
     if (!form.description.trim())
       newErrors.description = 'Descrição é obrigatória'
@@ -344,6 +349,9 @@ export default function NewProduct() {
             </TouchableOpacity>
           </View>
         </View>
+        {errors.image && (
+          <Text style={components.auth.errorText}>{errors.image}</Text>
+        )}
       </View>
 
       {/* IA */}
@@ -419,7 +427,7 @@ export default function NewProduct() {
           ]}
           value={form.description}
           onChangeText={(v) => setField('description', v)}
-          placeholder="Descreva o produto"
+          placeholder="Capriche na descrição do produto"
           multiline
         />
         {errors.description && (
@@ -448,11 +456,21 @@ export default function NewProduct() {
             errors.productCategory && components.input.error,
           ]}
         >
-          <Picker<UserTags>
-            selectedValue={form.productCategory || undefined}
+          <Picker<UserTags | undefined>
+            selectedValue={
+              form.productCategory ? form.productCategory : undefined
+            }
             onValueChange={(v) => {
-              setForm((prev) => ({ ...prev, productCategory: v }))
-              setErrors((prev) => ({ ...prev, productCategory: undefined }))
+              setForm((prev) => ({
+                ...prev,
+                productCategory: v ?? '',
+              }))
+
+              setErrors((prev) => ({
+                ...prev,
+                productCategory: undefined,
+              }))
+
               if (v && PHARMACY_TAGS.includes(v)) {
                 setShowPrescriptionToggle(true)
               } else {

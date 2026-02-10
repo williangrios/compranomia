@@ -22,6 +22,7 @@ import { validators } from '@/utils/validators'
 import { Language, UserCategory } from '@wrcb/cb-common'
 import { getCategoriesList, getCategoryName } from '@/utils/businessCategories'
 import { getApiErrors } from '@/utils/getApiErrors'
+import { capitalizeFullName } from '@/utils/capitalizeFullName'
 
 interface ApiError {
   message: string
@@ -72,7 +73,7 @@ export default function BusinessProfile() {
         setIsLoadingData(true)
         const { user: userData } = await profileService.getCurrentUserData()
         setEmail(userData.email || '')
-        setNickName(userData.nickName || '')
+        setNickName(capitalizeFullName(userData.nickName) || '')
         setBio(userData.bio || '')
         setCategory(userData.category || '')
         setProfilePhoto(userData.profilePhoto || '')
@@ -244,7 +245,7 @@ export default function BusinessProfile() {
 
         {/* Apelido */}
         <View style={{ marginBottom: 16 }}>
-          <Text style={components.input.label}>Nome do Negócio *</Text>
+          <Text style={components.input.label}>Nome da loja *</Text>
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
             <TextInput
               style={[
@@ -261,7 +262,7 @@ export default function BusinessProfile() {
                 setSuccessMessage(null)
               }}
               maxLength={20}
-              placeholder="Digite seu apelido"
+              placeholder="Digite o nome da sua loja"
               placeholderTextColor={colors.textSecondary}
             />
           </View>

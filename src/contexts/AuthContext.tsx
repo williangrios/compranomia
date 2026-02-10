@@ -92,19 +92,30 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       const cachedUser = await authService.getCachedUser()
 
       if (cachedUser) {
+        // 1️⃣ Mostra imediatamente o usuário completo do cache
         setUser(cachedUser)
 
+        // 2️⃣ Busca atualização do backend (JWT)
         authService
           .getCurrentUser()
           .then((freshUser) => {
-            if (freshUser) {
-              setUser(freshUser)
-            } else {
+            if (!freshUser) {
               setUser(null)
+              return
             }
+
+            // 3️⃣ MERGE: mantém dados completos + atualiza o que veio do JWT
+            const mergedUser = {
+              ...cachedUser,
+              ...freshUser,
+            }
+
+            setUser(mergedUser)
+            authService.updateCachedUser(mergedUser)
           })
           .catch(() => {
-            setUser(null)
+            // Se falhar a request, mantém o cache
+            setUser(cachedUser)
           })
       } else {
         setUser(null)

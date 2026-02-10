@@ -70,9 +70,9 @@ export function ProfilePhotoSelector({
     <View style={{ alignItems: 'center', marginBottom: 24 }}>
       <View
         style={{
-          width: 120,
-          height: 120,
-          borderRadius: 60,
+          width: 200,
+          height: 200,
+          borderRadius: 16,
           backgroundColor: colors.backgroundSecondary,
           justifyContent: 'center',
           alignItems: 'center',

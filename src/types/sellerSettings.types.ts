@@ -1,3 +1,5 @@
+import { PaymentMethod } from '@wrcb/cb-common'
+
 export interface DeliveryRange {
   minKm: number
   maxKm: number
@@ -20,6 +22,7 @@ export interface SellerSettingsPayload {
   sellerActive?: boolean
   deliveryRanges?: DeliveryRange[]
   schedule?: ScheduleDay[]
+  acceptedPaymentMethods?: PaymentMethod[]
   preparationTime?: number
   cutoffTime?: string
 }

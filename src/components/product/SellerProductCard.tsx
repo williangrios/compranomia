@@ -3,6 +3,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { colors } from '@/theme'
 import { productStyles as styles } from '@/styles/product.styles'
 import { SellerProduct } from '@/types/sellerProduct'
+import { DEFAULT_IMAGE } from '@/utils/constants'
 
 interface Props {
   product: SellerProduct
@@ -10,12 +11,9 @@ interface Props {
   onDelete: () => void
 }
 
-const DEFAULT_IMAGE = 'https://static.compranomia.com/defaults/product.png'
-
 export function SellerProductCard({ product, onEdit, onDelete }: Props) {
   const catalog = product.productCatalog
-  const name = product.name || catalog?.name || 'Produto'
-  const brand = product.brand || catalog?.brand
+  const name = product.name || catalog?.name || ''
   const images = product.processedImages?.length
     ? product.processedImages
     : product.originalImages?.length
@@ -43,9 +41,7 @@ export function SellerProductCard({ product, onEdit, onDelete }: Props) {
         <Text style={styles.sellerCardName} numberOfLines={2}>
           {name}
         </Text>
-
-        {brand && <Text style={styles.sellerCardBrand}>{brand}</Text>}
-
+        <Text style={styles.sellerCardCategory}>{product.productCategory}</Text>
         <View style={styles.sellerCardRow}>
           {hasPromo ? (
             <>
@@ -63,30 +59,22 @@ export function SellerProductCard({ product, onEdit, onDelete }: Props) {
           )}
         </View>
 
-        <View style={styles.sellerCardRow}>
-          <Text
-            style={
-              isLowStock ? styles.sellerCardStockLow : styles.sellerCardStock
-            }
+        {product.isActive ? (
+          <View
+            style={[styles.sellerCardBadge, { backgroundColor: '#DCFCE7' }]}
           >
-            Estoque: {product.stock}
-            {isLowStock ? ' ⚠️' : ''}
-          </Text>
-
-          {product.measurementUnit && product.measurementUnit !== 'Un' && (
-            <Text style={styles.sellerCardStock}>
-              · {product.step ?? 1}
-              {product.measurementUnit}/clique
+            <Text
+              style={[styles.sellerCardBadgeText, { color: colors.success }]}
+            >
+              Produto à venda
             </Text>
-          )}
-        </View>
-
-        {!product.isActive && (
+          </View>
+        ) : (
           <View
             style={[styles.sellerCardBadge, { backgroundColor: '#FEE2E2' }]}
           >
             <Text style={[styles.sellerCardBadgeText, { color: colors.error }]}>
-              Inativo
+              Oculto dos clientes
             </Text>
           </View>
         )}

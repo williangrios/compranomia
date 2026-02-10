@@ -54,10 +54,19 @@ export const productStyles = StyleSheet.create({
     paddingTop: 48,
   },
   scannerCloseButton: {
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    borderRadius: 20,
-    padding: spacing.sm,
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(0,0,0,0.65)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    elevation: 4,
+    shadowColor: '#000',
+    shadowOpacity: 0.3,
+    shadowRadius: 4,
+    shadowOffset: { width: 0, height: 2 },
   },
+
   scannerTypeButton: {
     backgroundColor: 'rgba(0,0,0,0.5)',
     borderRadius: 20,
@@ -124,7 +133,7 @@ export const productStyles = StyleSheet.create({
     fontWeight: '600',
     color: colors.textPrimary,
   },
-  searchResultBrand: {
+  searchResultDescription: {
     fontSize: 13,
     color: colors.textSecondary,
     marginTop: 2,
@@ -218,7 +227,7 @@ export const productStyles = StyleSheet.create({
     fontWeight: '600',
     color: colors.textPrimary,
   },
-  sellerCardBrand: {
+  sellerCardDescription: {
     fontSize: 13,
     color: colors.textSecondary,
     marginTop: 2,
@@ -264,10 +273,15 @@ export const productStyles = StyleSheet.create({
     alignItems: 'center',
     gap: spacing.sm,
   },
+  sellerCardCategory: {
+    fontSize: 12,
+    color: colors.textSecondary,
+    marginTop: 2,
+  },
   sellerCardActionButton: {
-    width: 36,
-    height: 36,
-    borderRadius: 18,
+    width: 44,
+    height: 44,
+    borderRadius: 22,
     backgroundColor: colors.surface,
     borderWidth: 1,
     borderColor: colors.border,

@@ -1,5 +1,7 @@
 // src/types/profile.types.ts
 
+import { PaymentMethod, UserTags } from '@wrcb/cb-common'
+
 export interface UpdateUserPersonalData {
   name: string
   doc: string
@@ -27,8 +29,10 @@ export interface SellerSettings {
   preparationTime: number
   cutoffTime: string
   exceptions: ScheduleException[]
+  tags: UserTags[]
   sellerActive: boolean
   adminActive: boolean
+  acceptedPaymentMethods: PaymentMethod[]
   createdAt: string
   updatedAt: string
 }

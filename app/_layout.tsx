@@ -7,6 +7,7 @@ import { AuthProvider } from '@/contexts/AuthContext'
 import { AddressProvider } from '@/contexts/AddressContext' // ← ADICIONA
 import { StatusBar } from 'expo-status-bar'
 import { NotificationProvider } from '@/contexts/NotificationContext'
+import { CartProvider } from '@/contexts/CartContext'
 
 SplashScreen.preventAutoHideAsync()
 
@@ -23,12 +24,14 @@ export default function RootLayout() {
     <AuthProvider>
       <AddressProvider>
         <NotificationProvider>
-          <StatusBar style="auto" />
-          <Stack screenOptions={{ headerShown: false }}>
-            <Stack.Screen name="index" />
-            <Stack.Screen name="(auth)" />
-            <Stack.Screen name="(tabs)" />
-          </Stack>
+          <CartProvider>
+            <StatusBar style="auto" />
+            <Stack screenOptions={{ headerShown: false }}>
+              <Stack.Screen name="index" />
+              <Stack.Screen name="(auth)" />
+              <Stack.Screen name="(tabs)" />
+            </Stack>
+          </CartProvider>
         </NotificationProvider>
       </AddressProvider>
     </AuthProvider>

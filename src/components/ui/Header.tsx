@@ -1,30 +1,28 @@
 // components/ui/Header.tsx
 import { useState } from 'react'
-import { View, Text, Pressable } from 'react-native'
+import { View, Text, Pressable, Image } from 'react-native'
 import { Ionicons } from '@expo/vector-icons'
 import { useRouter } from 'expo-router'
 import { components, colors } from '@/theme'
 import { useAddress } from '@/contexts/AddressContext'
 import { useNotifications } from '@/contexts/NotificationContext'
 import { AddressSelectorModal } from '@/components/modals/AddressSelectorModal'
+import { headerStyles as styles } from '@/styles/header.styles'
 
 export function Header() {
   const router = useRouter()
+  const logo = require('../../../assets/logo.png')
   const { address } = useAddress()
   const { hasUnread } = useNotifications()
   const [modalVisible, setModalVisible] = useState(false)
 
-  // Trunca o endereço se for muito longo
   const truncateAddress = (addr: typeof address) => {
     if (!addr) return 'Selecione o endereço'
-
     const fullAddress = `${addr.street}, ${addr.number}`
     const maxLength = 25
-
     if (fullAddress.length > maxLength) {
       return fullAddress.substring(0, maxLength) + '...'
     }
-
     return fullAddress
   }
 
@@ -33,65 +31,50 @@ export function Header() {
   return (
     <>
       <View style={components.header.container}>
-        <Pressable
-          onPress={() => setModalVisible(true)}
-          style={{
-            flexDirection: 'row',
-            alignItems: 'center',
-            flex: 1,
-            marginRight: 12,
-          }}
-          hitSlop={8}
-        >
-          <Ionicons
-            name="location"
-            size={18}
-            color={colors.primary}
-            style={{ marginRight: 6 }}
-          />
-          <Text
-            style={[components.header.title, { flex: 1 }]}
-            numberOfLines={1}
-          >
-            {displayAddress}
-          </Text>
-          <Ionicons
-            name="chevron-down"
-            size={16}
-            color={colors.textSecondary}
-            style={{ marginLeft: 4 }}
-          />
-        </Pressable>
+        {/* Logo */}
+        <View>
+          <Image source={logo} style={styles.logo} resizeMode="contain" />
+        </View>
 
+        {/* Slogan + Endereço */}
+        <View style={styles.centerColumn}>
+          <Text style={styles.sloganText}>Aqui, você compra com economia!</Text>
+          <Pressable
+            onPress={() => setModalVisible(true)}
+            style={styles.addressButton}
+            hitSlop={8}
+          >
+            <Ionicons
+              name="location-sharp"
+              size={16}
+              color={colors.background}
+            />
+            <Text style={styles.addressText} numberOfLines={1}>
+              {displayAddress}
+            </Text>
+            <Ionicons
+              name="chevron-down"
+              size={14}
+              color={colors.textInverse}
+            />
+          </Pressable>
+        </View>
+
+        {/* Notificações */}
         <Pressable
-          style={components.header.notificationButton}
+          style={styles.notificationButton}
           onPress={() => router.push('/notifications')}
           hitSlop={10}
         >
           <Ionicons
             name={hasUnread ? 'notifications' : 'notifications-outline'}
             size={20}
-            style={components.header.notificationIcon}
+            color={colors.primary}
           />
-          {hasUnread && (
-            <View
-              style={{
-                position: 'absolute',
-                top: -2,
-                right: -2,
-                width: 10,
-                height: 10,
-                borderRadius: 5,
-                backgroundColor: colors.danger,
-                borderWidth: 2,
-                borderColor: colors.background,
-              }}
-            />
-          )}
+          {hasUnread && <View style={styles.notificationDot} />}
         </Pressable>
       </View>
 
-      {/* Modal de seleção de endereços */}
       <AddressSelectorModal
         visible={modalVisible}
         onClose={() => setModalVisible(false)}

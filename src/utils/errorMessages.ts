@@ -67,11 +67,12 @@ export const errorMessages: Record<string, string> = {
   InvalidDocument: 'CPF inválido.',
 
   // Cadastro de produtos
-  SellerAlreadySellsThisProduct: 'Sua loja já tem esse item cadastrado',
+  SellerAlreadySellThisProduct: 'Sua loja já tem esse item cadastrado',
   SellerNotFound: 'Vendedor não encontrado',
   SellerProductNotFound: 'Produto não encontrado',
   UnauthorizedToDeleteSellerProduct: 'Não autorizado a deletar esse produto',
   ProductCatalogNotFound: 'Produto não encontrado',
+  ProductImageRequired: 'Selecione uma imagem',
 
   // Cadastro de vendedor
   ProfilePhotoRequired: 'Selecione uma foto de perfil.',

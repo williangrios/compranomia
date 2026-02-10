@@ -1,5 +1,4 @@
 // src/styles/sellerStore.styles.ts
-
 import { StyleSheet } from 'react-native'
 import { colors, spacing } from '@/theme'
 
@@ -23,81 +22,43 @@ export const sellerStoreStyles = StyleSheet.create({
     zIndex: 10,
   },
 
-  // Header
-  header: {
-    flexDirection: 'row',
-    alignItems: 'center',
-    paddingHorizontal: spacing.md,
-    paddingBottom: spacing.md,
-    backgroundColor: colors.background,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
-  },
-  headerSellerInfo: {
-    flex: 1,
-    flexDirection: 'row',
-    alignItems: 'center',
-    marginLeft: spacing.md,
-  },
-  headerAvatar: {
-    width: 40,
-    height: 40,
-    borderRadius: 20,
-    backgroundColor: colors.border,
-  },
-  headerTextContainer: {
-    flex: 1,
-    marginLeft: spacing.sm,
-  },
-  headerName: {
-    fontSize: 16,
-    fontWeight: '700',
-    color: colors.textPrimary,
-  },
-  headerNick: {
-    fontSize: 13,
-    color: colors.textSecondary,
-  },
-  headerPlaceholder: {
-    width: 24,
-  },
-
   // Categorias
   categoriesContainer: {
     paddingHorizontal: spacing.md,
-    paddingTop: spacing.sm,
-    paddingBottom: spacing.xs,
-    gap: spacing.xs,
+    paddingVertical: spacing.sm,
   },
-
   categoryChip: {
-    height: 36, // 🔥 altura fixa
+    height: 36, // 🔥 fixa de vez
     paddingHorizontal: spacing.md,
     borderRadius: 18,
     borderWidth: 1,
     borderColor: colors.border,
     backgroundColor: colors.surface,
     marginRight: spacing.sm,
+    flexDirection: 'row',
     alignItems: 'center',
-    justifyContent: 'center',
   },
 
   categoryChipActive: {
+    height: 36,
     backgroundColor: colors.primary,
+    borderColor: colors.primary,
   },
-
   categoryChipText: {
     fontSize: 13,
     fontWeight: '600',
     color: colors.textSecondary,
-    lineHeight: 16,
+    lineHeight: 13, // 🔥 igual ao fontSize
+    includeFontPadding: false, // 🔥 ANDROID FIX
+    textAlignVertical: 'center',
   },
-
   categoryChipTextActive: {
     fontSize: 13,
-    color: colors.textInverse,
     fontWeight: '600',
-    lineHeight: 16,
+    color: colors.textInverse,
+    lineHeight: 13,
+    includeFontPadding: false,
+    textAlignVertical: 'center',
   },
 
   // Produtos
@@ -120,86 +81,139 @@ export const sellerStoreStyles = StyleSheet.create({
     color: colors.primaryDark,
   },
 
-  // HEADER EXPANDIDO
+  // ═══════════ HEADER EXPANDIDO ═══════════
   headerExpanded: {
     paddingHorizontal: spacing.md,
     paddingBottom: spacing.md,
     backgroundColor: colors.primary,
-    borderBottomWidth: 1,
-    borderBottomColor: colors.border,
   },
   headerTopRow: {
     flexDirection: 'row',
     alignItems: 'center',
   },
+  headerBackButton: {
+    width: 36,
+    height: 36,
+    borderRadius: 18,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+  },
   headerAvatarLarge: {
-    width: 70,
-    height: 70,
-    borderRadius: 28,
+    width: 64,
+    height: 64,
+    borderRadius: 8,
+    borderWidth: 3,
+    borderColor: 'rgba(255,255,255,0.4)',
     backgroundColor: colors.border,
+    marginLeft: spacing.sm,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 2 },
+    shadowOpacity: 0.2,
+    shadowRadius: 4,
+    elevation: 4,
   },
   headerMainInfo: {
     flex: 1,
     marginLeft: spacing.md,
   },
-  headerNickLarge: {
-    fontSize: 18,
+  headerSellerRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 6,
+  },
+  headerNickName: {
+    fontSize: 17,
     fontWeight: '700',
     color: colors.textInverse,
   },
   headerBio: {
     fontSize: 13,
-    color: '#FFEFE6',
-    marginTop: 2,
+    color: 'rgba(255,255,255,0.75)',
+    marginTop: 3,
   },
   headerStars: {
     flexDirection: 'row',
     marginTop: spacing.xs,
     gap: 2,
   },
+  headerCartButton: {
+    width: 44,
+    height: 44,
+    borderRadius: 22,
+    backgroundColor: 'rgba(255,255,255,0.2)',
+    alignItems: 'center',
+    justifyContent: 'center',
+    marginLeft: spacing.sm,
+  },
+  headerCartBadge: {
+    position: 'absolute',
+    top: -2,
+    right: -2,
+    minWidth: 18,
+    height: 18,
+    borderRadius: 9,
+    backgroundColor: colors.textInverse,
+    alignItems: 'center',
+    justifyContent: 'center',
+    paddingHorizontal: 4,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.2,
+    shadowRadius: 2,
+    elevation: 3,
+  },
+  headerCartBadgeText: {
+    fontSize: 10,
+    fontWeight: '800',
+    color: colors.primary,
+  },
+
+  // ═══════════ INFO BADGES ═══════════
   headerInfoBadges: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginTop: spacing.sm,
+    marginTop: spacing.md,
     gap: spacing.sm,
   },
   headerBadge: {
     flexDirection: 'row',
     alignItems: 'center',
-    backgroundColor: 'rgba(255,255,255,0.15)',
-    borderRadius: 8,
-    paddingHorizontal: spacing.sm,
-    paddingVertical: spacing.xs,
-    borderWidth: 0,
-    gap: 4,
+    backgroundColor: 'rgba(255,255,255,0.9)',
+    borderRadius: 10,
+    paddingHorizontal: 10,
+    paddingVertical: 6,
+    gap: 5,
+    shadowColor: '#000',
+    shadowOffset: { width: 0, height: 1 },
+    shadowOpacity: 0.08,
+    shadowRadius: 2,
+    elevation: 2,
   },
-
   headerBadgeText: {
     fontSize: 12,
-    color: colors.textInverse,
+    fontWeight: '600',
+    color: colors.textPrimary,
   },
   headerBadgeOpen: {
     backgroundColor: '#DCFCE7',
-    borderColor: '#BBF7D0',
   },
   headerBadgeClosed: {
     backgroundColor: '#FEE2E2',
-    borderColor: '#FECACA',
   },
   headerBadgeOpenText: {
     fontSize: 12,
-    fontWeight: '600',
-    color: '#D1FAE5',
+    fontWeight: '700',
+    color: colors.success,
   },
-
   headerBadgeClosedText: {
     fontSize: 12,
-    fontWeight: '600',
-    color: '#FECACA',
+    fontWeight: '700',
+    color: colors.error,
   },
   headerFreeTag: {
     fontSize: 12,
-    fontWeight: '600',
+    fontWeight: '700',
     color: colors.success,
   },
 
@@ -219,7 +233,6 @@ export const sellerStoreStyles = StyleSheet.create({
   loadingMore: {
     paddingVertical: spacing.md,
   },
-
   // card
   promoCardSellerRow: {
     flexDirection: 'row',
@@ -228,12 +241,12 @@ export const sellerStoreStyles = StyleSheet.create({
   },
   promoCardSeller: {
     fontSize: 11,
-    color: colors.textSecondary,
+    color: colors.textInverse,
     marginTop: 2,
   },
   promoCardName: {
     fontSize: 13,
     fontWeight: '600',
-    color: colors.textPrimary,
+    color: colors.textInverse,
   },
 })

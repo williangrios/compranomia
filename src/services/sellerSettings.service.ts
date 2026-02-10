@@ -12,7 +12,11 @@ export const sellerSettingsService = {
     if (response.data.status === 'success') {
       return { sellerSettings: response.data.data.sellerSettings }
     }
-    console.log('-----------------', response.data.message)
+    console.log(
+      '-----------------chegou settings=======',
+      response.data.message,
+    )
+    console.log('-----------------chegou settings=======', response.data)
     throw new Error(response.data.message || 'GetSellerSettingsFailed')
   },
 

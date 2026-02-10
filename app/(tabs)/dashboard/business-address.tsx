@@ -9,7 +9,6 @@ import {
 } from 'react-native'
 import { ErrorMessage } from '@/components/ui/ErrorMessage'
 import { SuccessMessage } from '@/components/ui/SuccessMessage'
-import { LocationPickerModal } from '@/components/modals/LocationPickerModal'
 import { profileService } from '@/services/profile.service'
 import { useAuth } from '@/contexts/AuthContext'
 import { colors, components } from '@/theme'
@@ -57,6 +56,7 @@ export default function BusinessAddress() {
   const [success, setSuccess] = useState<{ message: string } | null>(null)
   const [errors, setErrors] = useState<FormErrors>({})
 
+  console.log('[BusinessAddress] user do AuthContext:', user)
   useEffect(() => {
     if (user) {
       setPostalCode(user.postalCode ? formatters.cep(user.postalCode) : '')

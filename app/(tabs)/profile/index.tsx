@@ -1,10 +1,12 @@
 import { View, Text, Alert } from 'react-native'
+import { Linking } from 'react-native'
 import { useRouter } from 'expo-router'
 import { ProfileMenuItem } from '@/components/profile/ProfileMenuItem'
 import { useAuth } from '@/contexts/AuthContext'
 import { UserRole } from '@wrcb/cb-common'
 import { colors } from '@/theme'
 import { Screen } from '@/components/layout/Screen'
+import { capitalizeFullName } from '@/utils/capitalizeFullName'
 
 export default function Profile() {
   const router = useRouter()
@@ -64,7 +66,7 @@ export default function Profile() {
             marginBottom: 4,
           }}
         >
-          {user?.name || user?.nickName}
+          {user?.name || capitalizeFullName(user?.nickName)}
         </Text>
 
         <Text style={{ fontSize: 14, color: colors.textSecondary }}>
@@ -114,6 +116,24 @@ export default function Profile() {
         subtitle="Alterar sua senha de acesso"
         onPress={() => router.push('/profile/update-password')}
         showBadge={!user?.isPersonalDataProvided}
+      />
+
+      <ProfileMenuItem
+        icon="document-text"
+        title="Política de Privacidade"
+        subtitle="Como seus dados são utilizados"
+        onPress={() =>
+          Linking.openURL('https://compranomia.com.br/privacy-policy')
+        }
+      />
+
+      <ProfileMenuItem
+        icon="shield-checkmark"
+        title="Termos e Condições"
+        subtitle="Regras de uso da plataforma"
+        onPress={() =>
+          Linking.openURL('https://compranomia.com.br/terms-and-conditions')
+        }
       />
 
       {/* Logout */}

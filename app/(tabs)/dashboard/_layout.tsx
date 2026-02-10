@@ -27,6 +27,13 @@ export default function DashboardLayout() {
       />
 
       <Stack.Screen
+        name="business-address"
+        options={{
+          title: 'Endereço do negócio',
+        }}
+      />
+
+      <Stack.Screen
         name="seller-settings"
         options={{
           title: 'Configurações do negócio',
@@ -37,7 +44,7 @@ export default function DashboardLayout() {
       <Stack.Screen
         name="products/index"
         options={{
-          title: 'Produtos',
+          title: 'Meus produtos',
         }}
       />
 
