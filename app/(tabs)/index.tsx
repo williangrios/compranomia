@@ -8,7 +8,6 @@ import {
   FlatList,
   ActivityIndicator,
   RefreshControl,
-  TouchableOpacity,
 } from 'react-native'
 import { useRouter } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons'
@@ -20,6 +19,8 @@ import { sellerService } from '@/services/seller.service'
 import { NearbySeller, SellerProductResult } from '@/types'
 import { homeStyles as styles } from '@/styles/home.styles'
 import { colors } from '@/theme'
+import { toastService } from '@/services/toast.service'
+import { capitalizeFullName } from '@/utils/capitalizeFullName'
 
 export default function Home() {
   const router = useRouter()
@@ -62,11 +63,17 @@ export default function Home() {
   }
 
   function handleSellerPress(seller: NearbySeller) {
+    toastService.success({
+      title: `🛍️ Você entrou na loja ${capitalizeFullName(seller.nickName)}`,
+    })
     router.push(`/seller/${seller.id}?distanceKm=${seller.distanceKm}`)
   }
 
   function handleProductPress(product: SellerProductResult) {
     if (product.seller) {
+      toastService.success({
+        title: `🛍️ Você entrou na loja ${capitalizeFullName(product.seller.nickName)}`,
+      })
       router.push(`/seller/${product.seller.id}`)
     }
   }

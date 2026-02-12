@@ -4,6 +4,7 @@ import { authService } from '@/services/auth.service'
 import api from '@/services/api'
 import { User } from '@/types'
 import { Country, Tenant, UserRole } from '@wrcb/cb-common'
+import { useAddress } from '@/contexts/AddressContext'
 
 interface AuthContextData {
   user: User | null
@@ -34,6 +35,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   const [user, setUser] = useState<User | null>(null)
   const [isLoading, setIsLoading] = useState(true)
 
+  const { checkIfHasDeliveryAddress, hasDeliveryAddress } = useAddress()
   const router = useRouter()
   const segments = useSegments()
 
@@ -43,80 +45,80 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
 
   useEffect(() => {
     if (isLoading) return
+    if (!user) return
+    if (!user.isEmailVerified) return
+    if (user.role !== UserRole.Consumer) return
 
-    const inAuthGroup = segments[0] === '(auth)'
+    checkIfHasDeliveryAddress()
+  }, [isLoading, user?.id])
 
-    // 🔒 Não autenticado
-    if (!user && !inAuthGroup) {
-      router.replace('/(auth)/welcome')
-      return
-    }
-
-    // 📧 Email não verificado
-    if (user && !user.isEmailVerified && !inAuthGroup) {
-      router.replace({
-        pathname: '/(auth)/verify-email',
-        params: { email: user.email },
-      })
-      return
-    }
-
-    // 🏠 Onboarding de endereço
-    // 👉 SÓ força se estiver dentro de (auth)
+  useEffect(() => {
+    if (isLoading) return
     if (
       user &&
       user.isEmailVerified &&
       user.role === UserRole.Consumer &&
-      !user.isAddressDataProvided &&
-      inAuthGroup
+      hasDeliveryAddress === null
     ) {
-      router.replace('/(auth)/complete-address')
+      return
+    }
+    const inAuthGroup = segments[0] === '(auth)'
+
+    // 1️⃣ Não autenticado
+    if (!user) {
+      if (!inAuthGroup) {
+        router.replace('/(auth)/welcome')
+      }
       return
     }
 
-    // ✅ Usuário pronto → sai do auth
-    if (
-      user &&
-      user.isEmailVerified &&
-      (user.role === UserRole.Seller || user.isAddressDataProvided) &&
-      inAuthGroup
-    ) {
-      router.replace('/(tabs)')
+    // 2️⃣ Email NÃO verificado
+    if (!user.isEmailVerified) {
+      if (!inAuthGroup) {
+        router.replace({
+          pathname: '/(auth)/verify-email',
+          params: { email: user.email },
+        })
+      }
+      return
     }
-  }, [user, segments, isLoading])
+
+    // 3️⃣ Seller → nunca depende de endereço
+    if (user.role === UserRole.Seller) {
+      if (inAuthGroup) {
+        router.replace('/(tabs)')
+      }
+      return
+    }
+
+    // 4️⃣ Consumer SEM delivery address
+    if (hasDeliveryAddress === false) {
+      if (!inAuthGroup) {
+        router.replace('/(auth)/complete-address')
+      }
+      return
+    }
+
+    // 5️⃣ Consumer COM delivery address
+    if (hasDeliveryAddress === true) {
+      if (inAuthGroup) {
+        router.replace('/(tabs)')
+      }
+      return
+    }
+  }, [user, hasDeliveryAddress, segments, isLoading])
 
   async function checkAuth() {
+    console.log('🔴 [AuthContext] checkAuth INICIADO')
     try {
       setIsLoading(true)
-
       const cachedUser = await authService.getCachedUser()
 
       if (cachedUser) {
-        // 1️⃣ Mostra imediatamente o usuário completo do cache
-        setUser(cachedUser)
-
-        // 2️⃣ Busca atualização do backend (JWT)
-        authService
-          .getCurrentUser()
-          .then((freshUser) => {
-            if (!freshUser) {
-              setUser(null)
-              return
-            }
-
-            // 3️⃣ MERGE: mantém dados completos + atualiza o que veio do JWT
-            const mergedUser = {
-              ...cachedUser,
-              ...freshUser,
-            }
-
-            setUser(mergedUser)
-            authService.updateCachedUser(mergedUser)
-          })
-          .catch(() => {
-            // Se falhar a request, mantém o cache
-            setUser(cachedUser)
-          })
+        console.log('🟡 [AuthContext] Carregando do CACHE:', {
+          isAddressDataProvided: cachedUser.isAddressDataProvided,
+        })
+        setUser(cachedUser) // ✅ Confia 100% no cache
       } else {
         setUser(null)
       }

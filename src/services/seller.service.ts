@@ -25,11 +25,27 @@ export const sellerService = {
       productCategory?: string
       limit?: number
       skip?: number
+      q?: string // ← ADICIONAR ESTA LINHA
     },
   ): Promise<SellerProductsResponse> {
     const response = await api.get(
       `/api/business/compranomia/sellers/${sellerId}/products`,
       { params },
+    )
+    return response.data.data
+  },
+
+  async searchSellerProducts(
+    sellerId: string,
+    query: string,
+    params?: {
+      limit?: number
+      skip?: number
+    },
+  ): Promise<SellerProductsResponse> {
+    const response = await api.get(
+      `/api/business/compranomia/sellers/${sellerId}/products/search`,
+      { params: { q: query, ...params } },
     )
     return response.data.data
   },

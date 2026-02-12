@@ -9,6 +9,7 @@ export default function ProfileLayout() {
         name="index"
         options={{
           title: 'Perfil',
+          headerBackVisible: false,
         }}
       />
 
@@ -17,6 +18,7 @@ export default function ProfileLayout() {
         name="addresses/index"
         options={{
           title: 'Endereços',
+          headerBackVisible: true,
         }}
       />
 
@@ -24,6 +26,7 @@ export default function ProfileLayout() {
         name="addresses/add"
         options={{
           title: 'Adicionar endereço',
+          headerBackVisible: true,
         }}
       />
 
@@ -31,6 +34,7 @@ export default function ProfileLayout() {
         name="addresses/edit/[id]"
         options={{
           title: 'Editar endereço',
+          headerBackVisible: true,
         }}
       />
 
@@ -39,6 +43,7 @@ export default function ProfileLayout() {
         name="personal-data"
         options={{
           title: 'Dados pessoais',
+          headerBackVisible: true,
         }}
       />
 
@@ -46,6 +51,7 @@ export default function ProfileLayout() {
         name="update-password"
         options={{
           title: 'Alterar senha',
+          headerBackVisible: true,
         }}
       />
 
@@ -54,6 +60,7 @@ export default function ProfileLayout() {
         name="business-profile"
         options={{
           title: 'Perfil do negócio',
+          headerBackVisible: true,
         }}
       />
 
@@ -61,12 +68,14 @@ export default function ProfileLayout() {
         name="seller-settings"
         options={{
           title: 'Configurações do vendedor',
+          headerBackVisible: true,
         }}
       />
       <Stack.Screen
         name="store-address"
         options={{
           title: 'Endereço da loja',
+          headerBackVisible: true,
         }}
       />
     </Stack>

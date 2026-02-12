@@ -20,6 +20,7 @@ import { orderService } from '@/services/order.service'
 import { colors, spacing } from '@/theme'
 import { DEFAULT_IMAGE } from '@/utils/constants'
 import { capitalizeFullName } from '@/utils/capitalizeFullName'
+import { translateError } from '@/utils/errorMessages'
 
 // ─── Payment Labels ───────────────────────────────────────────────────────────
 
@@ -30,8 +31,14 @@ const PAYMENT_LABELS: Record<PaymentMethod, { label: string; icon: string }> = {
     label: 'Cartão de Crédito',
     icon: 'card-outline',
   },
-  //   [PaymentMethod.DebitCard]: { label: 'Cartão de Débito', icon: 'card-outline' },
-  //   [PaymentMethod.MealCard]: { label: 'Vale Refeição', icon: 'restaurant-outline' },
+  [PaymentMethod.DebitCard]: {
+    label: 'Cartão de Débito',
+    icon: 'card-outline',
+  },
+  [PaymentMethod.MealCard]: {
+    label: 'Vale Refeição',
+    icon: 'restaurant-outline',
+  },
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -107,11 +114,11 @@ export default function Checkout() {
   async function handleSubmit() {
     if (!cart || cart.items.length === 0) return
     if (!selectedPayment) {
-      Alert.alert('Atenção', 'Selecione uma forma de pagamento')
+      Alert.alert('Ooops..', 'Selecione uma forma de pagamento')
       return
     }
     if (!address || !coordinates) {
-      Alert.alert('Atenção', 'Selecione um endereço de entrega')
+      Alert.alert('Ooops..', 'Selecione um endereço de entrega')
       return
     }
 
@@ -149,6 +156,8 @@ export default function Checkout() {
                 items: cart.items.map((item) => ({
                   sellerProductId: item.sellerProductId,
                   quantity: item.quantity,
+                  price: item.price,
+                  promotionalPrice: item.promotionalPrice ?? null,
                 })),
                 subtotal,
                 deliveryFee,
@@ -156,8 +165,28 @@ export default function Checkout() {
                 paymentMethod: selectedPayment,
                 estimatedDeliveryDate: getEstimatedDeliveryDate().toISOString(),
               }
-
               const { order } = await orderService.createOrder(payload)
+              console.log(
+                '[CHECKOUT] Payload enviado:',
+                JSON.stringify(payload, null, 2),
+              )
+              console.log(
+                '[CHECKOUT] Subtotal calculado pelo contexto:',
+                subtotal,
+              )
+              console.log('[CHECKOUT] DeliveryFee:', deliveryFee)
+              console.log('[CHECKOUT] Total:', total)
+              console.log(
+                '[CHECKOUT] Items:',
+                cart.items.map((i) => ({
+                  name: i.name,
+                  price: i.price,
+                  promotionalPrice: i.promotionalPrice,
+                  quantity: i.quantity,
+                  step: i.step,
+                  measurementUnit: i.measurementUnit,
+                })),
+              )
 
               clearCart(id!)
 
@@ -175,9 +204,10 @@ export default function Checkout() {
                 ],
               )
             } catch (error: any) {
-              const msg =
-                error.normalizedErrors?.[0]?.message || 'Erro ao criar pedido'
-              Alert.alert('Erro', msg)
+              const errorKey =
+                error.normalizedErrors?.[0]?.message || 'GenericError'
+              const msg = translateError(errorKey)
+              Alert.alert('Ooops..', msg)
             } finally {
               setIsSubmitting(false)
             }
@@ -291,6 +321,19 @@ export default function Checkout() {
           ) : (
             <Text style={s.warningText}>Selecione um endereço</Text>
           )}
+          {/* Tempo estimado */}
+          {deliveryTime > 0 && (
+            <View style={s.deliveryTimeRow}>
+              <Ionicons
+                name="time-outline"
+                size={18}
+                color={colors.textSecondary}
+              />
+              <Text style={s.deliveryTimeText}>
+                Entrega estimada: {deliveryTime} min
+              </Text>
+            </View>
+          )}
         </View>
 
         {/* Forma de pagamento */}
@@ -351,25 +394,17 @@ export default function Checkout() {
             <Text style={s.totalValue}>R$ {total.toFixed(2)}</Text>
           </View>
         </View>
-
-        {/* Tempo estimado */}
-        {deliveryTime > 0 && (
-          <View style={s.deliveryTimeRow}>
-            <Ionicons
-              name="time-outline"
-              size={18}
-              color={colors.textSecondary}
-            />
-            <Text style={s.deliveryTimeText}>
-              Entrega estimada: {deliveryTime} min
-            </Text>
-          </View>
-        )}
       </ScrollView>
 
       {/* Bottom bar */}
       <View
-        style={[s.bottomBar, { paddingBottom: insets.bottom + spacing.md }]}
+        style={[
+          s.bottomBar,
+          {
+            backgroundColor: '#eee',
+            paddingBottom: insets.bottom + spacing.md,
+          },
+        ]}
       >
         <View>
           <Text style={s.bottomTotal}>R$ {total.toFixed(2)}</Text>
@@ -384,7 +419,7 @@ export default function Checkout() {
           {isSubmitting ? (
             <ActivityIndicator color="#FFF" size="small" />
           ) : (
-            <Text style={s.submitButtonText}>Fazer Pedido</Text>
+            <Text style={s.submitButtonText}>Finalizar Compra</Text>
           )}
         </TouchableOpacity>
       </View>
@@ -406,7 +441,7 @@ function CartItemRow({
   const hasPromo =
     item.promotionalPrice != null && item.promotionalPrice < item.price
   const displayPrice = hasPromo ? item.promotionalPrice! : item.price
-  const itemTotal = displayPrice * item.quantity
+  const itemTotal = displayPrice * (item.quantity / item.step)
 
   return (
     <View style={s.cartItem}>
@@ -439,7 +474,10 @@ function CartItemRow({
                 color={colors.primary}
               />
             </TouchableOpacity>
-            <Text style={s.quantityText}>{item.quantity}</Text>
+            <Text style={s.quantityText}>
+              {' '}
+              {item.quantity} {item.measurementUnit}
+            </Text>
             <TouchableOpacity
               style={s.quantityButton}
               onPress={() => onUpdateQuantity(item.quantity + item.step)}
@@ -511,8 +549,8 @@ const s = StyleSheet.create({
     borderBottomColor: colors.border,
   },
   sellerPhoto: {
-    width: 40,
-    height: 40,
+    width: 64,
+    height: 64,
     borderRadius: 12,
     backgroundColor: colors.border,
   },
@@ -666,10 +704,10 @@ const s = StyleSheet.create({
   },
   deliveryTimeRow: {
     flexDirection: 'row',
-    alignItems: 'center',
+    alignItems: 'flex-start',
     gap: 8,
-    paddingHorizontal: spacing.md,
-    paddingVertical: 12,
+    paddingTop: 12,
+    paddingVertical: 6,
   },
   deliveryTimeText: {
     fontSize: 13,

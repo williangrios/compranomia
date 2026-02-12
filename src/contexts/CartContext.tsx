@@ -8,6 +8,9 @@ import {
 } from 'react'
 import AsyncStorage from '@react-native-async-storage/async-storage'
 import { STORAGE_KEYS } from '@/utils/constants'
+import { toastService } from '@/services/toast.service'
+import { capitalizeFullName } from '@/utils/capitalizeFullName'
+import { MeasurementUnit } from '@wrcb/cb-common'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
 
@@ -37,6 +40,24 @@ interface CartContextData {
     sellerId: string,
     sellerInfo: { name: string; photo: string },
     item: CartItem,
+  ) => void
+  addProductToCart: (
+    // ✅ NOVO
+    sellerId: string,
+    sellerInfo: { name: string; photo: string },
+    product: {
+      id: string
+      productCatalogId: string
+      name: string
+      price: number
+      promotionalPrice?: number | null
+      measurementUnit: string
+      step: number
+      stock: number
+      processedImages?: string[]
+      originalImages?: string[]
+    },
+    quantity: number,
   ) => void
   updateQuantity: (
     sellerId: string,
@@ -127,7 +148,10 @@ export function CartProvider({ children }: { children: ReactNode }) {
         } else {
           updatedItems = [...cart.items, item]
         }
-
+        toastService.success({
+          title: `🛒 Item adicionado ao carrinho de ${capitalizeFullName(sellerInfo.name)}: ${item.name}`,
+          message: '',
+        })
         return {
           ...prev,
           [sellerId]: { ...cart, items: updatedItems },
@@ -189,6 +213,62 @@ export function CartProvider({ children }: { children: ReactNode }) {
     [],
   )
 
+  const addProductToCart = useCallback(
+    (
+      sellerId: string,
+      sellerInfo: { name: string; photo: string },
+      product: {
+        id: string // sellerProductId
+        productCatalogId: string
+        name: string
+        price: number
+        promotionalPrice?: number | null
+        measurementUnit: string
+        step: number
+        stock: number
+        processedImages?: string[]
+        originalImages?: string[]
+      },
+      quantity: number,
+    ) => {
+      // ✅ Validações
+      if (quantity <= 0) {
+        return
+      }
+
+      // ✅ Processa imagens
+      const images = product.processedImages?.length
+        ? product.processedImages
+        : product.originalImages?.length
+          ? product.originalImages
+          : []
+
+      // ✅ Garante step válido
+      const step = product.step && product.step > 0 ? product.step : 1
+      console.log('step------', step)
+      console.log('unidade------', product.measurementUnit)
+      console.log('quantidade------', quantity)
+
+      // ✅ Cria o CartItem
+      const cartItem: CartItem = {
+        sellerProductId: product.id,
+        productCatalogId: product.productCatalogId,
+        name: product.name,
+        price: product.price,
+        promotionalPrice: product.promotionalPrice,
+        quantity,
+        measurementUnit: product.measurementUnit,
+        step,
+        image: images[0] || '',
+        stock: product.stock,
+      }
+
+      // ✅ Adiciona ao carrinho (usa a função addItem existente)
+      addItem(sellerId, sellerInfo, cartItem)
+    },
+    [addItem],
+  )
+
   const clearCart = useCallback((sellerId: string) => {
     setCarts((prev) => {
       const { [sellerId]: _, ...rest } = prev
@@ -218,7 +298,13 @@ export function CartProvider({ children }: { children: ReactNode }) {
       if (!cart) return 0
       return cart.items.reduce((sum, item) => {
         const price = getItemPrice(item)
-        return sum + price * item.quantity
+        let subtotal = 0
+        if (item.measurementUnit === MeasurementUnit.Un) {
+          subtotal = sum + price * item.quantity
+        } else {
+          subtotal = sum + price * (item.quantity / item.step)
+        }
+        return subtotal
       }, 0)
     },
     [carts],
@@ -249,6 +335,7 @@ export function CartProvider({ children }: { children: ReactNode }) {
         carts,
         addItem,
         updateQuantity,
+        addProductToCart,
         removeItem,
         clearCart,
         getCart,

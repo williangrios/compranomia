@@ -19,6 +19,7 @@ import { deliveryAddressService } from '@/services/deliveryAddress.service'
 import { DeliveryAddress } from '@/types'
 import { colors } from '@/theme'
 import { getApiErrors } from '@/utils/getApiErrors'
+import { useAddress } from '@/contexts/AddressContext'
 
 interface ApiError {
   message: string
@@ -30,6 +31,7 @@ const MAX_ADDRESSES = 4
 export default function Addresses() {
   const router = useRouter()
   const insets = useSafeAreaInsets()
+  const { setAddress, refreshAddressFromApi } = useAddress()
 
   const [addresses, setAddresses] = useState<DeliveryAddress[]>([])
   const [isLoading, setIsLoading] = useState(true)
@@ -72,13 +74,13 @@ export default function Addresses() {
     }
   }
 
-  async function handleSetDefault(id: string) {
+  async function handleSetDefault(address: DeliveryAddress) {
     try {
       setApiErrors(null)
       setSuccess(null)
-      await deliveryAddressService.setDefault(id)
-      setSuccess({ message: 'Endereço padrão definido' })
+      await setAddress(address)
       await loadAddresses()
+      setSuccess({ message: 'Endereço padrão definido' })
     } catch (error: unknown) {
       setApiErrors(getApiErrors(error))
     }
@@ -156,7 +158,7 @@ export default function Addresses() {
                 router.push(`/profile/addresses/edit/${address.id}`)
               }
               onDelete={() => handleDelete(address.id)}
-              onSetDefault={() => handleSetDefault(address.id)}
+              onSetDefault={() => handleSetDefault(address)}
             />
           ))
         )}

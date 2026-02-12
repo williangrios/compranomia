@@ -4,6 +4,8 @@ import { colors } from '@/theme'
 import { productStyles as styles } from '@/styles/product.styles'
 import { SellerProduct } from '@/types/sellerProduct'
 import { DEFAULT_IMAGE } from '@/utils/constants'
+import { formatters } from '@/utils/formatters'
+import { MeasurementUnit } from '@wrcb/cb-common'
 
 interface Props {
   product: SellerProduct
@@ -26,9 +28,6 @@ export function SellerProductCard({ product, onEdit, onDelete }: Props) {
   const hasPromo =
     product.promotionalPrice != null && product.promotionalPrice < product.price
 
-  const isLowStock =
-    product.minStockAlert != null && product.stock <= product.minStockAlert
-
   return (
     <TouchableOpacity
       onPress={onEdit}
@@ -46,18 +45,30 @@ export function SellerProductCard({ product, onEdit, onDelete }: Props) {
           {hasPromo ? (
             <>
               <Text style={styles.sellerCardPrice}>
-                R$ {product.promotionalPrice!.toFixed(2)}
+                {formatters.showPrice(
+                  product.promotionalPrice!,
+                  product.step,
+                  product.measurementUnit,
+                )}
               </Text>
               <Text style={styles.sellerCardPriceOriginal}>
-                R$ {product.price.toFixed(2)}
+                {formatters.showOriginalPrice(product.price)}
               </Text>
             </>
           ) : (
             <Text style={styles.sellerCardPrice}>
-              R$ {product.price.toFixed(2)}
+              {formatters.showOriginalPrice(product.price)}
             </Text>
           )}
         </View>
+
+        {product.measurementUnit !== MeasurementUnit.Un && (
+          <View style={styles.sellerCardRow}>
+            <Text style={styles.sellerCardCategory}>
+              {formatters.formatStep(product.step, product.measurementUnit)}
+            </Text>
+          </View>
+        )}
 
         {product.isActive ? (
           <View

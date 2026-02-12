@@ -1,6 +1,6 @@
 // src/types/seller.types.ts
 
-import { UserTags } from '@wrcb/cb-common'
+import { MeasurementUnit, UserTags } from '@wrcb/cb-common'
 
 export interface NearbySeller {
   id: string
@@ -21,11 +21,11 @@ export interface SellerProductResult {
   name: string
   description: string
   productCategory: string
-  measurementUnit: string
+  measurementUnit: MeasurementUnit
   baseWeight?: number
   brand?: string
   barcode?: string
-  step?: number
+  step: number
   price: number
   promotionalPrice?: number | null
   stock: number

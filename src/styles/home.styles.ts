@@ -79,7 +79,7 @@ export const homeStyles = StyleSheet.create({
     borderWidth: 1,
     borderColor: colors.border,
     overflow: 'hidden',
-    marginRight: spacing.md,
+    marginRight: spacing.sm,
   },
   nearbyCardTags: {
     flexDirection: 'row',

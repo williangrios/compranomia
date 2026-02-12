@@ -73,12 +73,24 @@ export const errorMessages: Record<string, string> = {
   UnauthorizedToDeleteSellerProduct: 'Não autorizado a deletar esse produto',
   ProductCatalogNotFound: 'Produto não encontrado',
   ProductImageRequired: 'Selecione uma imagem',
+  RequireProvidedAddress:
+    'Antes de cadastrar produtos, você deve terminar eu cadastro. Vá no menu Loja > Endereço do negócio.',
+  RequireProvidedBusinessData:
+    'Antes de cadastrar produtos, você deve terminar eu cadastro. Vá no menu Loja > Perfil do negócio.',
+  RequireProvidedPersonalData:
+    'Antes de cadastrar produtos, você deve terminar eu cadastro. Vá no menu Perfil > Dados pessoais.',
 
   // Cadastro de vendedor
   ProfilePhotoRequired: 'Selecione uma foto de perfil.',
 
   // Rate limit
   TooManyRequests: 'Muitas tentativas. Aguarde um momento.',
+
+  // Compra
+  CannotBuyFromYourself: 'Não pode comprar de sua própria loja.',
+
+  // Chat
+  CannotSendMessageToDeliveredOrder: 'A venda já foi finalizada',
 }
 
 export function translateError(errorKey: string): string {

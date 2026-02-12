@@ -1,5 +1,7 @@
 // src/utils/formatters.ts
 
+import { MeasurementUnit } from '@wrcb/cb-common'
+
 export const formatters = {
   /**
    * Formata CEP (12345678 -> 12345-678)
@@ -163,5 +165,59 @@ export const formatters = {
   truncate(text: string, maxLength: number): string {
     if (text.length <= maxLength) return text
     return text.slice(0, maxLength) + '...'
+  },
+
+  showPrice(
+    price: number,
+    amount: number,
+    measurementUnit: MeasurementUnit,
+  ): string {
+    const priceFormatter = new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+      minimumFractionDigits: 2,
+    })
+    const amountPart = amount === 1 ? '' : `${amount} `
+    return `${priceFormatter.format(price)} / ${amountPart}${measurementUnit}`
+  },
+
+  calculatePrice(
+    quantity: number,
+    displayPrice: number,
+    isUnit: boolean,
+    step: number,
+  ): string {
+    const price =
+      quantity > 0
+        ? `R$ ${(displayPrice * (isUnit ? quantity : quantity / step)).toFixed(2)}`
+        : 'Adicionar'
+    return price
+  },
+
+  showOriginalPrice(price: number): string {
+    const priceFormatter = new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+      minimumFractionDigits: 2,
+    })
+    return `${priceFormatter.format(price)}`
+  },
+
+  formatQuantity(quantity: number, measurementUnit: MeasurementUnit): string {
+    return `${quantity} ${measurementUnit}`
+  },
+
+  formatStep(step: number, measurementUnit: MeasurementUnit): string | null {
+    if (measurementUnit !== MeasurementUnit.Un) {
+      return `Vendido de ${step}${measurementUnit} em ${step}${measurementUnit}`
+    }
+    return null
+  },
+
+  instructionsHowToBuy(
+    measurementUnit: MeasurementUnit,
+    step: number,
+  ): string | null {
+    return `Ex: O cliente comprará de ${step} ${measurementUnit} em ${step} ${measurementUnit}`
   },
 }

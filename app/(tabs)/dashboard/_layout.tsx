@@ -9,6 +9,7 @@ export default function DashboardLayout() {
         name="index"
         options={{
           title: 'Loja',
+          headerBackVisible: false,
         }}
       />
 
@@ -16,6 +17,7 @@ export default function DashboardLayout() {
         name="products"
         options={{
           title: 'Produtos',
+          headerBackVisible: true,
         }}
       />
 
@@ -23,6 +25,7 @@ export default function DashboardLayout() {
         name="business-profile"
         options={{
           title: 'Perfil do negócio',
+          headerBackVisible: true,
         }}
       />
 
@@ -30,6 +33,7 @@ export default function DashboardLayout() {
         name="business-address"
         options={{
           title: 'Endereço do negócio',
+          headerBackVisible: true,
         }}
       />
 
@@ -37,6 +41,7 @@ export default function DashboardLayout() {
         name="seller-settings"
         options={{
           title: 'Configurações do negócio',
+          headerBackVisible: true,
         }}
       />
 
@@ -45,6 +50,7 @@ export default function DashboardLayout() {
         name="products/index"
         options={{
           title: 'Meus produtos',
+          headerBackVisible: true,
         }}
       />
 
@@ -52,6 +58,7 @@ export default function DashboardLayout() {
         name="products/add"
         options={{
           title: 'Adicionar produto',
+          headerBackVisible: true,
         }}
       />
 
@@ -59,6 +66,7 @@ export default function DashboardLayout() {
         name="products/new"
         options={{
           title: 'Adicionar produto',
+          headerBackVisible: true,
         }}
       />
 
@@ -66,6 +74,7 @@ export default function DashboardLayout() {
         name="products/adopt"
         options={{
           title: 'Adicionar produto',
+          headerBackVisible: true,
         }}
       />
 
@@ -73,6 +82,7 @@ export default function DashboardLayout() {
         name="products/search"
         options={{
           title: 'Buscar produto',
+          headerBackVisible: true,
         }}
       />
 
@@ -80,6 +90,7 @@ export default function DashboardLayout() {
         name="products/edit/[id]"
         options={{
           title: 'Editar produto',
+          headerBackVisible: true,
         }}
       />
     </Stack>

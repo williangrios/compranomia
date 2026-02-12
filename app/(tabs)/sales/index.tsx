@@ -1,43 +1,25 @@
 // app/(tabs)/sales/index.tsx
-import { View, Text } from 'react-native'
-import { Ionicons } from '@expo/vector-icons'
-import { Screen } from '@/components/layout/Screen'
-import { colors } from '@/theme'
+import { OrdersListScreen } from '@/components/order/OrdersListScreen'
+import { capitalizeFullName } from '@/utils/capitalizeFullName'
+import { useRouter } from 'expo-router'
 
 export default function Sales() {
+  const router = useRouter()
   return (
-    <Screen>
-      {/* Empty State */}
-      <View style={{ alignItems: 'center', paddingVertical: 80 }}>
-        <Ionicons
-          name="receipt-outline"
-          size={64}
-          color={colors.textSecondary}
-        />
-
-        <Text
-          style={{
-            fontSize: 18,
-            fontWeight: '600',
-            color: colors.textPrimary,
-            marginTop: 16,
-            marginBottom: 8,
-          }}
-        >
-          Nenhuma venda realizada
-        </Text>
-
-        <Text
-          style={{
-            fontSize: 14,
-            color: colors.textSecondary,
-            textAlign: 'center',
-            paddingHorizontal: 40,
-          }}
-        >
-          Quando você receber pedidos, eles aparecerão aqui
-        </Text>
-      </View>
-    </Screen>
+    <OrdersListScreen
+      getDisplayName={(order: any) =>
+        order.customerId?.name
+          ? capitalizeFullName(order.customerId.name)
+          : order.customerId?.name
+            ? capitalizeFullName(order.customerId.name)
+            : 'Cliente'
+      }
+      emptyTitle="Nenhuma venda realizada.."
+      emptySubtitle="Quando você receber pedidos, eles aparecerão aqui"
+      emptyIcon="receipt-outline"
+      onViewOrder={(id) => router.push(`/(tabs)/sales/${id}`)}
+      onOpenChat={(id) => router.push(`/(tabs)/sales/${id}?tab=chat`)}
+      type="sales"
+    />
   )
 }

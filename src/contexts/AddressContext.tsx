@@ -7,6 +7,8 @@ interface AddressContextData {
   address: DeliveryAddress | null
   coordinates: { lat: number; lng: number } | null
   isLoading: boolean
+  hasDeliveryAddress: boolean | null
+  checkIfHasDeliveryAddress: () => Promise<void>
   setAddress: (address: DeliveryAddress) => Promise<void>
   clearAddress: () => Promise<void>
   refreshAddressFromApi: () => Promise<void>
@@ -19,6 +21,9 @@ const AddressContext = createContext<AddressContextData>(
 export function AddressProvider({ children }: { children: React.ReactNode }) {
   const [address, setAddressState] = useState<DeliveryAddress | null>(null)
   const [isLoading, setIsLoading] = useState(true)
+  const [hasDeliveryAddress, setHasDeliveryAddress] = useState<boolean | null>(
+    null,
+  )
 
   const coordinates = address?.location?.coordinates
     ? {
@@ -46,10 +51,11 @@ export function AddressProvider({ children }: { children: React.ReactNode }) {
 
   async function setAddress(address: DeliveryAddress) {
     try {
-      await deliveryAddressService.setDefault(address.id)
-      const updatedAddress = { ...address, isDefault: true }
-      setAddressState(updatedAddress)
-      await storageService.saveSelectedAddress(updatedAddress)
+      const { deliveryAddress } = await deliveryAddressService.setDefault(
+        address.id,
+      )
+      setAddressState(deliveryAddress)
+      await storageService.saveSelectedAddress(deliveryAddress)
     } catch (error) {
       console.error('Error setting default address:', error)
       throw error
@@ -78,15 +84,40 @@ export function AddressProvider({ children }: { children: React.ReactNode }) {
     }
   }
 
+  async function checkIfHasDeliveryAddress() {
+    try {
+      const response = await deliveryAddressService.list()
+      const hasAddress =
+        Array.isArray(response.deliveryAddresses) &&
+        response.deliveryAddresses.length > 0
+
+      setHasDeliveryAddress(hasAddress)
+
+      if (hasAddress) {
+        const defaultAddress =
+          response.deliveryAddresses.find((a: any) => a.isDefault) ||
+          response.deliveryAddresses[0]
+
+        setAddressState(defaultAddress)
+        await storageService.saveSelectedAddress(defaultAddress)
+      }
+    } catch (error) {
+      console.error('[AddressContext] checkIfHasDeliveryAddress error', error)
+      setHasDeliveryAddress(false)
+    }
+  }
+
   return (
     <AddressContext.Provider
       value={{
         address,
         coordinates,
         isLoading,
+        hasDeliveryAddress,
         setAddress,
         clearAddress,
         refreshAddressFromApi,
+        checkIfHasDeliveryAddress,
       }}
     >
       {children}

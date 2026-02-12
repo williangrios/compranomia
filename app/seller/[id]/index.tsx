@@ -11,6 +11,7 @@ import {
   TouchableOpacity,
   RefreshControl,
   StyleSheet,
+  TextInput,
 } from 'react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons'
@@ -25,6 +26,7 @@ import { colors, spacing } from '@/theme'
 import { PaymentMethod, UserTags } from '@wrcb/cb-common'
 import { capitalizeFullName } from '@/utils/capitalizeFullName'
 import { CartItem, useCart } from '@/contexts/CartContext'
+import { CartSummaryBar } from '@/components/cart/CartSummaryBar'
 
 const DEFAULT_AVATAR = 'https://static.compranomia.com/defaults/seller.png'
 
@@ -72,7 +74,7 @@ interface SellerProfile {
 }
 
 export default function SellerStore() {
-  const { addItem, getCartCount } = useCart()
+  const { getCartCount, addProductToCart, getCartSubtotal } = useCart()
   const { id, distanceKm: distanceKmParam } = useLocalSearchParams<{
     id: string
     distanceKm?: string
@@ -86,6 +88,12 @@ export default function SellerStore() {
   const [total, setTotal] = useState(0)
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [categories, setCategories] = useState<UserTags[]>([])
+  const [searchMode, setSearchMode] = useState(false)
+  const [searchQuery, setSearchQuery] = useState('')
+  const [categoryProducts, setCategoryProducts] = useState<
+    Record<string, SellerProductResult[]>
+  >({})
+  const [viewMode, setViewMode] = useState<'all' | 'category' | 'search'>('all')
   const [isLoading, setIsLoading] = useState(true)
   const [isRefreshing, setIsRefreshing] = useState(false)
   const [isLoadingMore, setIsLoadingMore] = useState(false)
@@ -98,6 +106,7 @@ export default function SellerStore() {
   // Dados derivados do profile
   const seller = profile?.seller || null
   const cartCount = seller ? getCartCount(id!) : 0
+  const cartSubtotal = seller ? getCartSubtotal(id!) : 0
   const todaySchedule = profile ? getTodaySchedule(profile.schedule.days) : null
   const isOpenToday = todaySchedule?.isOpen ?? false
   const scheduleText = formatSchedule(todaySchedule)
@@ -157,34 +166,138 @@ export default function SellerStore() {
     loadData().finally(() => setIsLoading(false))
   }, [loadData])
 
+  useEffect(() => {
+    // Carrega produtos por categoria quando as categorias forem definidas
+    if (
+      categories.length > 0 &&
+      viewMode === 'all' &&
+      Object.keys(categoryProducts).length === 0
+    ) {
+      const loadCategoryProducts = async () => {
+        const categoryProductsMap: Record<string, SellerProductResult[]> = {}
+
+        await Promise.all(
+          categories.map(async (cat) => {
+            const response = await sellerService.getProducts(id!, {
+              productCategory: cat,
+              limit: 10,
+              skip: 0,
+            })
+            categoryProductsMap[cat] = response.products
+          }),
+        )
+
+        setCategoryProducts(categoryProductsMap)
+      }
+
+      loadCategoryProducts()
+    }
+  }, [categories, viewMode, categoryProducts, id])
+
   async function handleRefresh() {
     setIsRefreshing(true)
     await loadData()
+
+    // Recarregar conforme o modo atual
+    if (viewMode === 'all') {
+      await handleCategoryPress(null)
+    } else if (viewMode === 'category' && selectedCategory) {
+      await handleCategoryPress(selectedCategory)
+    } else if (viewMode === 'search' && searchQuery.length >= 2) {
+      await handleSearch(searchQuery)
+    }
+
     setIsRefreshing(false)
   }
 
   async function handleCategoryPress(category: string | null) {
     setSelectedCategory(category)
+
+    if (category === null) {
+      // Modo "Todos" - carregar produtos por categoria para sliders
+      setViewMode('all')
+      setIsLoading(true)
+      try {
+        const categoryProductsMap: Record<string, SellerProductResult[]> = {}
+
+        // Carregar produtos de cada categoria (10 por categoria)
+        await Promise.all(
+          categories.map(async (cat) => {
+            const response = await sellerService.getProducts(id!, {
+              productCategory: cat,
+              limit: 10,
+              skip: 0,
+            })
+            categoryProductsMap[cat] = response.products
+          }),
+        )
+
+        setCategoryProducts(categoryProductsMap)
+      } catch (error) {
+        console.error('Error loading category products:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    } else {
+      // Modo Grid - categoria específica
+      setViewMode('category')
+      setIsLoading(true)
+      try {
+        const params: any = { limit: 20, skip: 0 }
+        params.productCategory = category
+        const response = await sellerService.getProducts(id!, params)
+        setProducts(response.products)
+        setTotal(response.total)
+      } catch (error) {
+        console.error('Error filtering products:', error)
+      } finally {
+        setIsLoading(false)
+      }
+    }
+  }
+
+  async function handleSearch(text: string) {
+    setSearchQuery(text)
+
+    if (text.trim().length < 2) {
+      setProducts([])
+      setTotal(0)
+      return
+    }
+
     setIsLoading(true)
     try {
-      const params: any = { limit: 20, skip: 0 }
-      if (category) params.productCategory = category
-      const response = await sellerService.getProducts(id!, params)
+      const response = await sellerService.getProducts(id!, {
+        q: text.trim(),
+        limit: 20,
+        skip: 0,
+      })
       setProducts(response.products)
       setTotal(response.total)
     } catch (error) {
-      console.error('Error filtering products:', error)
+      console.error('Error searching products:', error)
     } finally {
       setIsLoading(false)
     }
   }
 
   async function handleLoadMore() {
+    // LoadMore só funciona nos modos category e search
+    if (viewMode === 'all') return
     if (isLoadingMore || products.length >= total) return
+
     setIsLoadingMore(true)
     try {
       const params: any = { limit: 20, skip: products.length }
-      if (selectedCategory) params.productCategory = selectedCategory
+
+      if (viewMode === 'category' && selectedCategory) {
+        params.productCategory = selectedCategory
+      }
+
+      if (viewMode === 'search' && searchQuery) {
+        params.q = searchQuery
+      }
+
       const response = await sellerService.getProducts(id!, params)
       setProducts((prev) => [...prev, ...response.products])
       setTotal(response.total)
@@ -195,36 +308,9 @@ export default function SellerStore() {
     }
   }
 
-  function handleAddToCart(product: SellerProductResult, quantity: number) {
-    if (!seller) return
-
-    const images = product.processedImages?.length
-      ? product.processedImages
-      : product.originalImages?.length
-        ? product.originalImages
-        : []
-
-    const cartItem: CartItem = {
-      sellerProductId: product.id,
-      productCatalogId: product.productCatalogId,
-      name: product.name,
-      price: product.price,
-      promotionalPrice: product.promotionalPrice,
-      quantity,
-      measurementUnit: product.measurementUnit,
-      step: product.step ?? 1,
-      image: images[0] || '',
-      stock: product.stock,
-    }
-
-    addItem(
-      id!,
-      { name: seller.nickName, photo: seller.profilePhoto },
-      cartItem,
-    )
+  function redirectToItemPage(sellerId: string, itemId: string): void {
+    router.push(`/seller/${sellerId}/product/${itemId}`)
   }
-  const promotionalProducts = products.filter((p) => p.discountPercent > 0)
-  const regularProducts = products.filter((p) => p.discountPercent === 0)
 
   if (isLoading && !seller) {
     return (
@@ -297,47 +383,6 @@ export default function SellerStore() {
               </View>
             </>
           )}
-
-          {/* Carrinho fake */}
-          <TouchableOpacity
-            activeOpacity={0.8}
-            style={{
-              marginLeft: 'auto',
-              position: 'relative',
-              padding: 6,
-            }}
-            onPress={() => {
-              if (cartCount > 0) {
-                router.push(`/seller/${id}/checkout`)
-              }
-            }}
-          >
-            <Ionicons name="cart-outline" size={24} color="#FFF" />
-            <View
-              style={{
-                position: 'absolute',
-                top: 2,
-                right: 2,
-                minWidth: 16,
-                height: 16,
-                borderRadius: 8,
-                backgroundColor: '#FFF',
-                alignItems: 'center',
-                justifyContent: 'center',
-                paddingHorizontal: 4,
-              }}
-            >
-              <Text
-                style={{
-                  fontSize: 10,
-                  fontWeight: '700',
-                  color: colors.primary,
-                }}
-              >
-                {cartCount}
-              </Text>
-            </View>
-          </TouchableOpacity>
         </View>
 
         {/* Badges de info */}
@@ -364,20 +409,6 @@ export default function SellerStore() {
               {scheduleText}
             </Text>
           </View>
-
-          {/* Tempo de preparo */}
-          {/* {profile && (
-            <View style={styles.headerBadge}>
-              <Ionicons
-                name="restaurant-outline"
-                size={14}
-                color={colors.textSecondary}
-              />
-              <Text style={styles.headerBadgeText}>
-                Preparo: {profile.schedule.preparationTime} min
-              </Text>
-            </View>
-          )} */}
 
           {/* Entrega */}
           {deliveryRange && (
@@ -423,23 +454,42 @@ export default function SellerStore() {
             contentContainerStyle={styles.categoriesContainer}
           >
             <TouchableOpacity
-              style={styles.categoryChip}
-              onPress={() => console.log('Abrir busca')}
+              style={[
+                styles.categoryChip,
+                viewMode === 'search' && styles.categoryChipActive,
+              ]}
+              onPress={() => {
+                setViewMode('search')
+                setSelectedCategory(null)
+                setSearchQuery('')
+                setProducts([])
+              }}
               activeOpacity={0.8}
             >
               <Ionicons
                 name="search-outline"
                 size={14}
-                color={colors.textSecondary}
+                color={
+                  viewMode === 'search'
+                    ? colors.textInverse
+                    : colors.textSecondary
+                }
                 style={{ marginRight: 6 }}
               />
-              <Text style={styles.categoryChipText}>Pesquisar</Text>
+              <Text
+                style={[
+                  styles.categoryChipText,
+                  viewMode === 'search' && styles.categoryChipTextActive,
+                ]}
+              >
+                Pesquisar
+              </Text>
             </TouchableOpacity>
 
             <TouchableOpacity
               style={[
                 styles.categoryChip,
-                !selectedCategory && styles.categoryChipActive,
+                viewMode === 'all' && styles.categoryChipActive,
               ]}
               onPress={() => handleCategoryPress(null)}
               activeOpacity={0.8}
@@ -447,7 +497,7 @@ export default function SellerStore() {
               <Text
                 style={[
                   styles.categoryChipText,
-                  !selectedCategory && styles.categoryChipTextActive,
+                  viewMode === 'all' && styles.categoryChipTextActive,
                 ]}
               >
                 Todos
@@ -462,7 +512,9 @@ export default function SellerStore() {
                   key={cat}
                   style={[
                     styles.categoryChip,
-                    selectedCategory === cat && styles.categoryChipActive,
+                    viewMode === 'category' &&
+                      selectedCategory === cat &&
+                      styles.categoryChipActive,
                   ]}
                   onPress={() => handleCategoryPress(cat)}
                   activeOpacity={0.8}
@@ -470,7 +522,9 @@ export default function SellerStore() {
                   <Text
                     style={[
                       styles.categoryChipText,
-                      selectedCategory === cat && styles.categoryChipTextActive,
+                      viewMode === 'category' &&
+                        selectedCategory === cat &&
+                        styles.categoryChipTextActive,
                     ]}
                   >
                     {label}
@@ -483,65 +537,220 @@ export default function SellerStore() {
       )}
 
       {/* Produtos */}
-      <FlatList
-        data={
-          selectedCategory
-            ? products
-            : [...promotionalProducts, ...regularProducts]
-        }
-        keyExtractor={(item) => item.id}
-        contentContainerStyle={styles.productsContainer}
-        refreshControl={
-          <RefreshControl
-            refreshing={isRefreshing}
-            onRefresh={handleRefresh}
-            colors={[colors.primary]}
-            tintColor={colors.primary}
-          />
-        }
-        // ListHeaderComponent={
-        //   <View>
-        //     {!selectedCategory && promotionalProducts.length > 0 && (
-        //       <View style={styles.promoHeader}>
-        //         <Text style={styles.promoHeaderText}>
-        //           🔥 {promotionalProducts.length} produto
-        //           {promotionalProducts.length > 1 ? 's' : ''} em promoção
-        //         </Text>
-        //       </View>
-        //     )}
-        //   </View>
-        // }
-        renderItem={({ item }) => (
-          <ConsumerProductCard
-            product={item as any}
-            onAddToCart={(qty) => handleAddToCart(item, qty)}
-          />
-        )}
-        ListEmptyComponent={
-          <View style={styles.emptyContainer}>
-            <Ionicons
-              name="cube-outline"
-              size={48}
-              color={colors.textSecondary}
-            />
-            <Text style={styles.emptyText}>
-              {selectedCategory
-                ? 'Nenhum produto nesta categoria'
-                : 'Nenhum produto disponível'}
-            </Text>
+      {viewMode === 'search' && (
+        <>
+          {/* Input de busca */}
+          <View style={styles.searchContainer}>
+            <View style={styles.searchInputWrapper}>
+              <Ionicons name="search" size={20} color={colors.textSecondary} />
+              <TextInput
+                style={styles.searchInput}
+                value={searchQuery}
+                onChangeText={handleSearch}
+                placeholder="Buscar produtos nesta loja..."
+                placeholderTextColor={colors.textSecondary}
+                autoFocus
+                returnKeyType="search"
+              />
+              {searchQuery.length > 0 && (
+                <TouchableOpacity onPress={() => handleSearch('')} hitSlop={10}>
+                  <Ionicons
+                    name="close-circle"
+                    size={20}
+                    color={colors.textSecondary}
+                  />
+                </TouchableOpacity>
+              )}
+            </View>
           </View>
-        }
-        ListFooterComponent={
-          isLoadingMore ? (
-            <ActivityIndicator
-              size="small"
-              color={colors.primary}
-              style={styles.loadingMore}
+
+          {/* Resultados da busca */}
+          <FlatList
+            data={searchQuery.length >= 2 ? products : []}
+            keyExtractor={(item) => item.id}
+            numColumns={2}
+            columnWrapperStyle={{ gap: spacing.sm }}
+            contentContainerStyle={[styles.productsGrid, { gap: spacing.sm }]}
+            refreshControl={
+              <RefreshControl
+                refreshing={isRefreshing}
+                onRefresh={handleRefresh}
+                colors={[colors.primary]}
+                tintColor={colors.primary}
+              />
+            }
+            renderItem={({ item }) => (
+              <ConsumerProductCard
+                product={item as any}
+                size="grid"
+                onAddToCart={(qty) =>
+                  addProductToCart(
+                    id!,
+                    { name: seller!.nickName, photo: seller!.profilePhoto },
+                    item,
+                    qty,
+                  )
+                }
+                onPress={() => redirectToItemPage(id, item.id)}
+              />
+            )}
+            ListEmptyComponent={
+              isLoading ? (
+                <View style={styles.loadingContainer}>
+                  <ActivityIndicator size="large" color={colors.primary} />
+                </View>
+              ) : (
+                <View style={styles.emptyContainer}>
+                  <Ionicons
+                    name="search-outline"
+                    size={48}
+                    color={colors.textSecondary}
+                  />
+                  <Text style={styles.emptyText}>
+                    {searchQuery.length < 2
+                      ? 'Digite pelo menos 2 letras'
+                      : 'Nenhum produto encontrado'}
+                  </Text>
+                </View>
+              )
+            }
+            ListFooterComponent={
+              isLoadingMore ? (
+                <ActivityIndicator
+                  size="small"
+                  color={colors.primary}
+                  style={styles.loadingMore}
+                />
+              ) : null
+            }
+            onEndReached={handleLoadMore}
+            onEndReachedThreshold={0.3}
+          />
+        </>
+      )}
+
+      {viewMode === 'category' && (
+        <FlatList
+          data={products}
+          keyExtractor={(item) => item.id}
+          numColumns={2}
+          columnWrapperStyle={{ gap: spacing.sm }}
+          contentContainerStyle={[styles.productsGrid, { gap: spacing.sm }]}
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefreshing}
+              onRefresh={handleRefresh}
+              colors={[colors.primary]}
+              tintColor={colors.primary}
             />
-          ) : null
-        }
-        onEndReached={handleLoadMore}
-        onEndReachedThreshold={0.3}
+          }
+          renderItem={({ item }) => (
+            <ConsumerProductCard
+              product={item as any}
+              size="grid"
+              onAddToCart={(qty) =>
+                addProductToCart(
+                  id!,
+                  { name: seller!.nickName, photo: seller!.profilePhoto },
+                  item,
+                  qty,
+                )
+              }
+              onPress={() => redirectToItemPage(id, item.id)}
+            />
+          )}
+          ListEmptyComponent={
+            <View style={styles.emptyContainer}>
+              <Ionicons
+                name="cube-outline"
+                size={48}
+                color={colors.textSecondary}
+              />
+              <Text style={styles.emptyText}>
+                Nenhum produto nesta categoria
+              </Text>
+            </View>
+          }
+          ListFooterComponent={
+            isLoadingMore ? (
+              <ActivityIndicator
+                size="small"
+                color={colors.primary}
+                style={styles.loadingMore}
+              />
+            ) : null
+          }
+          onEndReached={handleLoadMore}
+          onEndReachedThreshold={0.3}
+        />
+      )}
+
+      {viewMode === 'all' && (
+        <ScrollView
+          contentContainerStyle={{ paddingBottom: 100 }}
+          refreshControl={
+            <RefreshControl
+              refreshing={isRefreshing}
+              onRefresh={handleRefresh}
+              colors={[colors.primary]}
+              tintColor={colors.primary}
+            />
+          }
+        >
+          {isLoading ? (
+            <View style={styles.loadingContainer}>
+              <ActivityIndicator size="large" color={colors.primary} />
+            </View>
+          ) : (
+            translatedCategories.map((cat) => {
+              const categoryProductsList = categoryProducts[cat] || []
+              if (categoryProductsList.length === 0) return null
+
+              const label =
+                (userTagsLabels as Record<string, string>)[cat] ?? cat
+
+              return (
+                <View key={cat} style={styles.categorySection}>
+                  <Text style={styles.categorySectionTitle}>{label}</Text>
+                  <FlatList
+                    data={categoryProductsList}
+                    keyExtractor={(item) => item.id}
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.categorySliderContainer}
+                    renderItem={({ item }) => (
+                      <View style={{ marginRight: spacing.sm }}>
+                        <ConsumerProductCard
+                          product={item as any}
+                          size="slider"
+                          onAddToCart={(qty) =>
+                            addProductToCart(
+                              id!,
+                              {
+                                name: seller!.nickName,
+                                photo: seller!.profilePhoto,
+                              },
+                              item,
+                              qty,
+                            )
+                          }
+                          onPress={() => redirectToItemPage(id, item.id)}
+                        />
+                      </View>
+                    )}
+                  />
+                </View>
+              )
+            })
+          )}
+        </ScrollView>
+      )}
+
+      <CartSummaryBar
+        sellerNickName={seller?.nickName ?? ''}
+        cartCount={cartCount}
+        cartSubtotal={cartSubtotal}
+        sellerId={seller?.id!}
       />
     </View>
   )

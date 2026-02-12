@@ -1,3 +1,5 @@
+import { MeasurementUnit } from '@wrcb/cb-common'
+
 export interface SellerProduct {
   id: string
   sellerId: string
@@ -5,11 +7,11 @@ export interface SellerProduct {
   name: string
   description: string
   productCategory: string
-  measurementUnit: string
+  measurementUnit: MeasurementUnit
   baseWeight?: number
   brand?: string
   barcode?: string
-  step?: number
+  step: number
   price: number
   promotionalPrice?: number | null
   stock: number

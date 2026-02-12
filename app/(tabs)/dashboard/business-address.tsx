@@ -17,6 +17,7 @@ import { Screen } from '@/components/layout/Screen'
 import { useAddressSearch } from '@/hooks/useAddressSearch'
 import { useGeocode } from '@/hooks/useGeocode'
 import { getApiErrors } from '@/utils/getApiErrors'
+import { authService } from '@/services'
 
 interface ApiError {
   message: string
@@ -206,18 +207,24 @@ export default function BusinessAddress() {
         city: city.trim(),
         state: state.trim(),
         country: country.trim(),
-        // ✅ NOVO: Adiciona coordenadas
         ...(coordinates && {
           location: { coordinates },
         }),
       })
 
+      console.log('✅ User atualizado do updateAddress:', {
+        isAddressDataProvided: response.user.isAddressDataProvided,
+        hasLocation: !!response.user.location,
+      })
+
+      // ✅ Usa direto o user do response (NÃO chama refreshUser)
       updateUser(response.user)
 
       setSuccess({
         message: 'Endereço atualizado com sucesso',
       })
     } catch (error: any) {
+      console.error('❌ Erro ao salvar endereço:', error)
       setApiErrors(getApiErrors(error))
     } finally {
       setIsLoading(false)

@@ -26,6 +26,8 @@ export const sellerStoreStyles = StyleSheet.create({
   categoriesContainer: {
     paddingHorizontal: spacing.md,
     paddingVertical: spacing.sm,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
   },
   categoryChip: {
     height: 36, // 🔥 fixa de vez
@@ -248,5 +250,53 @@ export const sellerStoreStyles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
     color: colors.textInverse,
+  },
+  // Grid layout
+  productsGrid: {
+    padding: spacing.md,
+    paddingBottom: 100,
+  },
+
+  // Search input
+  searchContainer: {
+    paddingHorizontal: spacing.md,
+    paddingVertical: spacing.sm,
+    backgroundColor: colors.surface,
+    borderBottomWidth: 1,
+    borderBottomColor: colors.border,
+  },
+  searchInputWrapper: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 10,
+    paddingHorizontal: spacing.md,
+    backgroundColor: colors.background,
+    height: 48,
+  },
+  searchInput: {
+    flex: 1,
+    fontSize: 16,
+    color: colors.textPrimary,
+    marginLeft: spacing.sm,
+  },
+
+  // Category sections (para modo "Todos")
+  categorySection: {
+    marginBottom: spacing.lg,
+  },
+  categorySectionTitle: {
+    fontSize: 15,
+    fontWeight: '400',
+    marginHorizontal: spacing.md,
+    borderBottomColor: '#eee',
+    borderBottomWidth: 1,
+    color: colors.textPrimary,
+    marginVertical: spacing.md,
+    paddingHorizontal: spacing.md,
+  },
+  categorySliderContainer: {
+    paddingLeft: spacing.md,
   },
 })

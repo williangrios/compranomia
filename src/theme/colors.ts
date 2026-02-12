@@ -1,3 +1,4 @@
+// src/theme/colors.ts
 export const colors = {
   // Marca
   primary: '#F97316', // laranja principal

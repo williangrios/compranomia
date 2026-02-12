@@ -118,6 +118,9 @@ export default function Search() {
 
   function handleProductPress(product: SellerProductResult) {
     if (product.seller) {
+      toastService.success({
+        title: `🛍️ Você entrou na loja ${capitalizeFullName(product.seller.nickName)}`,
+      })
       router.push(`/seller/${product.seller.id}`)
     }
   }
@@ -238,6 +241,8 @@ export default function Search() {
 }
 
 import { StyleSheet } from 'react-native'
+import { toastService } from '@/services/toast.service'
+import { capitalizeFullName } from '@/utils/capitalizeFullName'
 
 const searchStyles = StyleSheet.create({
   inputWrapper: {

@@ -21,6 +21,8 @@ interface CreateOrderPayload {
   items: {
     sellerProductId: string
     quantity: number
+    price: number
+    promotionalPrice?: number | null
   }[]
   subtotal: number
   deliveryFee: number
@@ -49,10 +51,15 @@ export const orderService = {
     return response.data.data
   },
 
-  async updateStatus(orderId: string, status: string) {
+  // order.service.ts
+  async updateStatus(
+    orderId: string,
+    status: string,
+    cancellationReason?: string,
+  ) {
     const response = await api.patch(
       `/api/business/compranomia/orders/${orderId}/status`,
-      { status },
+      { status, ...(cancellationReason ? { cancellationReason } : {}) },
     )
     return response.data.data
   },

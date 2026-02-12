@@ -12,7 +12,8 @@ import {
 import { Ionicons } from '@expo/vector-icons'
 import { colors } from '@/theme'
 import { deliveryAddressService } from '@/services/deliveryAddress.service'
-import { useAddress, DeliveryAddress } from '@/contexts/AddressContext'
+import { useAddress } from '@/contexts/AddressContext'
+import { DeliveryAddress } from '@/types'
 
 interface AddressSelectorModalProps {
   visible: boolean
@@ -96,7 +97,7 @@ export function AddressSelectorModal({
                 color: colors.textPrimary,
               }}
             >
-              Selecionar Endereço
+              Selecionar endereço de entrega
             </Text>
             <TouchableOpacity onPress={onClose} hitSlop={10}>
               <Ionicons name="close" size={24} color={colors.textPrimary} />

@@ -8,6 +8,8 @@ import { AddressProvider } from '@/contexts/AddressContext' // ← ADICIONA
 import { StatusBar } from 'expo-status-bar'
 import { NotificationProvider } from '@/contexts/NotificationContext'
 import { CartProvider } from '@/contexts/CartContext'
+import Toast from 'react-native-toast-message'
+import { toastConfig } from '@/theme/toast.config'
 
 SplashScreen.preventAutoHideAsync()
 
@@ -21,8 +23,8 @@ export default function RootLayout() {
   }, [])
 
   return (
-    <AuthProvider>
-      <AddressProvider>
+    <AddressProvider>
+      <AuthProvider>
         <NotificationProvider>
           <CartProvider>
             <StatusBar style="auto" />
@@ -31,9 +33,10 @@ export default function RootLayout() {
               <Stack.Screen name="(auth)" />
               <Stack.Screen name="(tabs)" />
             </Stack>
+            <Toast config={toastConfig} />
           </CartProvider>
         </NotificationProvider>
-      </AddressProvider>
-    </AuthProvider>
+      </AuthProvider>
+    </AddressProvider>
   )
 }

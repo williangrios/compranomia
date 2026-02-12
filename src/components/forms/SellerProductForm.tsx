@@ -19,6 +19,7 @@ import { getApiErrors } from '@/utils/getApiErrors'
 import { MeasurementUnit, UserTags } from '@wrcb/cb-common'
 import { sortByLabel, userTagsLabels } from '@/utils/enumLabels/userTags.labels'
 import { COMPRANOMIA_TAGS, DEFAULT_IMAGE } from '@/utils/constants'
+import { formatters } from '@/utils/formatters'
 
 interface ApiError {
   message: string
@@ -67,13 +68,6 @@ interface SellerProductFormProps {
   onSuccess?: () => void
 }
 
-const UNIT_TYPES: MeasurementUnit[] = [
-  MeasurementUnit.Un,
-  MeasurementUnit.Pack,
-  MeasurementUnit.Bandeja,
-  MeasurementUnit.Pct,
-]
-
 export function SellerProductForm({
   productCatalogId,
   sellerProductId,
@@ -83,6 +77,8 @@ export function SellerProductForm({
   const isAdoptMode = !!productCatalogId && !sellerProductId
 
   const [catalog, setCatalog] = useState<CatalogData | null>(null)
+  const [restrictedToAdults, setRestrictedToAdults] = useState(false)
+  const [requiresPrescription, setRequiresPrescription] = useState(false)
   const [isFetching, setIsFetching] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [hasPromotion, setHasPromotion] = useState(false)
@@ -101,7 +97,7 @@ export function SellerProductForm({
     measurementUnit: MeasurementUnit.Un,
     isActive: true,
   })
-
+  const isUnit = form.measurementUnit === MeasurementUnit.Un
   const [errors, setErrors] = useState<FormErrors>({})
   const [apiErrors, setApiErrors] = useState<ApiError[] | null>(null)
   const [success, setSuccess] = useState<{ message: string } | null>(null)
@@ -113,6 +109,30 @@ export function SellerProductForm({
       loadCatalogForAdopt(productCatalogId)
     }
   }, [sellerProductId, productCatalogId])
+
+  useEffect(() => {
+    if (form.measurementUnit !== MeasurementUnit.Un) {
+      setForm((prev) => ({
+        ...prev,
+        baseWeight: prev.step,
+      }))
+    } else {
+      setField('step', '1')
+    }
+  }, [form.measurementUnit, form.step])
+
+  useEffect(() => {
+    if (form.measurementUnit !== MeasurementUnit.Un) {
+      setForm((prev) => ({
+        ...prev,
+        baseWeight: prev.step.toString(),
+      }))
+    }
+  }, [form.step])
+
+  const showPrescriptionToggle =
+    form.productCategory === UserTags.Medicines ||
+    form.productCategory === UserTags.GenericMedicines
 
   const sortedTags = sortByLabel(COMPRANOMIA_TAGS, userTagsLabels)
 
@@ -295,10 +315,6 @@ export function SellerProductForm({
     return images?.[0] ?? DEFAULT_IMAGE
   }
 
-  function isUnitBased(): boolean {
-    return UNIT_TYPES.includes(form.measurementUnit)
-  }
-
   if (isFetching) {
     return (
       <View style={styles.loadingContainer}>
@@ -318,11 +334,11 @@ export function SellerProductForm({
               style={styles.searchResultImage}
             />
             <View style={styles.searchResultInfo}>
-              {catalog.barcode && (
-                <Text style={styles.searchResultCategory}>
-                  Cód: {catalog.barcode}
-                </Text>
-              )}
+              <Text style={styles.searchResultCategory}>
+                {catalog.barcode
+                  ? `Cód: ${catalog.barcode}`
+                  : 'Produto sem código de barras'}
+              </Text>
             </View>
           </View>
         </View>
@@ -362,17 +378,6 @@ export function SellerProductForm({
           </View>
 
           <View style={styles.fieldWrapper}>
-            <Text style={components.input.label}>Peso / Volume</Text>
-            <TextInput
-              style={[components.input.container, components.input.text]}
-              value={form.baseWeight}
-              onChangeText={(v) => setField('baseWeight', v)}
-              placeholder="Ex: 500"
-              keyboardType="numeric"
-            />
-          </View>
-
-          <View style={styles.fieldWrapper}>
             <Text style={components.input.label}>Categoria</Text>
             <View style={[components.input.container, { padding: 0 }]}>
               <Picker<UserTags>
@@ -397,9 +402,76 @@ export function SellerProductForm({
         </>
       )}
 
+      {/* Unidade de medida */}
+      <View style={styles.fieldWrapper}>
+        <Text style={components.input.label}>Unidade de medida</Text>
+        <View style={[components.input.container, { padding: 0 }]}>
+          <Picker<MeasurementUnit>
+            selectedValue={form.measurementUnit}
+            onValueChange={(v) =>
+              setForm((prev) => ({ ...prev, measurementUnit: v }))
+            }
+          >
+            {Object.values(MeasurementUnit).map((u) => (
+              <Picker.Item key={u} label={u} value={u} />
+            ))}
+          </Picker>
+        </View>
+        {catalog?.barcode && (
+          <Text style={styles.hintText}>
+            Produtos com código de barras geralmente são vendidos por unidade
+          </Text>
+        )}
+      </View>
+
+      {isUnit && (
+        <View style={styles.fieldWrapper}>
+          <Text style={components.input.label}>Peso / Volume</Text>
+          <TextInput
+            style={[components.input.container, components.input.text]}
+            value={form.baseWeight}
+            editable={isUnit}
+            onChangeText={(v) => setField('baseWeight', v)}
+            placeholder="Ex: 500"
+            keyboardType="numeric"
+          />
+        </View>
+      )}
+
+      {/* Step / Incremento */}
+
+      <View style={styles.fieldWrapper}>
+        <Text style={components.input.label}>
+          Incremento por clique ({form.measurementUnit}) *
+        </Text>
+        <TextInput
+          style={[
+            components.input.container,
+            components.input.text,
+            errors.step && components.input.error,
+          ]}
+          value={form.step}
+          editable={!isUnit}
+          onChangeText={(v) => setField('step', v)}
+          keyboardType="numeric"
+        />
+        <Text style={styles.hintText}>
+          {formatters.instructionsHowToBuy(
+            form.measurementUnit,
+            Number(form.step),
+          )}
+        </Text>
+        {errors.step && (
+          <Text style={components.auth.errorText}>{errors.step}</Text>
+        )}
+      </View>
+
       {/* Preço */}
       <View style={styles.fieldWrapper}>
-        <Text style={components.input.label}>Preço (R$) *</Text>
+        <Text style={components.input.label}>
+          Preço a cada {form.step}
+          {form.measurementUnit} (R$) *
+        </Text>
         <TextInput
           style={[
             components.input.container,
@@ -433,7 +505,9 @@ export function SellerProductForm({
 
       {hasPromotion && (
         <View style={styles.fieldWrapper}>
-          <Text style={components.input.label}>Preço promocional (R$) *</Text>
+          <Text
+            style={components.input.label}
+          >{`Preço promocional a cada ${form.step} ${form.measurementUnit}(R$) *`}</Text>
           <TextInput
             style={[
               components.input.container,
@@ -464,93 +538,24 @@ export function SellerProductForm({
         </View>
       )}
 
-      {/* Estoque */}
-      {/* <View style={styles.fieldWrapper}>
-        <Text style={components.input.label}>Estoque *</Text>
-        <TextInput
-          style={[
-            components.input.container,
-            components.input.text,
-            errors.stock && components.input.error,
-          ]}
-          value={form.stock}
-          onChangeText={(v) => setField('stock', v)}
-          placeholder="0"
-          keyboardType="number-pad"
+      {/* Flags */}
+      <View style={styles.switchRow}>
+        <Text style={styles.switchLabel}>Venda proibida para menores</Text>
+        <Switch
+          value={restrictedToAdults}
+          onValueChange={setRestrictedToAdults}
         />
-        {errors.stock && (
-          <Text style={components.auth.errorText}>{errors.stock}</Text>
-        )}
-      </View> */}
+      </View>
 
-      {/* Alerta de estoque mínimo */}
-      {/* <View style={styles.fieldWrapper}>
-        <Text style={components.input.label}>
-          Alerta de estoque mínimo (opcional)
-        </Text>
-        <TextInput
-          style={[components.input.container, components.input.text]}
-          value={form.minStockAlert}
-          onChangeText={(v) => setField('minStockAlert', v)}
-          placeholder="Ex: 5"
-          keyboardType="number-pad"
-        />
-        <Text style={styles.hintText}>
-          Você será notificado quando o estoque atingir esse valor
-        </Text>
-      </View> */}
-
-      {/* Unidade de medida */}
-      <View style={styles.fieldWrapper}>
-        <Text style={components.input.label}>Unidade de medida</Text>
-        <View style={[components.input.container, { padding: 0 }]}>
-          <Picker<MeasurementUnit>
-            selectedValue={form.measurementUnit}
-            onValueChange={(v) => {
-              setForm((prev) => ({
-                ...prev,
-                measurementUnit: v,
-                step: UNIT_TYPES.includes(v) ? '1' : prev.step,
-              }))
-            }}
-          >
-            {Object.values(MeasurementUnit).map((u) => (
-              <Picker.Item key={u} label={u} value={u} />
-            ))}
-          </Picker>
+      {showPrescriptionToggle && (
+        <View style={styles.switchRow}>
+          <Text style={styles.switchLabel}>Exige receita médica</Text>
+          <Switch
+            value={requiresPrescription}
+            onValueChange={setRequiresPrescription}
+          />
         </View>
-        {catalog?.barcode && (
-          <Text style={styles.hintText}>
-            Produtos com código de barras geralmente são vendidos por unidade
-          </Text>
-        )}
-      </View>
-
-      {/* Step / Incremento */}
-      <View style={styles.fieldWrapper}>
-        <Text style={components.input.label}>
-          Incremento por clique ({form.measurementUnit}) *
-        </Text>
-        <TextInput
-          style={[
-            components.input.container,
-            components.input.text,
-            errors.step && components.input.error,
-          ]}
-          value={form.step}
-          onChangeText={(v) => setField('step', v)}
-          placeholder="1"
-          keyboardType="numeric"
-        />
-        <Text style={styles.hintText}>
-          {isUnitBased()
-            ? 'Cada clique no "+" adiciona essa quantidade ao carrinho'
-            : `Ex: se colocar 100, o cliente comprará de 100 em 100 ${form.measurementUnit}`}
-        </Text>
-        {errors.step && (
-          <Text style={components.auth.errorText}>{errors.step}</Text>
-        )}
-      </View>
+      )}
 
       <View style={styles.switchRow}>
         <Text style={styles.switchLabel}>

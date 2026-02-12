@@ -1,4 +1,4 @@
-import { useState, useRef } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import {
   View,
   Text,
@@ -23,6 +23,7 @@ import { MeasurementUnit, UserTags } from '@wrcb/cb-common'
 import { COMPRANOMIA_TAGS, PHARMACY_TAGS } from '@/utils/constants'
 import { sortByLabel, userTagsLabels } from '@/utils/enumLabels/userTags.labels'
 import { getApiErrors } from '@/utils/getApiErrors'
+import { formatters } from '@/utils/formatters'
 
 interface ApiError {
   message: string
@@ -46,7 +47,7 @@ interface ProductForm {
   description: string
   brand: string
   productCategory: UserTags | ''
-  measurementUnit: MeasurementUnit | ''
+  measurementUnit: MeasurementUnit
   baseWeight: string
   step: string
   price: string
@@ -54,13 +55,6 @@ interface ProductForm {
   minStockAlert: string
   promotionalPrice: string
 }
-
-const UNIT_TYPES: MeasurementUnit[] = [
-  MeasurementUnit.Un,
-  MeasurementUnit.Pack,
-  MeasurementUnit.Bandeja,
-  MeasurementUnit.Pct,
-]
 
 export default function NewProduct() {
   const router = useRouter()
@@ -75,7 +69,7 @@ export default function NewProduct() {
     description: 'descricao',
     brand: 'marca',
     productCategory: '',
-    measurementUnit: '',
+    measurementUnit: MeasurementUnit.Un,
     baseWeight: '50',
     step: '1',
     price: '52',
@@ -84,17 +78,37 @@ export default function NewProduct() {
     promotionalPrice: '',
   })
 
+  const isUnit = form.measurementUnit === MeasurementUnit.Un
   const [hasPromotion, setHasPromotion] = useState(false)
   const [restrictedToAdults, setRestrictedToAdults] = useState(false)
   const [requiresPrescription, setRequiresPrescription] = useState(false)
   const [showPrescriptionToggle, setShowPrescriptionToggle] = useState(false)
-
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isEnriching, setIsEnriching] = useState(false)
 
   const [errors, setErrors] = useState<FormErrors>({})
   const [apiErrors, setApiErrors] = useState<ApiError[] | null>(null)
   const [success, setSuccess] = useState<{ message: string } | null>(null)
+
+  useEffect(() => {
+    if (form.measurementUnit !== MeasurementUnit.Un) {
+      setForm((prev) => ({
+        ...prev,
+        baseWeight: prev.step,
+      }))
+    } else {
+      setField('step', '1')
+    }
+  }, [form.measurementUnit, form.step])
+
+  useEffect(() => {
+    if (form.measurementUnit !== MeasurementUnit.Un) {
+      setForm((prev) => ({
+        ...prev,
+        baseWeight: prev.step.toString(),
+      }))
+    }
+  }, [form.step])
 
   function setField<K extends keyof ProductForm>(key: K, value: string) {
     setForm((prev) => ({ ...prev, [key]: value }))
@@ -237,18 +251,7 @@ export default function NewProduct() {
 
   async function handleSubmit() {
     if (!validate()) return
-    console.log(
-      '[NEW PRODUCT] payload::::::::::::::::::::::::::::::::::::::::::',
-      {
-        name: form.name.trim(),
-        description: form.description.trim(),
-        productCategory: form.productCategory,
-        measurementUnit: form.measurementUnit,
-        price: Number(form.price),
-        stock: Number(form.stock),
-        hasImage: !!image,
-      },
-    )
+
     try {
       setIsSubmitting(true)
       setApiErrors(null)
@@ -258,10 +261,10 @@ export default function NewProduct() {
         name: form.name.trim(),
         description: form.description.trim(),
         brand: form.brand.trim(),
-        productCategory: form.productCategory || undefined,
-        measurementUnit: form.measurementUnit || undefined,
-        baseWeight: form.baseWeight ? Number(form.baseWeight) : undefined,
-        step: form.step ? Number(form.step) : undefined,
+        productCategory: form.productCategory,
+        measurementUnit: form.measurementUnit,
+        baseWeight: Number(form.baseWeight),
+        step: Number(form.step),
         price: Number(form.price),
         stock: Number(form.stock),
         minStockAlert: form.minStockAlert
@@ -282,14 +285,6 @@ export default function NewProduct() {
     } finally {
       setIsSubmitting(false)
     }
-  }
-
-  // ═══════════════════════════════════════
-  // HELPERS
-  // ═══════════════════════════════════════
-
-  function isUnitBased(): boolean {
-    return UNIT_TYPES.includes(form.measurementUnit as MeasurementUnit)
   }
 
   // ═══════════════════════════════════════
@@ -507,17 +502,11 @@ export default function NewProduct() {
           ]}
         >
           <Picker<MeasurementUnit>
-            selectedValue={form.measurementUnit || undefined}
-            onValueChange={(v) => {
-              setForm((prev) => ({
-                ...prev,
-                measurementUnit: v,
-                step: UNIT_TYPES.includes(v) ? '1' : prev.step,
-              }))
-              setErrors((prev) => ({ ...prev, measurementUnit: undefined }))
-            }}
+            selectedValue={form.measurementUnit}
+            onValueChange={(v) =>
+              setForm((prev) => ({ ...prev, measurementUnit: v }))
+            }
           >
-            <Picker.Item label="Selecione" value={undefined} />
             {Object.values(MeasurementUnit).map((u) => (
               <Picker.Item key={u} label={u} value={u} />
             ))}
@@ -531,16 +520,19 @@ export default function NewProduct() {
       </View>
 
       {/* Peso / Volume */}
-      <View style={styles.fieldWrapper}>
-        <Text style={components.input.label}>Peso / Volume</Text>
-        <TextInput
-          style={[components.input.container, components.input.text]}
-          value={form.baseWeight}
-          onChangeText={(v) => setField('baseWeight', v)}
-          placeholder="Ex: 500"
-          keyboardType="numeric"
-        />
-      </View>
+      {isUnit && (
+        <View style={styles.fieldWrapper}>
+          <Text style={components.input.label}>Peso / Volume</Text>
+          <TextInput
+            style={[components.input.container, components.input.text]}
+            value={form.baseWeight}
+            editable={isUnit}
+            onChangeText={(v) => setField('baseWeight', v)}
+            placeholder="Ex: 500"
+            keyboardType="numeric"
+          />
+        </View>
+      )}
 
       {/* Step / Incremento */}
       <View style={styles.fieldWrapper}>
@@ -554,14 +546,15 @@ export default function NewProduct() {
             errors.step && components.input.error,
           ]}
           value={form.step}
+          editable={!isUnit}
           onChangeText={(v) => setField('step', v)}
-          placeholder="1"
           keyboardType="numeric"
         />
         <Text style={styles.hintText}>
-          {isUnitBased()
-            ? 'Cada clique no "+" adiciona essa quantidade ao carrinho'
-            : `Ex: se colocar 100, o cliente comprará de 100 em 100 ${form.measurementUnit}`}
+          {formatters.instructionsHowToBuy(
+            form.measurementUnit,
+            Number(form.step),
+          )}
         </Text>
         {errors.step && (
           <Text style={components.auth.errorText}>{errors.step}</Text>
@@ -570,7 +563,9 @@ export default function NewProduct() {
 
       {/* Preço */}
       <View style={styles.fieldWrapper}>
-        <Text style={components.input.label}>Preço (R$) *</Text>
+        <Text style={components.input.label}>
+          Preço a cada {form.step} {form.measurementUnit} (R$) *
+        </Text>
         <TextInput
           style={[
             components.input.container,
@@ -604,7 +599,9 @@ export default function NewProduct() {
 
       {hasPromotion && (
         <View style={styles.fieldWrapper}>
-          <Text style={components.input.label}>Preço promocional (R$) *</Text>
+          <Text
+            style={components.input.label}
+          >{`Preço promocional a cada ${form.step} ${form.measurementUnit} (R$) *`}</Text>
           <TextInput
             style={[
               components.input.container,
@@ -634,42 +631,6 @@ export default function NewProduct() {
           )}
         </View>
       )}
-
-      {/* Estoque */}
-      {/* <View style={styles.fieldWrapper}>
-        <Text style={components.input.label}>Estoque *</Text>
-        <TextInput
-          style={[
-            components.input.container,
-            components.input.text,
-            errors.stock && components.input.error,
-          ]}
-          value={form.stock}
-          onChangeText={(v) => setField('stock', v)}
-          placeholder="0"
-          keyboardType="number-pad"
-        />
-        {errors.stock && (
-          <Text style={components.auth.errorText}>{errors.stock}</Text>
-        )}
-      </View> */}
-
-      {/* Alerta estoque mínimo */}
-      {/* <View style={styles.fieldWrapper}>
-        <Text style={components.input.label}>
-          Alerta de estoque mínimo (opcional)
-        </Text>
-        <TextInput
-          style={[components.input.container, components.input.text]}
-          value={form.minStockAlert}
-          onChangeText={(v) => setField('minStockAlert', v)}
-          placeholder="Ex: 5"
-          keyboardType="number-pad"
-        />
-        <Text style={styles.hintText}>
-          Você será notificado quando o estoque atingir esse valor
-        </Text>
-      </View> */}
 
       {/* Flags */}
       <View style={styles.switchRow}>

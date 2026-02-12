@@ -8,6 +8,19 @@ export default function SalesLayout() {
         name="index"
         options={{
           title: 'Vendas',
+          headerBackVisible: false,
+        }}
+      />
+      <Stack.Screen
+        name="[id]"
+        options={{
+          headerShown: false,
+        }}
+      />
+      <Stack.Screen
+        name="[id]/chat"
+        options={{
+          headerShown: false,
         }}
       />
     </Stack>

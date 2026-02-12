@@ -6,6 +6,8 @@ import { SellerProductResult } from '@/types'
 import { DEFAULT_IMAGE } from '@/utils/constants'
 import { Ionicons } from '@expo/vector-icons'
 import { capitalizeFullName } from '@/utils/capitalizeFullName'
+import { formatters } from '@/utils/formatters'
+import { DiscountBadge } from '../ui/DiscountBadge'
 
 interface Props {
   product: SellerProductResult
@@ -55,19 +57,21 @@ export function SearchProductCard({ product, onPress }: Props) {
 
         <View style={styles.searchCardPriceRow}>
           <Text style={styles.searchCardPrice}>
-            R$ {displayPrice.toFixed(2)}
+            {formatters.showPrice(
+              displayPrice,
+              product.step,
+              product.measurementUnit,
+            )}
           </Text>
           {hasPromo && (
             <Text style={styles.searchCardPriceOriginal}>
-              R$ {product.price.toFixed(2)}
-            </Text>
-          )}
-          {product.discountPercent > 0 && (
-            <Text style={styles.searchCardDiscount}>
-              🔥 -{product.discountPercent}%
+              {formatters.showOriginalPrice(product.price)}
             </Text>
           )}
         </View>
+        {product.discountPercent > 0 && (
+          <DiscountBadge percent={product.discountPercent} />
+        )}
       </View>
     </TouchableOpacity>
   )

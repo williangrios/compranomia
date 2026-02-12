@@ -5,9 +5,6 @@ import { apiCache } from '@/utils/apiCache'
 import { User, SignUpData, SignInData, VerifyEmailData } from '@/types'
 
 export const authService = {
-  /**
-   * Sign Up - Criar nova conta
-   */
   async signUp(data: SignUpData): Promise<{ user: User }> {
     console.log('[authService] signUp - Data enviada:', data)
     const response = await api.post('/api/auth/signup', data)
@@ -27,9 +24,6 @@ export const authService = {
     throw new Error(response.data.message || 'SignUpFailed')
   },
 
-  /**
-   * Sign In - Fazer login
-   */
   async signIn(data: SignInData): Promise<{ user: User }> {
     console.log('[authService] signIn - Data enviada:', data)
     const response = await api.post('/api/auth/signin', data)
@@ -50,9 +44,6 @@ export const authService = {
     throw new Error(response.data.message || 'SignInFailed')
   },
 
-  /**
-   * Verify Email - Confirmar email com código
-   */
   async verifyEmail(data: VerifyEmailData): Promise<{ user: User }> {
     console.log('[authService] verifyEmail - Data enviada:', data)
     const response = await api.post('/api/auth/verifyemail', data)
@@ -72,9 +63,6 @@ export const authService = {
     throw new Error(response.data.message || 'VerifyEmailFailed')
   },
 
-  /**
-   * Get Current User - Buscar usuário atual (verifica se está logado)
-   */
   async getCurrentUser(): Promise<User | null> {
     try {
       console.log('[authService] getCurrentUser - Fetching...')
@@ -95,9 +83,6 @@ export const authService = {
     }
   },
 
-  /**
-   * Logout - Fazer logout
-   */
   async logout(): Promise<void> {
     try {
       console.log('[authService] logout - Starting...')
@@ -111,25 +96,38 @@ export const authService = {
     }
   },
 
-  /**
-   * Check if user is authenticated
-   */
   async isAuthenticated(): Promise<boolean> {
     const userData = await storageService.getUserData()
     return userData !== null
   },
 
-  /**
-   * Get cached user data (sem fazer request)
-   */
   async getCachedUser(): Promise<User | null> {
     return await storageService.getUserData()
   },
 
-  /**
-   * Update cached user data
-   */
   async updateCachedUser(user: User): Promise<void> {
     await storageService.saveUserData(user)
+  },
+
+  async getCurrentUserData(): Promise<User | null> {
+    try {
+      console.log('[authService] getCurrentUserData - Fetching from DB...')
+      const response = await api.get('/api/auth/getcurrentuserdata')
+
+      if (response.data.status === 'success' && response.data.data.user) {
+        const user = response.data.data.user
+        await storageService.saveUserData(user)
+        console.log('[authService] getCurrentUserData - User updated:', {
+          isAddressDataProvided: user.isAddressDataProvided,
+          isBusinessDataProvided: user.isBusinessDataProvided,
+          isPersonalDataProvided: user.isPersonalDataProvided,
+        })
+        return user
+      }
+      return null
+    } catch (error) {
+      console.error('[authService] getCurrentUserData error:', error)
+      return null
+    }
   },
 }
