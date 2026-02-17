@@ -1,100 +1,172 @@
-import { View, Text } from 'react-native'
-import { useRouter } from 'expo-router'
+import { View, Text, ActivityIndicator } from 'react-native'
+import { useRouter, useFocusEffect } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons'
-import { Screen } from '@/components/layout/Screen'
+import { useCallback, useState } from 'react'
 import { DashboardActionItem } from '@/components/dashboard/DashboardActionItem'
 import { colors } from '@/theme'
+import { useAuth } from '@/contexts/AuthContext'
+import { capitalizeFullName } from '@/utils/capitalizeFullName'
+import { Screen } from '@/components/layout/Screen'
+import { dashboardService, DashboardStats } from '@/services/dashboard.service'
 
 export default function Dashboard() {
   const router = useRouter()
+  const { user } = useAuth()
+
+  const [statsData, setStatsData] = useState<DashboardStats | null>(null)
+  const [loading, setLoading] = useState(true)
+  const [error, setError] = useState<string | null>(null)
+
+  const formatCurrency = (value: number) => {
+    return new Intl.NumberFormat('pt-BR', {
+      style: 'currency',
+      currency: 'BRL',
+    }).format(value)
+  }
+
+  const loadDashboard = async () => {
+    try {
+      setLoading(true)
+      setError(null)
+
+      const data = await dashboardService.getStats()
+      setStatsData(data)
+    } catch (err) {
+      console.error(err)
+      setError('Erro ao carregar dashboard')
+    } finally {
+      setLoading(false)
+    }
+  }
+
+  // 🔄 Atualiza sempre que voltar pra tela
+  useFocusEffect(
+    useCallback(() => {
+      loadDashboard()
+    }, []),
+  )
+
+  // Cálculos seguros
+  const todayOrders =
+    (statsData?.ordersByStatus?.Pending || 0) +
+    (statsData?.ordersByStatus?.Confirmed || 0) +
+    (statsData?.ordersByStatus?.Preparing || 0) +
+    (statsData?.ordersByStatus?.Delivering || 0) +
+    (statsData?.ordersByStatus?.Delivered || 0)
+
+  const concluded = statsData?.ordersByStatus?.Delivered || 0
+  const pending = statsData?.pendingAction?.count || 0
+  const todaySales = statsData?.revenue?.today || 0
 
   const stats = [
     {
       icon: 'cart',
-      label: 'Pedidos Hoje',
-      value: '0',
+      label: 'Vendas Hoje',
+      value: todayOrders.toString(),
       color: colors.primary,
     },
     {
       icon: 'cash',
-      label: 'Vendas Hoje',
-      value: 'R$ 0,00',
+      label: 'Faturamento Hoje',
+      value: formatCurrency(todaySales),
       color: '#10B981',
     },
     {
       icon: 'time',
-      label: 'Pedidos Pendentes',
-      value: '0',
+      label: 'Vendas pendentes',
+      value: pending.toString(),
       color: '#F59E0B',
     },
     {
       icon: 'checkmark-circle',
       label: 'Concluídos',
-      value: '0',
+      value: concluded.toString(),
       color: '#6366F1',
     },
   ] as const
 
   return (
     <Screen>
-      {/* 📊 Cards de métricas */}
-      <View
-        style={{
-          flexDirection: 'row',
-          flexWrap: 'wrap',
-          gap: 12,
-          marginBottom: 24,
-        }}
-      >
-        {stats.map((stat, index) => (
-          <View
-            key={index}
-            style={{
-              flex: 1,
-              minWidth: '45%',
-              backgroundColor: colors.surface,
-              padding: 16,
-              borderRadius: 14,
-              borderWidth: 1,
-              borderColor: colors.border,
-            }}
-          >
-            <View
-              style={{
-                width: 40,
-                height: 40,
-                borderRadius: 20,
-                backgroundColor: stat.color + '20',
-                alignItems: 'center',
-                justifyContent: 'center',
-                marginBottom: 12,
-              }}
-            >
-              <Ionicons name={stat.icon} size={20} color={stat.color} />
-            </View>
-
-            <Text
-              style={{
-                fontSize: 22,
-                fontWeight: 'bold',
-                color: colors.textPrimary,
-              }}
-            >
-              {stat.value}
-            </Text>
-
-            <Text
-              style={{
-                fontSize: 12,
-                color: colors.textSecondary,
-                marginTop: 2,
-              }}
-            >
-              {stat.label}
-            </Text>
-          </View>
-        ))}
+      {/* Seller info */}
+      <View>
+        <Text
+          style={{
+            fontSize: 18,
+            fontWeight: 'bold',
+            color: colors.textPrimary,
+            marginBottom: 12,
+          }}
+        >
+          {user?.nickName ? capitalizeFullName(user.nickName) : ''}
+        </Text>
       </View>
+
+      {/* Loading */}
+      {loading && <ActivityIndicator size="large" color={colors.primary} />}
+
+      {/* Error */}
+      {error && <Text style={{ color: 'red', marginBottom: 12 }}>{error}</Text>}
+
+      {/* 📊 Cards */}
+      {!loading && !error && (
+        <View
+          style={{
+            flexDirection: 'row',
+            flexWrap: 'wrap',
+            gap: 12,
+            marginBottom: 24,
+          }}
+        >
+          {stats.map((stat, index) => (
+            <View
+              key={index}
+              style={{
+                flex: 1,
+                minWidth: '45%',
+                backgroundColor: colors.surface,
+                padding: 16,
+                borderRadius: 14,
+                borderWidth: 1,
+                borderColor: colors.border,
+              }}
+            >
+              <View
+                style={{
+                  width: 40,
+                  height: 40,
+                  borderRadius: 20,
+                  backgroundColor: stat.color + '20',
+                  alignItems: 'center',
+                  justifyContent: 'center',
+                  marginBottom: 12,
+                }}
+              >
+                <Ionicons name={stat.icon} size={20} color={stat.color} />
+              </View>
+
+              <Text
+                style={{
+                  fontSize: 22,
+                  fontWeight: 'bold',
+                  color: colors.textPrimary,
+                }}
+              >
+                {stat.value}
+              </Text>
+
+              <Text
+                style={{
+                  fontSize: 12,
+                  color: colors.textSecondary,
+                  marginTop: 2,
+                }}
+              >
+                {stat.label}
+              </Text>
+            </View>
+          ))}
+        </View>
+      )}
 
       {/* ⚡ Ações rápidas */}
       <Text

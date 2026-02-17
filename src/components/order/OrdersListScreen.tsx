@@ -26,8 +26,16 @@ interface Order {
   total: number
   items: OrderItem[]
   createdAt: string
-  sellerId?: { nickName: string }
-  customerId?: { nickName?: string; name?: string }
+  wasRated: boolean
+  sellerId?: {
+    id: string
+    nickName: string
+  }
+  customerId?: {
+    id?: string
+    nickName?: string
+    name?: string
+  }
 }
 
 interface Props {
@@ -38,6 +46,7 @@ interface Props {
   emptyTitle: string
   emptySubtitle: string
   emptyIcon: keyof typeof Ionicons.glyphMap
+  onRateOrder?: (orderId: string, sellerId: string, sellerName: string) => void
 }
 
 const STATUS_CONFIG: Record<
@@ -106,6 +115,8 @@ export function OrdersListScreen({
   onOpenChat,
   getDisplayName,
   emptyTitle,
+  type,
+  onRateOrder,
   emptySubtitle,
   emptyIcon,
 }: Props) {
@@ -121,7 +132,12 @@ export function OrdersListScreen({
   const loadOrders = useCallback(
     async (status: OrderStatus | null, skip = 0, append = false) => {
       try {
-        const params: any = { limit: LIMIT, skip }
+        const params: any = {
+          limit: LIMIT,
+          skip,
+          mode: type === 'orders' ? 'purchase' : 'sale',
+        }
+
         if (status) params.status = status
 
         const data = await orderService.getOrders(params)
@@ -142,7 +158,7 @@ export function OrdersListScreen({
         console.error('[ORDERS LIST] Error loading:', error)
       }
     },
-    [],
+    [type],
   )
 
   useEffect(() => {
@@ -226,6 +242,37 @@ export function OrdersListScreen({
               Chat
             </Text>
           </TouchableOpacity>
+
+          {item.status === OrderStatus.Delivered && type === 'orders' && (
+            <TouchableOpacity
+              style={[s.actionButton, item.wasRated && s.actionButtonDisabled]}
+              onPress={() => {
+                if (!item.wasRated && item.sellerId) {
+                  onRateOrder?.(
+                    item.id,
+                    item.sellerId.id,
+                    item.sellerId.nickName,
+                  )
+                }
+              }}
+              disabled={item.wasRated}
+              activeOpacity={0.8}
+            >
+              <Ionicons
+                name={item.wasRated ? 'checkmark-circle' : 'star'}
+                size={16}
+                color={item.wasRated ? colors.textSecondary : colors.primary}
+              />
+              <Text
+                style={[
+                  s.actionButtonText,
+                  item.wasRated && s.actionButtonTextDisabled,
+                ]}
+              >
+                {item.wasRated ? 'Avaliado' : 'Avaliar'}
+              </Text>
+            </TouchableOpacity>
+          )}
         </View>
       </View>
     )
@@ -233,7 +280,6 @@ export function OrdersListScreen({
 
   return (
     <View style={s.container}>
-      {/* Chips (FORA da lista principal) */}
       <FlatList
         data={FILTER_CHIPS}
         horizontal

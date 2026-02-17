@@ -1,18 +1,27 @@
 // src/types/user.types.ts
-import { UserRole } from '@wrcb/cb-common'
+import {
+  Country,
+  Currency,
+  Language,
+  Tenant,
+  TimeZone,
+  UserCategory,
+  UserProvider,
+  UserRole,
+} from '@wrcb/cb-common'
 
 export interface User {
   id: string
   email: string
   nickName: string
-  category: string
+  category: UserCategory
   name: string
   role: UserRole
-  tenant: string
-  country: string
-  language: string
-  currency: string
-  timeZone: string
+  tenant: Tenant
+  country: Country
+  language: Language
+  currency: Currency
+  timeZone: TimeZone
 
   // Dados pessoais
   doc?: string
@@ -66,11 +75,11 @@ export interface User {
   affiliateId?: string
 
   // Provider
-  provider: string
+  provider: UserProvider
   providerId?: string
 
   // Idiomas
-  iSpeakLanguages?: string[]
+  iSpeakLanguages?: Language[]
 
   // Timestamps
   createdAt?: string
@@ -83,8 +92,8 @@ export interface SignUpData {
   passwordConfirmation: string
   nickName: string
   role: UserRole
-  country: string
-  tenant: string
+  country: Country
+  tenant: Tenant
   affiliateCode?: string
   coupon?: string
 }
@@ -92,13 +101,13 @@ export interface SignUpData {
 export interface SignInData {
   email: string
   password: string
-  tenant: string
+  tenant: Tenant
 }
 
 export interface VerifyEmailData {
   email: string
   code: string
-  tenant: string
+  tenant: Tenant
 }
 
 export interface UpdateUserAddressData {
@@ -109,5 +118,5 @@ export interface UpdateUserAddressData {
   neighborhood: string
   city: string
   state: string
-  country: string
+  country: Country
 }

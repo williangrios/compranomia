@@ -82,7 +82,7 @@ export default function ProductDetail() {
     )
   }
 
-  const seller = product.seller
+  const seller = product.sellerId
   const cartCount = getCartCount(id!)
   const cartSubtotal = getCartSubtotal(id!)
 
@@ -90,6 +90,8 @@ export default function ProductDetail() {
   const category = product.productCategory || ''
   const measurementUnit = product.measurementUnit || MeasurementUnit.Un
   const step = product.step ?? 1
+  const isProhibitedForMinors = product.isProhibitedForMinors ?? false
+  const isPrescriptionRequired = product.isPrescriptionRequired ?? false
 
   const isUnit = product.measurementUnit === MeasurementUnit.Un
   const increment = isUnit ? 1 : step
@@ -238,12 +240,28 @@ export default function ProductDetail() {
             </View>
           )}
 
-          {measurementUnit !== MeasurementUnit.Un && (
+          {(measurementUnit !== MeasurementUnit.Un ||
+            isProhibitedForMinors ||
+            isPrescriptionRequired) && (
             <View style={s.descriptionSection}>
               <Text style={s.sectionLabel}>Observações</Text>
-              <Text style={s.bulkNote}>
-                O peso pode variar ligeiramente para mais ou para menos
-              </Text>
+              {measurementUnit !== MeasurementUnit.Un && (
+                <Text style={s.bulkNote}>
+                  O peso pode variar ligeiramente para mais ou para menos
+                </Text>
+              )}
+              {isProhibitedForMinors && (
+                <Text style={s.bulkNote}>
+                  Produto vendido apenas para maiores de idade (o entregador irá
+                  checar a identidade no mometo da entrega)
+                </Text>
+              )}
+              {isPrescriptionRequired && (
+                <Text style={s.bulkNote}>
+                  Produto necessita de receita mética (verifique o chat pois o
+                  farmacêutico irá solicitar o envio da receita)
+                </Text>
+              )}
             </View>
           )}
         </View>
@@ -287,7 +305,10 @@ export default function ProductDetail() {
           onPress={() => {
             addProductToCart(
               id!,
-              { name: seller!.nickName, photo: seller!.profilePhoto },
+              {
+                name: seller?.nickName ?? 'Vendedor',
+                photo: seller?.profilePhoto ?? '',
+              },
               product,
               quantity,
             )

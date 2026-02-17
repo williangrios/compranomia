@@ -7,6 +7,7 @@ import {
   TouchableOpacity,
   ActivityIndicator,
   Alert,
+  Modal,
   Image,
   KeyboardAvoidingView,
   Platform,
@@ -67,6 +68,72 @@ function formatDate(iso: string): string {
 function getSenderId(msg: Message): string {
   if (typeof msg.senderId === 'string') return msg.senderId
   return msg.senderId?.id ?? msg.senderId?._id ?? ''
+}
+
+function ChatImage({ uri }: { uri: string }) {
+  const [dimensions, setDimensions] = useState({ width: 200, height: 150 })
+  const [isModalVisible, setIsModalVisible] = useState(false)
+  const maxWidth = 220
+
+  useEffect(() => {
+    Image.getSize(uri, (w, h) => {
+      const ratio = h / w
+      setDimensions({ width: maxWidth, height: maxWidth * ratio })
+    })
+  }, [uri])
+
+  return (
+    <>
+      <TouchableOpacity
+        onPress={() => setIsModalVisible(true)}
+        activeOpacity={0.9}
+      >
+        <Image
+          source={{ uri }}
+          style={{
+            width: dimensions.width,
+            height: dimensions.height,
+            borderRadius: 10,
+            marginBottom: 4,
+          }}
+          resizeMode="cover"
+        />
+      </TouchableOpacity>
+
+      <Modal
+        visible={isModalVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={() => setIsModalVisible(false)}
+      >
+        <TouchableOpacity
+          style={{
+            flex: 1,
+            backgroundColor: 'rgba(0,0,0,0.9)',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+          activeOpacity={1}
+          onPress={() => setIsModalVisible(false)}
+        >
+          <Image
+            source={{ uri }}
+            style={{ width: '100%', height: '80%' }}
+            resizeMode="contain"
+          />
+          <Text
+            style={{
+              color: 'rgba(255,255,255,0.5)',
+              marginTop: 16,
+              fontSize: 13,
+            }}
+          >
+            Toque para fechar
+          </Text>
+        </TouchableOpacity>
+      </Modal>
+    </>
+  )
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -156,10 +223,25 @@ export function OrderChat({
         name: asset.fileName ?? 'image.jpg',
         type: asset.mimeType ?? 'image/jpeg',
       }
+
+      console.log('[IMAGE ASSET]', {
+        uri: asset.uri,
+        fileName: asset.fileName,
+        mimeType: asset.mimeType,
+        fileSize: asset.fileSize,
+        width: asset.width,
+        height: asset.height,
+      })
+
       const data = await orderService.sendMessage(orderId, undefined, image)
       setMessages(data.order.messages ?? [])
       setTimeout(() => listRef.current?.scrollToEnd({ animated: true }), 100)
     } catch (error: any) {
+      console.log(
+        '[SEND IMAGE ERROR]',
+        JSON.stringify(error?.response?.data || error?.message || error),
+      )
+
       const key = error.normalizedErrors?.[0]?.message || 'GenericError'
       Alert.alert('Erro', translateError(key))
     } finally {
@@ -190,13 +272,7 @@ export function OrderChat({
         <View style={[s.messageRow, isMe ? s.messageRowMe : s.messageRowThem]}>
           <View style={[s.bubble, isMe ? s.bubbleMe : s.bubbleThem]}>
             {/* Imagem */}
-            {item.imageUrl && (
-              <Image
-                source={{ uri: item.imageUrl }}
-                style={s.messageImage}
-                resizeMode="cover"
-              />
-            )}
+            {item.imageUrl && <ChatImage uri={item.imageUrl} />}
             {/* Texto */}
             {item.message ? (
               <Text
@@ -276,7 +352,7 @@ export function OrderChat({
       )}
 
       {/* Input */}
-      <View style={[s.inputBar, { paddingBottom: insets.bottom + 80 }]}>
+      <View style={[s.inputBar]}>
         <TouchableOpacity
           style={s.imageButton}
           onPress={handleSendImage}
@@ -320,20 +396,20 @@ export function OrderChat({
 // ─── Styles ───────────────────────────────────────────────────────────────────
 
 const s = StyleSheet.create({
-  container: { flex: 1, backgroundColor: colors.background },
+  container: { flex: 1, padding: 20, backgroundColor: colors.background },
   loadingContainer: { flex: 1, alignItems: 'center', justifyContent: 'center' },
   header: {
     flexDirection: 'row',
     alignItems: 'center',
+    marginTop: 25,
     justifyContent: 'space-between',
-    paddingHorizontal: spacing.md,
-    paddingVertical: spacing.sm,
     borderBottomWidth: 1,
     borderBottomColor: colors.border,
   },
   headerTitle: {
     fontSize: 17,
     fontWeight: '700',
+    marginBottom: 10,
     color: colors.textPrimary,
     flex: 1,
     textAlign: 'center',
@@ -379,12 +455,7 @@ const s = StyleSheet.create({
     borderColor: colors.border,
     borderBottomLeftRadius: 4,
   },
-  messageImage: {
-    width: 200,
-    height: 150,
-    borderRadius: 10,
-    marginBottom: 4,
-  },
+
   messageText: { fontSize: 15, lineHeight: 20 },
   messageTextMe: { color: '#FFF' },
   messageTextThem: { color: colors.textPrimary },
@@ -396,6 +467,7 @@ const s = StyleSheet.create({
     alignItems: 'flex-end',
     paddingHorizontal: spacing.md,
     paddingTop: spacing.sm,
+    paddingBottom: 120, // insets + tab bar height + espaço extra
     borderTopWidth: 1,
     borderTopColor: colors.border,
     backgroundColor: colors.background,

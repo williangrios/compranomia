@@ -3,6 +3,7 @@
 import {
   NearbySeller,
   PaginatedProductsResponse,
+  SellerProductResult,
   SellerProductsResponse,
 } from '@/types/seller.types'
 import api from './api'
@@ -19,13 +20,34 @@ export const sellerService = {
     return response.data.data
   },
 
+  async getHomeFeed(
+    lat: number,
+    lng: number,
+    params?: {
+      category?: string
+      limit?: number
+    },
+  ): Promise<{
+    sellers: NearbySeller[]
+    sellersTotal: number
+    promotions: SellerProductResult[]
+    promotionsTotal: number
+    sponsored: SellerProductResult[]
+    sponsoredTotal: number
+  }> {
+    const response = await api.get('/api/business/compranomia/home-feed', {
+      params: { lat, lng, ...params },
+    })
+    return response.data.data
+  },
+
   async getProducts(
     sellerId: string,
     params?: {
       productCategory?: string
       limit?: number
       skip?: number
-      q?: string // ← ADICIONAR ESTA LINHA
+      q?: string
     },
   ): Promise<SellerProductsResponse> {
     const response = await api.get(
@@ -50,11 +72,43 @@ export const sellerService = {
     return response.data.data
   },
 
+  async getSponsored(
+    lat: number,
+    lng: number,
+    params?: {
+      category?: string
+      limit?: number
+      skip?: number
+    },
+  ): Promise<PaginatedProductsResponse> {
+    const response = await api.get(
+      '/api/business/compranomia/products/sponsored',
+      { params: { lat, lng, ...params } },
+    )
+    return response.data.data
+  },
+
+  async getNearbySellers(
+    lat: number,
+    lng: number,
+    params?: {
+      category?: string
+      limit?: number
+      skip?: number
+    },
+  ): Promise<{ sellers: NearbySeller[]; total: number }> {
+    const response = await api.get('/api/business/compranomia/sellers/nearby', {
+      params: { lat, lng, ...params },
+    })
+    return response.data.data
+  },
+
   async getPromotions(
     lat: number,
     lng: number,
     params?: {
       minDiscount?: number
+      category?: string
       limit?: number
       skip?: number
     },
@@ -74,6 +128,8 @@ export const sellerService = {
       bio: string
       profilePhoto: string
       category: string
+      averageRating: number
+      ratingCount: number
       address: {
         neighborhood: string
         city: string

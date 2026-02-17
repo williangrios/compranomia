@@ -17,6 +17,7 @@ import {
   type NotificationItem,
 } from '@/services/notification.service'
 import { useNotifications } from '@/contexts/NotificationContext'
+import { Screen } from '@/components/layout/Screen'
 
 function formatDate(dateString: string): string {
   const date = new Date(dateString)
@@ -54,7 +55,6 @@ export default function Notifications() {
 
         const { notifications: items } =
           await notificationService.getNotifications(pageNum)
-
         setNotifications((prev) => (append ? [...prev, ...items] : items))
         setHasMore(items.length === PAGE_SIZE)
       } catch {
@@ -82,14 +82,14 @@ export default function Notifications() {
   // Marca como lido
   async function handlePress(notification: NotificationItem) {
     if (!notification.isRead) {
-      notificationService.markAsRead(notification._id)
+      notificationService.markAsRead(notification.id)
       setNotifications((prev) =>
         prev.map((n) =>
-          n._id === notification._id ? { ...n, isRead: true } : n,
+          n.id === notification.id ? { ...n, isRead: true } : n,
         ),
       )
     }
-    router.push(`/notifications/${notification._id}`)
+    router.push(`/notifications/${notification.id}`)
   }
 
   // Carrega próxima página
@@ -163,12 +163,12 @@ export default function Notifications() {
 
   // ── Lista ─────────────────────────────────────────────────────────────────
   return (
-    <>
+    <Screen>
       <Stack.Screen options={screenOptions(router)} />
       <View style={{ flex: 1, backgroundColor: colors.background }}>
         <ScrollView showsVerticalScrollIndicator={false}>
           {notifications.map((notification) => (
-            <View key={notification._id} style={{ flexDirection: 'row' }}>
+            <View key={notification.id} style={{ flexDirection: 'row' }}>
               {/* Faixa indicadora não lido */}
               <View
                 style={{
@@ -182,7 +182,7 @@ export default function Notifications() {
               <View style={{ flex: 1 }}>
                 <ProfileMenuItem
                   title={notification.title}
-                  subtitle={`${notification.subject} · ${formatDate(notification.createdAt)}`}
+                  subtitle={`${notification.message} ${formatDate(notification.createdAt)}`}
                   showBadge={!notification.isRead}
                   onPress={() => handlePress(notification)}
                 />
@@ -219,7 +219,7 @@ export default function Notifications() {
           )}
         </ScrollView>
       </View>
-    </>
+    </Screen>
   )
 }
 

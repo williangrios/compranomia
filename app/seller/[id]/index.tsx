@@ -25,20 +25,10 @@ import { sellerStoreStyles as styles } from '@/styles/sellerStore.styles'
 import { colors, spacing } from '@/theme'
 import { PaymentMethod, UserTags } from '@wrcb/cb-common'
 import { capitalizeFullName } from '@/utils/capitalizeFullName'
-import { CartItem, useCart } from '@/contexts/CartContext'
+import { useCart } from '@/contexts/CartContext'
 import { CartSummaryBar } from '@/components/cart/CartSummaryBar'
 
 const DEFAULT_AVATAR = 'https://static.compranomia.com/defaults/seller.png'
-
-const nudgeStyles = StyleSheet.create({
-  fadeRight: {
-    position: 'absolute',
-    right: 0,
-    top: 0,
-    bottom: 0,
-    width: 40,
-  },
-})
 
 interface SellerProfile {
   seller: {
@@ -48,6 +38,8 @@ interface SellerProfile {
     bio: string
     profilePhoto: string
     category: string
+    averageRating: number
+    ratingCount: number
     address: { neighborhood: string; city: string; state: string }
   }
   delivery: {
@@ -371,14 +363,29 @@ export default function SellerStore() {
                 ) : null}
 
                 <View style={styles.headerStars}>
-                  {[1, 2, 3, 4, 5].map((star) => (
-                    <Ionicons
-                      key={star}
-                      name="star"
-                      size={14}
-                      color="#FFD166"
-                    />
-                  ))}
+                  {seller.ratingCount > 0 ? (
+                    <>
+                      {[1, 2, 3, 4, 5].map((star) => (
+                        <Ionicons
+                          key={star}
+                          name={
+                            star <= Math.floor(seller.averageRating)
+                              ? 'star'
+                              : star - seller.averageRating < 1
+                                ? 'star-half'
+                                : 'star-outline'
+                          }
+                          size={14}
+                          color="#FFD166"
+                        />
+                      ))}
+                      <Text style={styles.headerRatingText}>
+                        {seller.averageRating.toFixed(1)} ({seller.ratingCount})
+                      </Text>
+                    </>
+                  ) : (
+                    <Text style={styles.headerRatingText}>Sem avaliações</Text>
+                  )}
                 </View>
               </View>
             </>
@@ -586,7 +593,10 @@ export default function SellerStore() {
                 onAddToCart={(qty) =>
                   addProductToCart(
                     id!,
-                    { name: seller!.nickName, photo: seller!.profilePhoto },
+                    {
+                      name: seller?.nickName ?? 'Vendedor',
+                      photo: seller?.profilePhoto ?? '',
+                    },
                     item,
                     qty,
                   )
@@ -651,7 +661,10 @@ export default function SellerStore() {
               onAddToCart={(qty) =>
                 addProductToCart(
                   id!,
-                  { name: seller!.nickName, photo: seller!.profilePhoto },
+                  {
+                    name: seller?.nickName ?? 'Vendedor',
+                    photo: seller?.profilePhoto ?? '',
+                  },
                   item,
                   qty,
                 )
@@ -727,8 +740,8 @@ export default function SellerStore() {
                             addProductToCart(
                               id!,
                               {
-                                name: seller!.nickName,
-                                photo: seller!.profilePhoto,
+                                name: seller?.nickName ?? 'Vendedor',
+                                photo: seller?.profilePhoto ?? '',
                               },
                               item,
                               qty,

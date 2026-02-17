@@ -1,12 +1,13 @@
 // src/types/seller.types.ts
 
-import { MeasurementUnit, UserTags } from '@wrcb/cb-common'
+import { MeasurementUnit, UserCategory, UserTags } from '@wrcb/cb-common'
 
 export interface NearbySeller {
   id: string
   nickName: string
   name: string
   profilePhoto: string
+  category: UserCategory
   distanceKm: number
   deliveryFee: number
   freeAbove: number
@@ -16,7 +17,12 @@ export interface NearbySeller {
 
 export interface SellerProductResult {
   id: string
-  sellerId: string
+  sellerId: {
+    id: string
+    nickName: string
+    profilePhoto: string
+    category: UserCategory
+  }
   productCatalogId: string
   name: string
   description: string
@@ -29,6 +35,10 @@ export interface SellerProductResult {
   price: number
   promotionalPrice?: number | null
   stock: number
+  sellerSpotlighted?: boolean
+  adminSpotlighted?: boolean
+  isProhibitedForMinors?: boolean
+  isPrescriptionRequired?: boolean
   minStockAlert: number
   isActive: boolean
   originalImages: string[]

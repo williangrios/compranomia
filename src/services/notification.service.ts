@@ -1,8 +1,9 @@
 // services/notification.service.ts
+import { UserRole } from '@wrcb/cb-common'
 import api from './api'
 
 export interface NotificationItem {
-  _id: string
+  id: string
   subject: string
   title: string
   message: string
@@ -10,6 +11,7 @@ export interface NotificationItem {
   isRead: boolean
   data?: Record<string, any>
   createdAt: string
+  destinationRole: UserRole
 }
 
 export const notificationService = {

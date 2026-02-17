@@ -1,9 +1,15 @@
 // src/utils/constants.ts
-import { Tenant, TenantDataService, UserTags } from '@wrcb/cb-common'
+import {
+  Tenant,
+  TenantDataService,
+  UserCategory,
+  UserTags,
+} from '@wrcb/cb-common'
 import { isUserTag } from './typeGuards/isUserTag'
 
 // src/utils/constants.ts
 
+export const tenantData = TenantDataService.getTenantData(Tenant.Compranomia)
 export const API_URL = 'https://www.privateshow.com.br'
 export const TENANT = Tenant.Compranomia
 export const CACHE_TTL = 60000 // 1 minuto
@@ -23,11 +29,7 @@ export const COMPRANOMIA_USER_CATEGORIES =
 export const COMPRANOMIA_TAGS: UserTags[] =
   TenantDataService.getAllTagsForTenant(Tenant.Compranomia).filter(isUserTag)
 
-export const PHARMACY_TAGS = [
-  UserTags.Medicines,
-  UserTags.GenericMedicines,
-  UserTags.Supplements,
-  UserTags.Vitamins,
-  UserTags.FirstAid,
-  UserTags.NaturalProducts,
-]
+export const PHARMACY_TAGS: UserTags[] = TenantDataService.getTagsForCategory(
+  Tenant.Compranomia,
+  UserCategory.Pharmacy,
+).filter(isUserTag)

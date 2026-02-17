@@ -89,4 +89,16 @@ export const profileService = {
       throw error
     }
   },
+
+  async refreshUserData(): Promise<{ user: User }> {
+    const response = await api.get('/api/auth/getcurrentuserdata')
+    if (response.data.status === 'success') {
+      const { user, token } = response.data.data
+      if (token) {
+        await storageService.saveAuthToken(token)
+      }
+      return { user }
+    }
+    throw new Error(response.data.message || 'RefreshUserDataFailed')
+  },
 }

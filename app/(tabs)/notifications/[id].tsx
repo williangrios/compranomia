@@ -10,11 +10,13 @@ import {
 } from 'react-native'
 import { Stack, useRouter, useLocalSearchParams } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons'
-import { colors, components } from '@/theme'
+import { colors } from '@/theme'
 import {
   notificationService,
   type NotificationItem,
 } from '@/services/notification.service'
+import { useAuth } from '@/contexts/AuthContext'
+import { UserRole } from '@wrcb/cb-common'
 
 function formatDate(dateString: string): string {
   const date = new Date(dateString)
@@ -59,7 +61,6 @@ function subjectLabel(subject: string): {
 export default function NotificationDetail() {
   const router = useRouter()
   const { id } = useLocalSearchParams<{ id: string }>()
-
   const [notification, setNotification] = useState<NotificationItem | null>(
     null,
   )
@@ -143,11 +144,19 @@ export default function NotificationDetail() {
 
   // ── Detalhe ───────────────────────────────────────────────────────────────
   const { label, icon, color } = subjectLabel(notification.subject)
-  const data = notification.data
-    ? typeof notification.data === 'string'
-      ? JSON.parse(notification.data)
-      : notification.data
-    : null
+  const orderId = notification.subjectId
+
+  function goto(destinationRole: UserRole) {
+    let routeToGo: string | null = null
+    if (destinationRole === UserRole.Consumer) {
+      routeToGo = `/(tabs)/orders/${orderId}`
+    } else if (destinationRole === UserRole.Seller) {
+      routeToGo = `/(tabs)/sales/${orderId}`
+    }
+    if (!routeToGo) return
+    router.dismissAll()
+    router.navigate(routeToGo)
+  }
 
   return (
     <>
@@ -230,7 +239,7 @@ export default function NotificationDetail() {
           </Text>
 
           {/* Botão Ver Pedido — aparece quando há subjectId */}
-          {data?.orderId && (
+          {orderId && (
             <View style={{ paddingHorizontal: 16, marginBottom: 40 }}>
               <TouchableOpacity
                 style={{
@@ -243,9 +252,7 @@ export default function NotificationDetail() {
                   borderWidth: 1,
                   borderColor: colors.primary,
                 }}
-                onPress={() => {
-                  // TODO: navegar para tela do pedido
-                }}
+                onPress={() => goto(notification.destinationRole)}
                 activeOpacity={0.7}
               >
                 <Ionicons
@@ -274,7 +281,7 @@ export default function NotificationDetail() {
 // ── Screen options ────────────────────────────────────────────────────────────
 function screenOptions(router: ReturnType<typeof useRouter>) {
   return {
-    title: 'Detalhes',
+    title: 'Ler notificação',
     headerShown: true,
     headerStyle: { backgroundColor: colors.primary },
     headerTintColor: '#FFFFFF',

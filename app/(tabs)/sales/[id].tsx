@@ -17,6 +17,7 @@ import { orderService } from '@/services/order.service'
 import { colors, spacing } from '@/theme'
 import { capitalizeFullName } from '@/utils/capitalizeFullName'
 import { translateError } from '@/utils/errorMessages'
+import { Screen } from '@/components/layout/Screen'
 
 // ─── Tipos ────────────────────────────────────────────────────────────────────
 
@@ -238,7 +239,7 @@ export default function SaleDetail() {
         </View>
         <View style={s.loadingContainer}>
           <Text style={{ color: colors.textSecondary }}>
-            Pedido não encontrado
+            Venda não encontrada
           </Text>
         </View>
       </View>
@@ -257,237 +258,242 @@ export default function SaleDetail() {
       : 'Cliente'
 
   return (
-    <View style={[s.container, { paddingTop: insets.top }]}>
-      {/* Header */}
-      <View style={s.header}>
-        <TouchableOpacity onPress={() => router.back()} hitSlop={10}>
-          <Ionicons name="arrow-back" size={24} color={colors.textPrimary} />
-        </TouchableOpacity>
-        <Text style={s.headerTitle}>Detalhes da Venda</Text>
-        <TouchableOpacity
-          onPress={() => router.push(`/(tabs)/sales/${id}/chat`)}
-          hitSlop={10}
-        >
-          <Ionicons
-            name="chatbubble-outline"
-            size={22}
-            color={colors.primary}
-          />
-        </TouchableOpacity>
-      </View>
-
-      <ScrollView
-        showsVerticalScrollIndicator={false}
-        contentContainerStyle={{ paddingBottom: 120 }}
-      >
-        {/* Status */}
-        <View style={s.section}>
-          <View style={s.statusRow}>
-            <View style={[s.statusBadge, { backgroundColor: config.bg }]}>
-              <Ionicons
-                name={config.icon as any}
-                size={16}
-                color={config.color}
-              />
-              <Text style={[s.statusText, { color: config.color }]}>
-                {config.label}
-              </Text>
-            </View>
-            <Text style={s.dateText}>{formatDateTime(order.createdAt)}</Text>
-          </View>
-          <Text style={s.customerName}>Cliente: {customerName}</Text>
-          <View style={s.estimatedRow}>
-            <Ionicons
-              name="time-outline"
-              size={15}
-              color={colors.textSecondary}
-            />
-            <Text style={s.estimatedText}>
-              Previsão: {formatDateTime(order.estimatedDeliveryDate)}
-            </Text>
-          </View>
-        </View>
-
-        {/* Itens */}
-        <View style={s.section}>
-          <Text style={s.sectionTitle}>Itens ({order.items.length})</Text>
-          {order.items.map((item, idx) => {
-            const effectivePrice =
-              item.promotionalPrice != null &&
-              item.promotionalPrice < item.price
-                ? item.promotionalPrice
-                : item.price
-            return (
-              <View key={idx} style={s.itemRow}>
-                <View style={{ flex: 1 }}>
-                  <Text style={s.itemName}>{item.name}</Text>
-                  <Text style={s.itemMeta}>
-                    {item.quantity} {item.measurementUnit} × R${' '}
-                    {effectivePrice.toFixed(2)}
-                  </Text>
-                </View>
-                <Text style={s.itemSubtotal}>
-                  R$ {item.subtotal.toFixed(2)}
-                </Text>
-              </View>
-            )
-          })}
-        </View>
-
-        {/* Endereço */}
-        <View style={s.section}>
-          <Text style={s.sectionTitle}>Endereço de entrega</Text>
-          <View style={s.addressRow}>
-            <Ionicons name="location-sharp" size={18} color={colors.primary} />
-            <View style={{ flex: 1, marginLeft: spacing.sm }}>
-              <Text style={s.addressMain}>
-                {order.deliveryAddress.street}, {order.deliveryAddress.number}
-                {order.deliveryAddress.complement
-                  ? ` - ${order.deliveryAddress.complement}`
-                  : ''}
-              </Text>
-              <Text style={s.addressSecondary}>
-                {order.deliveryAddress.neighborhood} —{' '}
-                {order.deliveryAddress.city}/{order.deliveryAddress.state}
-              </Text>
-              <Text style={s.addressSecondary}>
-                CEP: {order.deliveryAddress.cep}
-              </Text>
-              {order.deliveryAddress.deliveryInstructions ? (
-                <Text style={s.addressSecondary}>
-                  Obs: {order.deliveryAddress.deliveryInstructions}
-                </Text>
-              ) : null}
-            </View>
-          </View>
-        </View>
-
-        {/* Pagamento */}
-        <View style={s.section}>
-          <Text style={s.sectionTitle}>Pagamento</Text>
-          <View style={s.paymentRow}>
-            <Ionicons
-              name="card-outline"
-              size={18}
-              color={colors.textSecondary}
-            />
-            <Text style={s.paymentText}>
-              {PAYMENT_LABELS[order.paymentMethod] ?? order.paymentMethod}
-            </Text>
-            <Text style={s.paymentHint}>(na entrega)</Text>
-          </View>
-        </View>
-
-        {/* Resumo */}
-        <View style={s.section}>
-          <Text style={s.sectionTitle}>Resumo</Text>
-          <View style={s.summaryRow}>
-            <Text style={s.summaryLabel}>Subtotal</Text>
-            <Text style={s.summaryValue}>R$ {order.subtotal.toFixed(2)}</Text>
-          </View>
-          <View style={s.summaryRow}>
-            <Text style={s.summaryLabel}>Taxa de entrega</Text>
-            <Text
-              style={[
-                s.summaryValue,
-                order.deliveryFee === 0 && { color: colors.success },
-              ]}
-            >
-              {order.deliveryFee === 0
-                ? 'Grátis'
-                : `R$ ${order.deliveryFee.toFixed(2)}`}
-            </Text>
-          </View>
-          <View style={[s.summaryRow, s.summaryTotal]}>
-            <Text style={s.totalLabel}>Total</Text>
-            <Text style={s.totalValue}>R$ {order.total.toFixed(2)}</Text>
-          </View>
-        </View>
-      </ScrollView>
-
-      {/* Bottom action */}
-      {canChangeStatus && (
-        <View
-          style={[s.bottomBar, { paddingBottom: insets.bottom + spacing.md }]}
-        >
+    <Screen>
+      <View style={[s.container, { paddingTop: insets.top }]}>
+        {/* Header */}
+        <View style={s.header}>
           <TouchableOpacity
-            style={[s.statusButton, isUpdating && { opacity: 0.6 }]}
-            onPress={() => setShowStatusModal(true)}
-            disabled={isUpdating}
-            activeOpacity={0.8}
+            onPress={() => router.replace('/(tabs)/sales')}
+            hitSlop={10}
           >
-            {isUpdating ? (
-              <ActivityIndicator color="#FFF" size="small" />
-            ) : (
-              <>
-                <Ionicons
-                  name="swap-horizontal-outline"
-                  size={18}
-                  color="#FFF"
-                />
-                <Text style={s.statusButtonText}>Alterar status</Text>
-                <Ionicons name="chevron-up-outline" size={18} color="#FFF" />
-              </>
-            )}
+            <Ionicons name="arrow-back" size={30} color={colors.textPrimary} />
+          </TouchableOpacity>
+          <Text style={s.headerTitle}>Detalhes da Venda</Text>
+          <TouchableOpacity
+            onPress={() => router.push(`/(tabs)/sales/${id}/chat`)}
+            hitSlop={10}
+          >
+            <Ionicons name="chatbubble" size={28} color={colors.success} />
           </TouchableOpacity>
         </View>
-      )}
 
-      {/* Modal de status */}
-      <Modal
-        visible={showStatusModal}
-        transparent
-        animationType="slide"
-        onRequestClose={() => setShowStatusModal(false)}
-      >
-        <TouchableOpacity
-          style={s.modalOverlay}
-          activeOpacity={1}
-          onPress={() => setShowStatusModal(false)}
+        <ScrollView
+          showsVerticalScrollIndicator={false}
+          contentContainerStyle={{ paddingBottom: 120 }}
         >
-          <View style={s.modalSheet}>
-            <View style={s.modalHandle} />
-            <Text style={s.modalTitle}>Alterar status para</Text>
+          {/* Status */}
+          <View style={s.section}>
+            <View style={s.statusRow}>
+              <View style={[s.statusBadge, { backgroundColor: config.bg }]}>
+                <Ionicons
+                  name={config.icon as any}
+                  size={16}
+                  color={config.color}
+                />
+                <Text style={[s.statusText, { color: config.color }]}>
+                  {config.label}
+                </Text>
+              </View>
+              <Text style={s.dateText}>{formatDateTime(order.createdAt)}</Text>
+            </View>
+            <Text style={s.customerName}>Cliente: {customerName}</Text>
+            <View style={s.estimatedRow}>
+              <Ionicons
+                name="time-outline"
+                size={15}
+                color={colors.textSecondary}
+              />
+              <Text style={s.estimatedText}>
+                Previsão: {formatDateTime(order.estimatedDeliveryDate)}
+              </Text>
+            </View>
+          </View>
 
-            {availableStatuses.map((status) => {
-              const cfg = STATUS_CONFIG[status]
+          {/* Itens */}
+          <View style={s.section}>
+            <Text style={s.sectionTitle}>Itens ({order.items.length})</Text>
+            {order.items.map((item, idx) => {
+              const effectivePrice =
+                item.promotionalPrice != null &&
+                item.promotionalPrice < item.price
+                  ? item.promotionalPrice
+                  : item.price
               return (
-                <TouchableOpacity
-                  key={status}
-                  style={s.modalOption}
-                  onPress={() => handleChangeStatus(status)}
-                  activeOpacity={0.7}
-                >
-                  <View
-                    style={[s.modalOptionIcon, { backgroundColor: cfg.bg }]}
-                  >
-                    <Ionicons
-                      name={cfg.icon as any}
-                      size={20}
-                      color={cfg.color}
-                    />
+                <View key={idx} style={s.itemRow}>
+                  <View style={{ flex: 1 }}>
+                    <Text style={s.itemName}>{item.name}</Text>
+                    <Text style={s.itemMeta}>
+                      {item.quantity} {item.measurementUnit} × R${' '}
+                      {effectivePrice.toFixed(2)}
+                    </Text>
                   </View>
-                  <Text style={s.modalOptionText}>{cfg.label}</Text>
-                  <Ionicons
-                    name="chevron-forward"
-                    size={18}
-                    color={colors.textSecondary}
-                  />
-                </TouchableOpacity>
+                  <Text style={s.itemSubtotal}>
+                    R$ {item.subtotal.toFixed(2)}
+                  </Text>
+                </View>
               )
             })}
+          </View>
 
+          {/* Endereço */}
+          <View style={s.section}>
+            <Text style={s.sectionTitle}>Endereço de entrega</Text>
+            <View style={s.addressRow}>
+              <Ionicons
+                name="location-sharp"
+                size={18}
+                color={colors.primary}
+              />
+              <View style={{ flex: 1, marginLeft: spacing.sm }}>
+                <Text style={s.addressMain}>
+                  {order.deliveryAddress.street}, {order.deliveryAddress.number}
+                  {order.deliveryAddress.complement
+                    ? ` - ${order.deliveryAddress.complement}`
+                    : ''}
+                </Text>
+                <Text style={s.addressSecondary}>
+                  {order.deliveryAddress.neighborhood} —{' '}
+                  {order.deliveryAddress.city}/{order.deliveryAddress.state}
+                </Text>
+                <Text style={s.addressSecondary}>
+                  CEP: {order.deliveryAddress.cep}
+                </Text>
+                {order.deliveryAddress.deliveryInstructions ? (
+                  <Text style={s.addressSecondary}>
+                    Obs: {order.deliveryAddress.deliveryInstructions}
+                  </Text>
+                ) : null}
+              </View>
+            </View>
+          </View>
+
+          {/* Pagamento */}
+          <View style={s.section}>
+            <Text style={s.sectionTitle}>Pagamento</Text>
+            <View style={s.paymentRow}>
+              <Ionicons
+                name="card-outline"
+                size={18}
+                color={colors.textSecondary}
+              />
+              <Text style={s.paymentText}>
+                {PAYMENT_LABELS[order.paymentMethod] ?? order.paymentMethod}
+              </Text>
+              <Text style={s.paymentHint}>(na entrega)</Text>
+            </View>
+          </View>
+
+          {/* Resumo */}
+          <View style={s.section}>
+            <Text style={s.sectionTitle}>Resumo</Text>
+            <View style={s.summaryRow}>
+              <Text style={s.summaryLabel}>Subtotal</Text>
+              <Text style={s.summaryValue}>R$ {order.subtotal.toFixed(2)}</Text>
+            </View>
+            <View style={s.summaryRow}>
+              <Text style={s.summaryLabel}>Taxa de entrega</Text>
+              <Text
+                style={[
+                  s.summaryValue,
+                  order.deliveryFee === 0 && { color: colors.success },
+                ]}
+              >
+                {order.deliveryFee === 0
+                  ? 'Grátis'
+                  : `R$ ${order.deliveryFee.toFixed(2)}`}
+              </Text>
+            </View>
+            <View style={[s.summaryRow, s.summaryTotal]}>
+              <Text style={s.totalLabel}>Total</Text>
+              <Text style={s.totalValue}>R$ {order.total.toFixed(2)}</Text>
+            </View>
+          </View>
+        </ScrollView>
+
+        {/* Bottom action */}
+        {canChangeStatus && (
+          <View
+            style={[s.bottomBar, { paddingBottom: insets.bottom + spacing.md }]}
+          >
             <TouchableOpacity
-              style={s.modalCancel}
-              onPress={() => setShowStatusModal(false)}
-              activeOpacity={0.7}
+              style={[s.statusButton, isUpdating && { opacity: 0.6 }]}
+              onPress={() => setShowStatusModal(true)}
+              disabled={isUpdating}
+              activeOpacity={0.8}
             >
-              <Text style={s.modalCancelText}>Cancelar</Text>
+              {isUpdating ? (
+                <ActivityIndicator color="#FFF" size="small" />
+              ) : (
+                <>
+                  <Ionicons
+                    name="swap-horizontal-outline"
+                    size={18}
+                    color="#FFF"
+                  />
+                  <Text style={s.statusButtonText}>Alterar status</Text>
+                  <Ionicons name="chevron-up-outline" size={18} color="#FFF" />
+                </>
+              )}
             </TouchableOpacity>
           </View>
-        </TouchableOpacity>
-      </Modal>
-    </View>
+        )}
+
+        {/* Modal de status */}
+        <Modal
+          visible={showStatusModal}
+          transparent
+          animationType="slide"
+          onRequestClose={() => setShowStatusModal(false)}
+        >
+          <TouchableOpacity
+            style={s.modalOverlay}
+            activeOpacity={1}
+            onPress={() => setShowStatusModal(false)}
+          >
+            <View style={s.modalSheet}>
+              <View style={s.modalHandle} />
+              <Text style={s.modalTitle}>Alterar status para</Text>
+
+              {availableStatuses.map((status) => {
+                const cfg = STATUS_CONFIG[status]
+                return (
+                  <TouchableOpacity
+                    key={status}
+                    style={s.modalOption}
+                    onPress={() => handleChangeStatus(status)}
+                    activeOpacity={0.7}
+                  >
+                    <View
+                      style={[s.modalOptionIcon, { backgroundColor: cfg.bg }]}
+                    >
+                      <Ionicons
+                        name={cfg.icon as any}
+                        size={20}
+                        color={cfg.color}
+                      />
+                    </View>
+                    <Text style={s.modalOptionText}>{cfg.label}</Text>
+                    <Ionicons
+                      name="chevron-forward"
+                      size={18}
+                      color={colors.textSecondary}
+                    />
+                  </TouchableOpacity>
+                )
+              })}
+
+              <TouchableOpacity
+                style={s.modalCancel}
+                onPress={() => setShowStatusModal(false)}
+                activeOpacity={0.7}
+              >
+                <Text style={s.modalCancelText}>Cancelar</Text>
+              </TouchableOpacity>
+            </View>
+          </TouchableOpacity>
+        </Modal>
+      </View>
+    </Screen>
   )
 }
 

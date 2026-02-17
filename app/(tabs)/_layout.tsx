@@ -1,5 +1,5 @@
 // app/(tabs)/_layout.tsx
-import { Tabs } from 'expo-router'
+import { Tabs, useRouter } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons'
 import { useAuth } from '@/contexts/AuthContext'
 import { UserRole } from '@wrcb/cb-common'
@@ -9,15 +9,14 @@ export default function TabsLayout() {
   const { user } = useAuth()
   const isSeller = user?.role === UserRole.Seller
   const insets = useSafeAreaInsets()
+  const router = useRouter()
 
   return (
     <Tabs
       screenOptions={{
         headerShown: false,
-
         tabBarActiveTintColor: '#FFFFFF',
         tabBarInactiveTintColor: 'rgba(255, 255, 255, 0.5)',
-
         tabBarStyle: {
           backgroundColor: '#F97316',
           borderTopWidth: 0,
@@ -27,11 +26,17 @@ export default function TabsLayout() {
           paddingTop: 8,
           position: 'absolute',
         },
-
         tabBarLabelStyle: {
           fontSize: 11,
           fontWeight: '600',
           marginBottom: 4,
+        },
+      }}
+      screenListeners={{
+        tabPress: () => {
+          if (router.canDismiss()) {
+            router.dismissAll()
+          }
         },
       }}
     >
@@ -48,7 +53,6 @@ export default function TabsLayout() {
           ),
         }}
       />
-
       <Tabs.Screen
         name="search"
         options={{
@@ -62,7 +66,6 @@ export default function TabsLayout() {
           ),
         }}
       />
-
       <Tabs.Screen
         name="orders"
         options={{
@@ -76,7 +79,6 @@ export default function TabsLayout() {
           ),
         }}
       />
-
       <Tabs.Screen
         name="sales"
         options={{
@@ -91,7 +93,6 @@ export default function TabsLayout() {
           ),
         }}
       />
-
       <Tabs.Screen
         name="dashboard"
         options={{
@@ -106,7 +107,6 @@ export default function TabsLayout() {
           ),
         }}
       />
-
       <Tabs.Screen
         name="notifications"
         options={{
@@ -121,7 +121,6 @@ export default function TabsLayout() {
           ),
         }}
       />
-
       <Tabs.Screen
         name="profile"
         options={{

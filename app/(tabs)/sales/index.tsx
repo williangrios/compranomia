@@ -18,7 +18,7 @@ export default function Sales() {
       emptySubtitle="Quando você receber pedidos, eles aparecerão aqui"
       emptyIcon="receipt-outline"
       onViewOrder={(id) => router.push(`/(tabs)/sales/${id}`)}
-      onOpenChat={(id) => router.push(`/(tabs)/sales/${id}?tab=chat`)}
+      onOpenChat={(id) => router.push(`/(tabs)/sales/${id}/chat`)}
       type="sales"
     />
   )

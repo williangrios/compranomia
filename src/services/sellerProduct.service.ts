@@ -16,6 +16,9 @@ interface CreatePayload {
   stock: number
   minStockAlert?: number
   promotionalPrice?: number
+  sellerSpotlighted: boolean
+  isProhibitedForMinors: boolean
+  isPrescriptionRequired: boolean
   images?: { uri: string }[]
 }
 
@@ -31,6 +34,9 @@ interface AdoptPayload {
   price: number
   stock: number
   step?: number
+  sellerSpotlighted: boolean
+  isProhibitedForMinors: boolean
+  isPrescriptionRequired: boolean
   minStockAlert?: number
   promotionalPrice?: number | null
 }
@@ -47,6 +53,9 @@ interface UpdatePayload {
   stock?: number
   step?: number
   minStockAlert?: number
+  sellerSpotlighted: boolean
+  isProhibitedForMinors: boolean
+  isPrescriptionRequired: boolean
   promotionalPrice?: number | null
   isActive?: boolean
 }
@@ -76,26 +85,53 @@ export const sellerProductService = {
   ) {
     const formData = new FormData()
 
+    // Obrigatórios
     formData.append('name', payload.name)
     formData.append('price', String(payload.price))
     formData.append('stock', String(payload.stock))
 
+    // Opcionais
     if (payload.description) formData.append('description', payload.description)
+
     if (payload.brand) formData.append('brand', payload.brand)
+
     if (payload.productCategory)
       formData.append('productCategory', payload.productCategory)
+
     if (payload.measurementUnit)
       formData.append('measurementUnit', payload.measurementUnit)
+
     if (typeof payload.baseWeight === 'number')
       formData.append('baseWeight', String(payload.baseWeight))
+
     if (typeof payload.step === 'number')
       formData.append('step', String(payload.step))
+
     if (typeof payload.minStockAlert === 'number')
       formData.append('minStockAlert', String(payload.minStockAlert))
+
     if (typeof payload.promotionalPrice === 'number')
       formData.append('promotionalPrice', String(payload.promotionalPrice))
+
     if (payload.barcode) formData.append('barcode', payload.barcode)
 
+    // 🔥 Flags boolean (sempre converter para string)
+    if (typeof payload.sellerSpotlighted === 'boolean')
+      formData.append('sellerSpotlighted', String(payload.sellerSpotlighted))
+
+    if (typeof payload.isProhibitedForMinors === 'boolean')
+      formData.append(
+        'isProhibitedForMinors',
+        String(payload.isProhibitedForMinors),
+      )
+
+    if (typeof payload.isPrescriptionRequired === 'boolean')
+      formData.append(
+        'isPrescriptionRequired',
+        String(payload.isPrescriptionRequired),
+      )
+
+    // Imagens
     if (payload.images?.length) {
       payload.images.forEach((img, index) => {
         formData.append('originalImages', {
@@ -114,6 +150,7 @@ export const sellerProductService = {
         method: 'POST',
         headers: {
           ...(token ? { Authorization: `Bearer ${token}` } : {}),
+          // ⚠️ NÃO setar Content-Type manualmente no React Native
         },
         body: formData,
       },
@@ -125,70 +162,19 @@ export const sellerProductService = {
       throw { response: { data: error } }
     }
 
-    const data = await response.json()
-    return data
+    return await response.json()
   },
 
-  // async create(
-  //   payload: CreatePayload & {
-  //     barcode?: string
-  //     promotionalPrice?: number
-  //   },
-  // ) {
-  //   console.log('inicou create product')
-  //   const formData = new FormData()
-
-  //   formData.append('name', payload.name)
-  //   formData.append('price', String(payload.price))
-  //   formData.append('stock', String(payload.stock))
-
-  //   if (payload.description) formData.append('description', payload.description)
-  //   if (payload.brand) formData.append('brand', payload.brand)
-  //   if (payload.productCategory)
-  //     formData.append('productCategory', payload.productCategory)
-  //   if (payload.measurementUnit)
-  //     formData.append('measurementUnit', payload.measurementUnit)
-  //   if (typeof payload.baseWeight === 'number')
-  //     formData.append('baseWeight', String(payload.baseWeight))
-  //   if (typeof payload.step === 'number')
-  //     formData.append('step', String(payload.step))
-  //   if (typeof payload.minStockAlert === 'number')
-  //     formData.append('minStockAlert', String(payload.minStockAlert))
-  //   if (typeof payload.promotionalPrice === 'number')
-  //     formData.append('promotionalPrice', String(payload.promotionalPrice))
-  //   if (payload.barcode) formData.append('barcode', payload.barcode)
-
-  //   if (payload.images?.length) {
-  //     payload.images.forEach((img, index) => {
-  //       formData.append('originalImages', {
-  //         uri: img.uri,
-  //         name: `product-${index}.jpg`,
-  //         type: 'image/jpeg',
-  //       } as any)
-  //     })
-  //   }
-
-  //   console.log('[CREATE] API_URL:', api.defaults.baseURL)
-  //   const { data } = await api.post(
-  //     '/api/business/compranomia/catalog/new',
-  //     formData,
-  //     { timeout: 60000 },
-  //   )
-  //   console.log('retorno create product--------', data)
-  //   return data
-  // },
-
   async adopt(payload: AdoptPayload) {
-    console.log('inicou adopt product')
     const { data } = await api.post(
       '/api/business/compranomia/catalog/adopt',
       payload,
     )
-    console.log('retorno adopt product--------', data)
     return data
   },
 
   async update(id: string, payload: UpdatePayload) {
+    console.log('-------------', payload)
     const { data } = await api.patch(
       `/api/business/compranomia/seller-product/${id}`,
       payload,

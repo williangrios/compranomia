@@ -1,4 +1,4 @@
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useMemo } from 'react'
 import {
   View,
   Text,
@@ -19,11 +19,12 @@ import { colors, components } from '@/theme'
 import { productEnrichmentService } from '@/services/productEnrichment.service'
 import { sellerProductService } from '@/services/sellerProduct.service'
 import { productStyles as styles } from '@/styles/product.styles'
-import { MeasurementUnit, UserTags } from '@wrcb/cb-common'
-import { COMPRANOMIA_TAGS, PHARMACY_TAGS } from '@/utils/constants'
+import { MeasurementUnit, TenantDataService, UserTags } from '@wrcb/cb-common'
+import { PHARMACY_TAGS } from '@/utils/constants'
 import { sortByLabel, userTagsLabels } from '@/utils/enumLabels/userTags.labels'
 import { getApiErrors } from '@/utils/getApiErrors'
 import { formatters } from '@/utils/formatters'
+import { useAuth } from '@/contexts/AuthContext'
 
 interface ApiError {
   message: string
@@ -39,6 +40,9 @@ interface FormErrors {
   price?: string
   stock?: string
   step?: string
+  sellerSpotlighted?: string
+  isProhibitedForMinors?: string
+  isPrescriptionRequired?: string
   promotionalPrice?: string
 }
 
@@ -53,16 +57,30 @@ interface ProductForm {
   price: string
   stock: string
   minStockAlert: string
+  sellerSpotlighted: boolean
+  isProhibitedForMinors: boolean
+  isPrescriptionRequired: boolean
   promotionalPrice: string
 }
 
 export default function NewProduct() {
   const router = useRouter()
   const { barcode: routeBarcode } = useLocalSearchParams<{ barcode?: string }>()
-  const sortedTags = sortByLabel(COMPRANOMIA_TAGS, userTagsLabels)
 
   const [image, setImage] = useState<ImagePicker.ImagePickerAsset | null>(null)
   const hasEnrichedRef = useRef(false)
+  const { user } = useAuth()
+
+  const sortedTags = useMemo(() => {
+    if (!user) return []
+
+    const allowed = TenantDataService.getTagsForCategory(
+      user.tenant,
+      user.category,
+    ) as UserTags[]
+
+    return sortByLabel(allowed, userTagsLabels)
+  }, [user])
 
   const [form, setForm] = useState<ProductForm>({
     name: 'nome',
@@ -73,6 +91,9 @@ export default function NewProduct() {
     baseWeight: '50',
     step: '1',
     price: '52',
+    sellerSpotlighted: false,
+    isProhibitedForMinors: false,
+    isPrescriptionRequired: false,
     stock: '0',
     minStockAlert: '',
     promotionalPrice: '',
@@ -80,8 +101,6 @@ export default function NewProduct() {
 
   const isUnit = form.measurementUnit === MeasurementUnit.Un
   const [hasPromotion, setHasPromotion] = useState(false)
-  const [restrictedToAdults, setRestrictedToAdults] = useState(false)
-  const [requiresPrescription, setRequiresPrescription] = useState(false)
   const [showPrescriptionToggle, setShowPrescriptionToggle] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [isEnriching, setIsEnriching] = useState(false)
@@ -97,18 +116,12 @@ export default function NewProduct() {
         baseWeight: prev.step,
       }))
     } else {
-      setField('step', '1')
-    }
-  }, [form.measurementUnit, form.step])
-
-  useEffect(() => {
-    if (form.measurementUnit !== MeasurementUnit.Un) {
       setForm((prev) => ({
         ...prev,
-        baseWeight: prev.step.toString(),
+        step: '1',
       }))
     }
-  }, [form.step])
+  }, [form.measurementUnit])
 
   function setField<K extends keyof ProductForm>(key: K, value: string) {
     setForm((prev) => ({ ...prev, [key]: value }))
@@ -163,6 +176,12 @@ export default function NewProduct() {
       const enriched = await productEnrichmentService.enrich(image)
       hasEnrichedRef.current = true
 
+      const isPharmacy =
+        enriched.productCategory &&
+        PHARMACY_TAGS.includes(enriched.productCategory as UserTags)
+
+      setShowPrescriptionToggle(!!isPharmacy)
+
       setForm((prev) => ({
         ...prev,
         name: enriched.name ?? prev.name,
@@ -175,20 +194,12 @@ export default function NewProduct() {
         baseWeight: enriched.baseWeight
           ? String(enriched.baseWeight)
           : prev.baseWeight,
+        isPrescriptionRequired: isPharmacy
+          ? !!enriched.requiresPrescription
+          : false,
+        isProhibitedForMinors: !!enriched.restrictedToAdults,
       }))
 
-      if (
-        enriched.productCategory &&
-        PHARMACY_TAGS.includes(enriched.productCategory as UserTags)
-      ) {
-        setShowPrescriptionToggle(true)
-        setRequiresPrescription(!!enriched.requiresPrescription)
-      } else {
-        setShowPrescriptionToggle(false)
-        setRequiresPrescription(false)
-      }
-
-      setRestrictedToAdults(!!enriched.restrictedToAdults)
       setSuccess({ message: 'Dados preenchidos automaticamente pela IA' })
     } catch (error: unknown) {
       setApiErrors(getApiErrors(error))
@@ -276,6 +287,9 @@ export default function NewProduct() {
             : undefined,
         barcode: routeBarcode || undefined,
         images: image ? [{ uri: image.uri }] : [],
+        sellerSpotlighted: Boolean(form.sellerSpotlighted),
+        isProhibitedForMinors: Boolean(form.isProhibitedForMinors),
+        isPrescriptionRequired: Boolean(form.isPrescriptionRequired),
       })
 
       setSuccess({ message: 'Produto criado com sucesso' })
@@ -470,7 +484,10 @@ export default function NewProduct() {
                 setShowPrescriptionToggle(true)
               } else {
                 setShowPrescriptionToggle(false)
-                setRequiresPrescription(false)
+                setForm((prev) => ({
+                  ...prev,
+                  isPrescriptionRequired: false,
+                }))
               }
             }}
           >
@@ -634,19 +651,35 @@ export default function NewProduct() {
 
       {/* Flags */}
       <View style={styles.switchRow}>
-        <Text style={styles.switchLabel}>Venda proibida para menores</Text>
+        <Text style={styles.switchLabel}>Destacar produto</Text>
         <Switch
-          value={restrictedToAdults}
-          onValueChange={setRestrictedToAdults}
+          value={form.sellerSpotlighted}
+          onValueChange={(v) =>
+            setForm((prev) => ({ ...prev, sellerSpotlighted: v }))
+          }
+        />
+      </View>
+
+      <View style={styles.switchRow}>
+        <Text style={styles.switchLabel}>Proibida venda para menores</Text>
+        <Switch
+          value={form.isProhibitedForMinors}
+          onValueChange={(v) =>
+            setForm((prev) => ({ ...prev, isProhibitedForMinors: v }))
+          }
         />
       </View>
 
       {showPrescriptionToggle && (
         <View style={styles.switchRow}>
-          <Text style={styles.switchLabel}>Exige receita médica</Text>
+          <Text style={styles.switchLabel}>
+            Exige retenção de receita médica
+          </Text>
           <Switch
-            value={requiresPrescription}
-            onValueChange={setRequiresPrescription}
+            value={form.isPrescriptionRequired}
+            onValueChange={(v) =>
+              setForm((prev) => ({ ...prev, isPrescriptionRequired: v }))
+            }
           />
         </View>
       )}

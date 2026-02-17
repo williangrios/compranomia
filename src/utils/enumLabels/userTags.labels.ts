@@ -1,140 +1,183 @@
 import { UserTags } from '@wrcb/cb-common'
 
 export const userTagsLabels: Record<UserTags, string> = {
-  // =========================
-  // 🥩 CARNES / AÇOUGUE
-  // =========================
-  BeefMeat: 'Carne bovina',
-  PorkMeat: 'Carne suína',
-  ChickenMeat: 'Carne de frango',
-  FishMeat: 'Peixes',
-  Seafood: 'Frutos do mar',
-  Sausages: 'Embutidos e linguiças',
-  OrganicMeat: 'Carnes orgânicas',
-  NoblesCuts: 'Cortes nobres',
+  [UserTags.Hortifruti]: 'Hortifruti',
+  [UserTags.Açougue]: 'Açougue',
+  [UserTags.Peixaria]: 'Peixaria',
+  [UserTags.Frios]: 'Frios',
+  [UserTags.Laticínios]: 'Laticínios',
+  [UserTags.Padaria]: 'Padaria',
+  [UserTags.Mercearia]: 'Mercearia',
+  [UserTags.Congelados]: 'Congelados',
+  [UserTags.HigieneEPerfumaria]: 'Higiene e perfumaria',
+  [UserTags.Limpeza]: 'Limpeza',
+  [UserTags.BebidasAlcoolicas]: 'Bebidas alcoólicas',
+  [UserTags.BebidasNaoAlcoolicas]: 'Bebidas não alcoólicas',
+  [UserTags.Infantil]: 'Infantil',
+  [UserTags.PetShop]: 'Pet shop',
+  [UserTags.UtilidadesDomesticas]: 'Utilidades domésticas',
 
   // =========================
-  // 🥬 FRUTAS / VERDURAS
+  // 🍔 COMPRANOMIA - FOOD
   // =========================
-  Fruits: 'Frutas',
-  Vegetables: 'Legumes e verduras',
-  OrganicVegetables: 'Vegetais orgânicos',
-  Herbs: 'Ervas e temperos',
-  SeasonalProducts: 'Produtos da estação',
+  [UserTags.Comidas]: 'Comidas',
+  [UserTags.Pizzas]: 'Pizzas',
+  [UserTags.CachorroQuente]: 'Cachorro-quente',
+  [UserTags.Lanches]: 'Lanches',
+  [UserTags.Porcoes]: 'Porções',
+  [UserTags.Complementos]: 'Complementos',
+  [UserTags.Cafeteria]: 'Cafeteria',
+  [UserTags.Esfihas]: 'Esfihas',
+  [UserTags.Massas]: 'Massas',
+  [UserTags.Salgados]: 'Salgados',
+  [UserTags.Snacks]: 'Snacks',
+  [UserTags.SorvetesECongelados]: 'Sorvetes e congelados',
 
   // =========================
-  // 🥖 PADARIA
+  // 🥩 COMPRANOMIA - AÇOUGUE
   // =========================
-  FreshBread: 'Pães frescos',
-  Cakes: 'Bolos',
-  Pastries: 'Salgados e folhados',
-  ArtisanalBread: 'Pães artesanais',
-  WholeMeal: 'Produtos integrais',
-  GlutenFreeBakery: 'Padaria sem glúten',
+  [UserTags.CarnesBovinas]: 'Carnes bovinas',
+  [UserTags.CarnesSuinas]: 'Carnes suínas',
+  [UserTags.Aves]: 'Aves',
+  [UserTags.CarnesPeixe]: 'Peixes',
+  [UserTags.CarnesEspeciais]: 'Carnes especiais',
+  [UserTags.EmbutidosEProcessados]: 'Embutidos e processados',
+  [UserTags.Churrasco]: 'Churrasco',
+  [UserTags.Miudos]: 'Miúdos',
 
   // =========================
-  // 🧀 LATICÍNIOS
+  // 🥬 HORTIFRUTI
   // =========================
-  Dairy: 'Laticínios',
-  Cheese: 'Queijos',
-  Yogurt: 'Iogurtes',
-  LactoseFree: 'Sem lactose',
+  [UserTags.Frutas]: 'Frutas',
+  [UserTags.Verduras]: 'Verduras',
+  [UserTags.Legumes]: 'Legumes',
+  [UserTags.TemperosEErvas]: 'Temperos e ervas',
+  [UserTags.Organicos]: 'Orgânicos',
+  [UserTags.RaizesETuberculos]: 'Raízes e tubérculos',
+  [UserTags.Graos]: 'Grãos',
 
   // =========================
-  // 🥤 BEBIDAS
+  // 🐶 PETSHOP
   // =========================
-  Beverages: 'Bebidas',
-  ColdDrinks: 'Bebidas geladas',
-  Juices: 'Sucos',
-  SoftDrinks: 'Refrigerantes',
-  AlcoholicDrinks: 'Bebidas alcoólicas',
-  Water: 'Água',
+  [UserTags.ComidaCaes]: 'Ração para cães',
+  [UserTags.ComidaGatos]: 'Ração para gatos',
+  [UserTags.ComidaOutrosAnimais]: 'Ração para outros animais',
+  [UserTags.HigieneELimpeza]: 'Higiene e limpeza (pet)',
+  [UserTags.BrinquedosEAcessorios]: 'Brinquedos e acessórios',
+  [UserTags.Saude]: 'Saúde animal',
 
   // =========================
-  // 🍫 SNACKS / DOCES
+  // 🧴 FARMÁCIA
   // =========================
-  Snacks: 'Snacks e lanches',
-  Candy: 'Balas e doces',
-  Chocolate: 'Chocolates',
-  IceCream: 'Sorvetes',
-  ReadyToEat: 'Prontos para consumo',
+  [UserTags.PetMedicamentos]: 'Medicamentos veterinários',
+  [UserTags.PetVidaSaudavel]: 'Vida saudável pet',
+  [UserTags.PetHigieneELimpeza]: 'Higiene e limpeza pet',
+
+  [UserTags.PeleCabeloEUnhas]: 'Pele, cabelo e unhas',
+  [UserTags.SaudeIntima]: 'Saúde íntima',
+  [UserTags.AbsorventesEFraldas]: 'Absorventes e fraldas',
+  [UserTags.Antialergicos]: 'Antialérgicos',
+  [UserTags.Depilacao]: 'Depilação',
+  [UserTags.Banho]: 'Banho',
+  [UserTags.HigienePessoal]: 'Higiene pessoal',
+  [UserTags.HigieneBucal]: 'Higiene bucal',
+  [UserTags.CuidadoMasculino]: 'Cuidados masculinos',
+  [UserTags.CuidadoFeminino]: 'Cuidados femininos',
+  [UserTags.Repelentes]: 'Repelentes',
+  [UserTags.Desodorantes]: 'Desodorantes',
+  [UserTags.VitaminasESuplementos]: 'Vitaminas e suplementos',
+  [UserTags.Fitness]: 'Fitness',
+  [UserTags.Perfumes]: 'Perfumes',
+  [UserTags.Maquiagens]: 'Maquiagens',
+  [UserTags.Coloracao]: 'Coloração',
+  [UserTags.ProtetorSolarEBronzeadores]: 'Protetor solar e bronzeadores',
+  [UserTags.HidratantesELimpezaDePele]: 'Hidratantes e limpeza de pele',
+  [UserTags.TratamentoCapilar]: 'Tratamento capilar',
+  [UserTags.SaudeSexual]: 'Saúde sexual',
+  [UserTags.Conveniencia]: 'Conveniência',
+
+  // Medicamentos
+  [UserTags.AnticoncepcionaisEDIU]: 'Anticoncepcionais e DIU',
+  [UserTags.Antiinflamatorios]: 'Anti-inflamatórios',
+  [UserTags.Antidepressivos]: 'Antidepressivos',
+  [UserTags.Calmantes]: 'Calmantes',
+  [UserTags.Asma]: 'Asma',
+  [UserTags.CongestaoNasal]: 'Congestão nasal',
+  [UserTags.Diabetes]: 'Diabetes',
+  [UserTags.DorEFebre]: 'Dor e febre',
+  [UserTags.RiniteESinusite]: 'Rinite e sinusite',
+  [UserTags.DorDeGarganta]: 'Dor de garganta',
+  [UserTags.GripeEResfriado]: 'Gripe e resfriado',
+  [UserTags.ControleDePeso]: 'Controle de peso',
+  [UserTags.Gastrite]: 'Gastrite',
+  [UserTags.Enxaqueca]: 'Enxaqueca',
+  [UserTags.Colesterol]: 'Colesterol',
+  [UserTags.Infeccoes]: 'Infecções',
+  [UserTags.Insonia]: 'Insônia',
+  [UserTags.Tireoide]: 'Tireoide',
+  [UserTags.Visao]: 'Visão',
+  [UserTags.AziaEMaDigestao]: 'Azia e má digestão',
+  [UserTags.PressaoAlta]: 'Pressão alta',
+  [UserTags.Tosse]: 'Tosse',
+  [UserTags.MedicamentosEspeciais]: 'Medicamentos especiais',
+
+  // Naturais
+  [UserTags.Fitoterapicos]: 'Fitoterápicos',
+  [UserTags.Homeopatia]: 'Homeopatia',
+  [UserTags.RemediosNaturais]: 'Remédios naturais',
+  [UserTags.Aromaterapia]: 'Aromaterapia',
+  [UserTags.Canabidiol]: 'Canabidiol',
+
+  // Equipamentos
+  [UserTags.Inaladores]: 'Inaladores',
+  [UserTags.Descartaveis]: 'Descartáveis',
+  [UserTags.EquipamentosDeProtecao]: 'Equipamentos de proteção',
+  [UserTags.PrimeirosSocorros]: 'Primeiros socorros',
+  [UserTags.ContusoesEMachucados]: 'Contusões e machucados',
+  [UserTags.Higienizadores]: 'Higienizadores',
+  [UserTags.EquipamentosEInstrumentosHospitalares]: 'Equipamentos hospitalares',
+  [UserTags.CamasColchoesEAlmofadas]: 'Camas, colchões e almofadas',
+  [UserTags.Nebulizadores]: 'Nebulizadores',
+  [UserTags.MonitoresETestes]: 'Monitores e testes',
+  [UserTags.OrtopedicosEProteses]: 'Ortopédicos e próteses',
+  [UserTags.Massageadores]: 'Massageadores',
+  [UserTags.Dermocosmeticos]: 'Dermocosméticos',
+  [UserTags.Nutricosmeticos]: 'Nutricosméticos',
+
+  // Bebê
+  [UserTags.PeleDoBebe]: 'Pele do bebê',
+  [UserTags.BanhoDoBebe]: 'Banho do bebê',
+  [UserTags.Amamentacao]: 'Amamentação',
+  [UserTags.AlimentacaoDoBebe]: 'Alimentação do bebê',
 
   // =========================
-  // 🧼 LIMPEZA / HIGIENE
+  // 🌾 AGROPECUÁRIA
   // =========================
-  Cleaning: 'Produtos de limpeza',
-  PersonalCare: 'Higiene pessoal',
-  BabyCare: 'Cuidados com bebês',
-  Perfumery: 'Perfumaria',
-  Diapers: 'Fraldas',
+  [UserTags.Gado]: 'Gado',
+  [UserTags.AvesAgropecuaria]: 'Aves',
+  [UserTags.Equinos]: 'Equinos',
+  [UserTags.Suinos]: 'Suínos',
+  [UserTags.Jardinagem]: 'Jardinagem',
+  [UserTags.Defensivos]: 'Defensivos agrícolas',
+  [UserTags.Ferramentas]: 'Ferramentas',
+  [UserTags.Caes]: 'Cães',
+  [UserTags.Gatos]: 'Gatos',
 
   // =========================
-  // 🐶 PET SHOP
+  // 🔧 SERVIÇOS
   // =========================
-  PetFood: 'Ração para pet',
-  DogFood: 'Ração para cães',
-  CatFood: 'Ração para gatos',
-  BirdFood: 'Ração para aves',
-  FishFood: 'Ração para peixes',
-  PetToys: 'Brinquedos para pets',
-  PetHygiene: 'Higiene para pets',
-  PetAccessories: 'Acessórios para pets',
-  VeterinaryProducts: 'Produtos veterinários',
+  [UserTags.LimpezaAutomotiva]: 'Limpeza automotiva',
 
   // =========================
-  // ❄️ CONGELADOS / CONSERVAS
+  // 💧 ÁGUA E GÁS
   // =========================
-  FrozenFood: 'Congelados',
-  CannedFood: 'Enlatados e conservas',
-  InstantFood: 'Alimentos instantâneos',
+  [UserTags.Agua]: 'Água',
+  [UserTags.Gas]: 'Gás',
 
   // =========================
-  // ✏️ PAPELARIA / UTILIDADES
+  // OUTROS
   // =========================
-  Stationery: 'Papelaria',
-  SchoolSupplies: 'Material escolar',
-  HomeUtilities: 'Utilidades domésticas',
-  Kitchenware: 'Utensílios de cozinha',
-
-  // =========================
-  // 💊 FARMÁCIA
-  // =========================
-  Medicines: 'Medicamentos',
-  GenericMedicines: 'Medicamentos genéricos',
-  Supplements: 'Suplementos',
-  Vitamins: 'Vitaminas',
-  FirstAid: 'Primeiros socorros',
-  NaturalProducts: 'Produtos naturais',
-  Cosmetics: 'Cosméticos',
-
-  // =========================
-  // 🌱 CARACTERÍSTICAS ESPECIAIS
-  // =========================
-  OrganicProducts: 'Produtos orgânicos',
-  GlutenFree: 'Sem glúten',
-  VeganProducts: 'Produtos veganos',
-  ImportedProducts: 'Produtos importados',
-  LocalProducts: 'Produtos locais',
-  DietProducts: 'Produtos diet',
-  Halal: 'Halal',
-  Kosher: 'Kosher',
-
-  // =========================
-  // 🚜 AGROPECUÁRIA
-  // =========================
-  AnimalFeed: 'Ração animal',
-  Seeds: 'Sementes',
-  Fertilizers: 'Fertilizantes',
-  Pesticides: 'Defensivos agrícolas',
-  FarmTools: 'Ferramentas agrícolas',
-  IrrigationEquipment: 'Equipamentos de irrigação',
-  VeterinarySupplies: 'Insumos veterinários',
-  Livestock: 'Criação de animais',
-
-  // =========================
-  // Outros
-  // =========================
-  Other: 'Outros',
+  [UserTags.Outros]: 'Outros',
 
   [UserTags.CityTour]: '',
   [UserTags.CulturalTour]: '',
@@ -245,7 +288,6 @@ export const userTagsLabels: Record<UserTags, string> = {
   [UserTags.Toys]: '',
   [UserTags.Voyeur]: '',
   [UserTags.White]: '',
-  [UserTags.OfficeSupplies]: '',
 }
 
 export function sortByLabel<T extends string>(

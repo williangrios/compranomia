@@ -21,6 +21,7 @@ import { homeStyles as styles } from '@/styles/home.styles'
 import { colors } from '@/theme'
 import { toastService } from '@/services/toast.service'
 import { capitalizeFullName } from '@/utils/capitalizeFullName'
+import { CategoryCards } from '@/components/home/CategoryIcon'
 
 export default function Home() {
   const router = useRouter()
@@ -28,22 +29,31 @@ export default function Home() {
 
   const [sellers, setSellers] = useState<NearbySeller[]>([])
   const [promotions, setPromotions] = useState<SellerProductResult[]>([])
+  const [sponsored, setSponsored] = useState<SellerProductResult[]>([])
   const [isLoading, setIsLoading] = useState(false)
   const [isRefreshing, setIsRefreshing] = useState(false)
+  const [promotionsTotal, setPromotionsTotal] = useState(0)
+  const [sponsoredTotal, setSponsoredTotal] = useState(0)
+  const [sellersTotal, setSellersTotal] = useState(0)
+  const [isLoadingMorePromotions, setIsLoadingMorePromotions] = useState(false)
+  const [isLoadingMoreSponsored, setIsLoadingMoreSponsored] = useState(false)
+  const [isLoadingMoreSellers, setIsLoadingMoreSellers] = useState(false)
 
   const loadData = useCallback(async () => {
     if (!coordinates) return
 
     try {
-      const [sellersRes, promosRes] = await Promise.all([
-        sellerService.getNearby(coordinates.lat, coordinates.lng),
-        sellerService.getPromotions(coordinates.lat, coordinates.lng, {
-          limit: 20,
-        }),
-      ])
+      const feed = await sellerService.getHomeFeed(
+        coordinates.lat,
+        coordinates.lng,
+      )
 
-      setSellers(sellersRes.sellers)
-      setPromotions(promosRes.products)
+      setSellers(feed.sellers)
+      setPromotions(feed.promotions)
+      setSponsored(feed.sponsored)
+      setPromotionsTotal(feed.promotionsTotal)
+      setSponsoredTotal(feed.sponsoredTotal)
+      setSellersTotal(feed.sellersTotal)
     } catch (error) {
       console.error('Error loading home data:', error)
     }
@@ -55,6 +65,71 @@ export default function Home() {
     setIsLoading(true)
     loadData().finally(() => setIsLoading(false))
   }, [coordinates, loadData])
+
+  async function handleLoadMoreSponsored() {
+    if (
+      isLoadingMoreSponsored ||
+      sponsored.length >= sponsoredTotal ||
+      !coordinates
+    )
+      return
+    setIsLoadingMoreSponsored(true)
+    try {
+      const res = await sellerService.getSponsored(
+        coordinates.lat,
+        coordinates.lng,
+        { skip: sponsored.length },
+      )
+      setSponsored((prev) => [...prev, ...res.products])
+      setSponsoredTotal(res.total)
+    } catch (error) {
+      console.error('Error loading more sponsored:', error)
+    } finally {
+      setIsLoadingMoreSponsored(false)
+    }
+  }
+
+  async function handleLoadMorePromotions() {
+    if (
+      isLoadingMorePromotions ||
+      promotions.length >= promotionsTotal ||
+      !coordinates
+    )
+      return
+    setIsLoadingMorePromotions(true)
+    try {
+      const res = await sellerService.getPromotions(
+        coordinates.lat,
+        coordinates.lng,
+        { skip: promotions.length },
+      )
+      setPromotions((prev) => [...prev, ...res.products])
+      setPromotionsTotal(res.total)
+    } catch (error) {
+      console.error('Error loading more promotions:', error)
+    } finally {
+      setIsLoadingMorePromotions(false)
+    }
+  }
+
+  async function handleLoadMoreSellers() {
+    if (isLoadingMoreSellers || sellers.length >= sellersTotal || !coordinates)
+      return
+    setIsLoadingMoreSellers(true)
+    try {
+      const res = await sellerService.getNearbySellers(
+        coordinates.lat,
+        coordinates.lng,
+        { skip: sellers.length },
+      )
+      setSellers((prev) => [...prev, ...res.sellers])
+      setSellersTotal(res.total)
+    } catch (error) {
+      console.error('Error loading more sellers:', error)
+    } finally {
+      setIsLoadingMoreSellers(false)
+    }
+  }
 
   async function handleRefresh() {
     setIsRefreshing(true)
@@ -127,7 +202,6 @@ export default function Home() {
   return (
     <View style={styles.container}>
       <Header />
-
       <ScrollView
         refreshControl={
           <RefreshControl
@@ -139,6 +213,43 @@ export default function Home() {
         }
         contentContainerStyle={{ paddingBottom: 100 }}
       >
+        <CategoryCards
+          onSelect={(category) => router.push(`/category/${category}`)}
+        />
+
+        {/* ═══ Patrocinados ═══ */}
+        {sponsored.length > 0 && (
+          <View style={styles.section}>
+            <View style={styles.sectionHeader}>
+              <Text style={styles.sectionTitle}>⭐ Destaques</Text>
+            </View>
+            <FlatList
+              data={sponsored}
+              keyExtractor={(item) => item.id}
+              horizontal
+              showsHorizontalScrollIndicator={false}
+              contentContainerStyle={{ paddingHorizontal: 16 }}
+              onEndReached={handleLoadMoreSponsored}
+              onEndReachedThreshold={0.3}
+              ListFooterComponent={
+                isLoadingMoreSponsored ? (
+                  <ActivityIndicator
+                    size="small"
+                    color={colors.primary}
+                    style={{ paddingHorizontal: 16, alignSelf: 'center' }}
+                  />
+                ) : null
+              }
+              renderItem={({ item }) => (
+                <PromotionCard
+                  product={item}
+                  onPress={() => handleProductPress(item)}
+                />
+              )}
+            />
+          </View>
+        )}
+
         {/* ═══ Promoções ═══ */}
         {promotions.length > 0 && (
           <View style={styles.section}>
@@ -152,6 +263,17 @@ export default function Home() {
               horizontal
               showsHorizontalScrollIndicator={false}
               contentContainerStyle={{ paddingHorizontal: 16 }}
+              onEndReached={handleLoadMorePromotions}
+              onEndReachedThreshold={0.3}
+              ListFooterComponent={
+                isLoadingMorePromotions ? (
+                  <ActivityIndicator
+                    size="small"
+                    color={colors.primary}
+                    style={{ paddingHorizontal: 16, alignSelf: 'center' }}
+                  />
+                ) : null
+              }
               renderItem={({ item }) => (
                 <PromotionCard
                   product={item}
@@ -180,13 +302,40 @@ export default function Home() {
               </Text>
             </View>
           ) : (
-            sellers.map((seller) => (
-              <NearbySellerCard
-                key={seller.id}
-                seller={seller}
-                onPress={() => handleSellerPress(seller)}
-              />
-            ))
+            <FlatList
+              data={sellers}
+              keyExtractor={(item) => String(item.id)}
+              scrollEnabled={false}
+              onEndReached={handleLoadMoreSellers}
+              onEndReachedThreshold={0.3}
+              ListEmptyComponent={
+                <View style={styles.emptyContainer}>
+                  <Ionicons
+                    name="storefront-outline"
+                    size={48}
+                    color={colors.textSecondary}
+                  />
+                  <Text style={styles.emptyText}>
+                    Nenhuma loja encontrada na sua região
+                  </Text>
+                </View>
+              }
+              ListFooterComponent={
+                isLoadingMoreSellers ? (
+                  <ActivityIndicator
+                    size="small"
+                    color={colors.primary}
+                    style={{ paddingVertical: 16 }}
+                  />
+                ) : null
+              }
+              renderItem={({ item }) => (
+                <NearbySellerCard
+                  seller={item}
+                  onPress={() => handleSellerPress(item)}
+                />
+              )}
+            />
           )}
         </View>
       </ScrollView>

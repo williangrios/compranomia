@@ -6,6 +6,13 @@ export const orderStyles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
+  actionButtonDisabled: {
+    backgroundColor: colors.disabled,
+    borderColor: colors.disabled,
+  },
+  actionButtonTextDisabled: {
+    color: colors.textSecondary,
+  },
   chipsRow: {
     maxHeight: 50,
     borderBottomWidth: 1,

@@ -7,7 +7,12 @@ export const sellerStoreStyles = StyleSheet.create({
     flex: 1,
     backgroundColor: colors.background,
   },
-
+  headerRatingText: {
+    fontSize: 12,
+    color: '#FFD166',
+    fontWeight: '600',
+    marginLeft: 4,
+  },
   // Loading
   loadingContainer: {
     flex: 1,

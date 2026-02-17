@@ -1,5 +1,5 @@
 // components/forms/SellerProductForm.tsx
-import { useState, useEffect } from 'react'
+import { useState, useEffect, useMemo } from 'react'
 import {
   View,
   Text,
@@ -16,10 +16,11 @@ import { colors, components } from '@/theme'
 import { sellerProductService } from '@/services/sellerProduct.service'
 import { productStyles as styles } from '@/styles/product.styles'
 import { getApiErrors } from '@/utils/getApiErrors'
-import { MeasurementUnit, UserTags } from '@wrcb/cb-common'
+import { MeasurementUnit, TenantDataService, UserTags } from '@wrcb/cb-common'
 import { sortByLabel, userTagsLabels } from '@/utils/enumLabels/userTags.labels'
-import { COMPRANOMIA_TAGS, DEFAULT_IMAGE } from '@/utils/constants'
+import { DEFAULT_IMAGE, PHARMACY_TAGS } from '@/utils/constants'
 import { formatters } from '@/utils/formatters'
+import { useAuth } from '@/contexts/AuthContext'
 
 interface ApiError {
   message: string
@@ -30,6 +31,9 @@ interface FormErrors {
   price?: string
   stock?: string
   step?: string
+  sellerSpotlighted?: string
+  isProhibitedForMinors?: string
+  isPrescriptionRequired?: string
   promotionalPrice?: string
 }
 
@@ -44,6 +48,9 @@ interface FormData {
   step: string
   minStockAlert: string
   promotionalPrice: string
+  sellerSpotlighted: boolean
+  isProhibitedForMinors: boolean
+  isPrescriptionRequired: boolean
   measurementUnit: MeasurementUnit
   isActive: boolean
 }
@@ -58,6 +65,8 @@ interface CatalogData {
   step?: number
   brand?: string
   barcode?: string
+  isProhibitedForMinors: boolean
+  isPrescriptionRequired: boolean
   originalImages?: string[]
   processedImages?: string[]
 }
@@ -77,11 +86,21 @@ export function SellerProductForm({
   const isAdoptMode = !!productCatalogId && !sellerProductId
 
   const [catalog, setCatalog] = useState<CatalogData | null>(null)
-  const [restrictedToAdults, setRestrictedToAdults] = useState(false)
-  const [requiresPrescription, setRequiresPrescription] = useState(false)
   const [isFetching, setIsFetching] = useState(false)
   const [isSubmitting, setIsSubmitting] = useState(false)
   const [hasPromotion, setHasPromotion] = useState(false)
+  const { user } = useAuth()
+
+  const sortedTags = useMemo(() => {
+    if (!user) return []
+
+    const allowed = TenantDataService.getTagsForCategory(
+      user.tenant,
+      user.category,
+    ) as UserTags[]
+
+    return sortByLabel(allowed, userTagsLabels)
+  }, [user])
 
   const [form, setForm] = useState<FormData>({
     name: '',
@@ -94,6 +113,9 @@ export function SellerProductForm({
     step: '1',
     minStockAlert: '0',
     promotionalPrice: '',
+    sellerSpotlighted: false,
+    isProhibitedForMinors: false,
+    isPrescriptionRequired: false,
     measurementUnit: MeasurementUnit.Un,
     isActive: true,
   })
@@ -117,24 +139,15 @@ export function SellerProductForm({
         baseWeight: prev.step,
       }))
     } else {
-      setField('step', '1')
-    }
-  }, [form.measurementUnit, form.step])
-
-  useEffect(() => {
-    if (form.measurementUnit !== MeasurementUnit.Un) {
       setForm((prev) => ({
         ...prev,
-        baseWeight: prev.step.toString(),
+        step: '1',
       }))
     }
-  }, [form.step])
+  }, [form.measurementUnit])
 
   const showPrescriptionToggle =
-    form.productCategory === UserTags.Medicines ||
-    form.productCategory === UserTags.GenericMedicines
-
-  const sortedTags = sortByLabel(COMPRANOMIA_TAGS, userTagsLabels)
+    form.productCategory && PHARMACY_TAGS.includes(form.productCategory)
 
   async function loadSellerProduct(id: string) {
     try {
@@ -156,18 +169,24 @@ export function SellerProductForm({
         price: String(sp.price),
         stock: String(sp.stock),
         step: String(sp.step ?? 1),
-        productCategory: sp.productCategory,
+        productCategory: sp.productCategory as UserTags,
+
         minStockAlert: sp.minStockAlert ? String(sp.minStockAlert) : '',
         promotionalPrice: sp.promotionalPrice
           ? String(sp.promotionalPrice)
           : '',
         measurementUnit:
           (sp.measurementUnit as MeasurementUnit) ?? MeasurementUnit.Un,
+        sellerSpotlighted: sp.sellerSpotlighted,
+        isPrescriptionRequired: sp.isPrescriptionRequired,
+        isProhibitedForMinors: sp.isProhibitedForMinors,
         isActive: sp.isActive ?? true,
       })
 
       if (sp.promotionalPrice && sp.promotionalPrice < sp.price) {
         setHasPromotion(true)
+      } else {
+        setHasPromotion(false)
       }
     } catch (error: unknown) {
       setApiErrors(getApiErrors(error))
@@ -192,10 +211,13 @@ export function SellerProductForm({
         ...prev,
         name: cat.name || '',
         description: cat.description || '',
-        productCategory: cat.productCategory,
+        productCategory: cat.productCategory as UserTags,
         brand: cat.brand || '',
         baseWeight: cat.baseWeight ? String(cat.baseWeight) : '',
+        isPrescriptionRequired: cat.isPrescriptionRequired,
+        isProhibitedForMinors: cat.isProhibitedForMinors,
         step: String(cat.step ?? 1),
+
         measurementUnit:
           (cat.measurementUnit as MeasurementUnit) ?? MeasurementUnit.Un,
       }))
@@ -271,28 +293,37 @@ export function SellerProductForm({
           description: form.description.trim(),
           brand: form.brand.trim(),
           productCategory: form.productCategory as UserTags,
-          baseWeight: parseFloat(form.baseWeight),
+          baseWeight: form.baseWeight ? parseFloat(form.baseWeight) : 0,
           measurementUnit: form.measurementUnit,
           isActive: form.isActive,
+          sellerSpotlighted: form.sellerSpotlighted,
+          isProhibitedForMinors: form.isProhibitedForMinors,
+          isPrescriptionRequired: showPrescriptionToggle
+            ? form.isPrescriptionRequired
+            : false,
         })
         setSuccess({ message: 'Produto atualizado com sucesso' })
       } else if (isAdoptMode && productCatalogId) {
         await sellerProductService.adopt({
           productCatalogId,
           price: parseFloat(form.price),
-
           stock: parseInt(form.stock),
           step: parseFloat(form.step),
           minStockAlert: form.minStockAlert
             ? parseInt(form.minStockAlert)
             : undefined,
           promotionalPrice: promoPrice,
-          name: form.name,
-          description: form.description,
-          brand: form.brand,
+          name: form.name.trim(),
+          description: form.description.trim(),
+          brand: form.brand.trim(),
           baseWeight: form.baseWeight ? parseFloat(form.baseWeight) : 0,
           measurementUnit: form.measurementUnit,
           productCategory: form.productCategory as UserTags,
+          sellerSpotlighted: form.sellerSpotlighted,
+          isProhibitedForMinors: form.isProhibitedForMinors,
+          isPrescriptionRequired: showPrescriptionToggle
+            ? form.isPrescriptionRequired
+            : false,
         })
         setSuccess({ message: 'Produto adotado com sucesso' })
       }
@@ -380,7 +411,7 @@ export function SellerProductForm({
           <View style={styles.fieldWrapper}>
             <Text style={components.input.label}>Categoria</Text>
             <View style={[components.input.container, { padding: 0 }]}>
-              <Picker<UserTags>
+              <Picker<UserTags | ''>
                 selectedValue={
                   form.productCategory ? form.productCategory : undefined
                 }
@@ -538,21 +569,36 @@ export function SellerProductForm({
         </View>
       )}
 
-      {/* Flags */}
       <View style={styles.switchRow}>
-        <Text style={styles.switchLabel}>Venda proibida para menores</Text>
+        <Text style={styles.switchLabel}>Destacar produto</Text>
         <Switch
-          value={restrictedToAdults}
-          onValueChange={setRestrictedToAdults}
+          value={form.sellerSpotlighted}
+          onValueChange={(v) =>
+            setForm((prev) => ({ ...prev, sellerSpotlighted: v }))
+          }
+        />
+      </View>
+
+      <View style={styles.switchRow}>
+        <Text style={styles.switchLabel}>Proibida venda para menores</Text>
+        <Switch
+          value={form.isProhibitedForMinors}
+          onValueChange={(v) =>
+            setForm((prev) => ({ ...prev, isProhibitedForMinors: v }))
+          }
         />
       </View>
 
       {showPrescriptionToggle && (
         <View style={styles.switchRow}>
-          <Text style={styles.switchLabel}>Exige receita médica</Text>
+          <Text style={styles.switchLabel}>
+            Exige retenção de receita médica
+          </Text>
           <Switch
-            value={requiresPrescription}
-            onValueChange={setRequiresPrescription}
+            value={form.isPrescriptionRequired}
+            onValueChange={(v) =>
+              setForm((prev) => ({ ...prev, isPrescriptionRequired: v }))
+            }
           />
         </View>
       )}
