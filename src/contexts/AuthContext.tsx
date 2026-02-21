@@ -27,6 +27,7 @@ interface AuthContextData {
   logout: () => Promise<void>
   refreshUser: () => Promise<void>
   updateUser: (user: User) => void
+  resendVerificationCode: () => Promise<void>
 }
 
 const AuthContext = createContext<AuthContextData>({} as AuthContextData)
@@ -192,6 +193,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     authService.updateCachedUser(updatedUser)
   }
 
+  async function resendVerificationCode() {
+    await authService.resendVerificationCode()
+  }
+
   return (
     <AuthContext.Provider
       value={{
@@ -205,6 +210,7 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         logout,
         refreshUser,
         updateUser,
+        resendVerificationCode,
       }}
     >
       {children}

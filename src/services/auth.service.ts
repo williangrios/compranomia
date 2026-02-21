@@ -134,4 +134,8 @@ export const authService = {
       return null
     }
   },
+
+  async resendVerificationCode(): Promise<void> {
+    await api.post('/api/auth/requestlinkandcodetoverifyemail')
+  },
 }

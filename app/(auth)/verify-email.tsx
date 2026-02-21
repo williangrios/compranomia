@@ -25,9 +25,12 @@ interface ApiError {
 
 export default function VerifyEmail() {
   const router = useRouter()
-  const { verifyEmail, user, logout } = useAuth()
+  const { resendVerificationCode, verifyEmail, user, logout } = useAuth()
   const params = useLocalSearchParams()
   const email = (params.email as string) || user?.email || ''
+
+  const [isResending, setIsResending] = useState(false)
+  const [resendSuccess, setResendSuccess] = useState(false)
 
   const [code, setCode] = useState('')
   const [isLoading, setIsLoading] = useState(false)
@@ -65,6 +68,20 @@ export default function VerifyEmail() {
       setApiErrors(getApiErrors(error))
     } finally {
       setIsLoading(false)
+    }
+  }
+
+  async function handleResend() {
+    try {
+      setLocalError('')
+      setApiErrors(null)
+      setIsResending(true)
+
+      await resendVerificationCode()
+    } catch (error: any) {
+      setApiErrors(getApiErrors(error)) // ← ISSO é o que faz aparecer no ErrorMessage
+    } finally {
+      setIsResending(false)
     }
   }
 
@@ -136,11 +153,19 @@ export default function VerifyEmail() {
             </TouchableOpacity>
 
             {/* Reenviar código */}
-            <TouchableOpacity>
+            <TouchableOpacity onPress={handleResend} disabled={isResending}>
               <Text style={[components.auth.linkText, { textAlign: 'center' }]}>
-                Não recebeu? Reenviar código
+                {isResending ? 'Reenviando...' : 'Não recebeu? Reenviar código'}
               </Text>
             </TouchableOpacity>
+
+            {resendSuccess && (
+              <Text
+                style={{ textAlign: 'center', color: 'green', marginTop: 8 }}
+              >
+                Novo código enviado com sucesso!
+              </Text>
+            )}
           </View>
 
           {/* Logout */}
