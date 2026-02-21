@@ -79,6 +79,8 @@ export const errorMessages: Record<string, string> = {
     'Antes de cadastrar produtos, você deve terminar eu cadastro. Vá no menu Loja > Perfil do negócio.',
   RequireProvidedPersonalData:
     'Antes de cadastrar produtos, você deve terminar eu cadastro. Vá no menu Perfil > Dados pessoais.',
+  RequireVerifiedWhatsapp:
+    'Antes de cadastrar produtos, você deve verificar seu número de whatsapp. Vá no menu Perfil > Dados pessoais.',
 
   // Cadastro de vendedor
   ProfilePhotoRequired: 'Selecione uma foto de perfil.',
@@ -88,9 +90,14 @@ export const errorMessages: Record<string, string> = {
 
   // Compra
   CannotBuyFromYourself: 'Não pode comprar de sua própria loja.',
+  AlreadyRated: 'Ooops.... Você já fez a avaliação.',
 
   // Chat
   CannotSendMessageToDeliveredOrder: 'A venda já foi finalizada',
+
+  // Atualização do app
+  AppUpdateRequired:
+    'Ooops.. Você precisa atualizar seu app na loja de aplicativos. Há uma nova versão incrível lá.',
 }
 
 export function translateError(errorKey: string): string {

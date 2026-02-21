@@ -26,6 +26,7 @@ interface Order {
   total: number
   items: OrderItem[]
   createdAt: string
+  observations: string
   wasRated: boolean
   sellerId?: {
     id: string
@@ -211,6 +212,10 @@ export function OrdersListScreen({
 
         <Text style={s.itemsSummary} numberOfLines={2}>
           {item.items.map((i) => i.name).join(', ')}
+        </Text>
+
+        <Text style={s.itemsSummary} numberOfLines={2}>
+          {item.observations}
         </Text>
 
         <View style={s.cardFooter}>

@@ -3,6 +3,7 @@ import { View, Text, TouchableOpacity } from 'react-native'
 import { useRouter } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons'
 import { colors, components, spacing } from '@/theme'
+import { tenantData } from '@/utils/constants'
 
 export default function Welcome() {
   const router = useRouter()
@@ -13,7 +14,7 @@ export default function Welcome() {
         {/* Header */}
         <View style={components.auth.header}>
           <Ionicons name="cart" size={64} color={colors.primary} />
-          <Text style={components.auth.title}>Compranomia</Text>
+          <Text style={components.auth.title}>{tenantData.SITE_NAME}</Text>
           <Text style={components.auth.subtitle}>
             Mercado completo na palma da sua mão
           </Text>

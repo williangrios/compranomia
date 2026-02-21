@@ -28,12 +28,11 @@ const CATEGORY_LABELS: Record<string, string> = {
   Pharmacy: 'Farmácia',
   Butcher: 'Açougue',
   Greengrocer: 'Hortifruti',
-  Bakery: 'Padaria',
+  Food: 'Comida',
   PetShop: 'Pet Shop',
   ConvenienceStore: 'Conveniência',
   AgricultureStore: 'Agropecuária',
   Services: 'Serviços',
-  Fishmonger: 'Peixaria',
   WaterAndGasSupplier: 'Água e Gás',
 }
 
@@ -303,7 +302,7 @@ export default function CategoryScreen() {
                     color={colors.textSecondary}
                   />
                   <Text style={styles.emptyText}>
-                    Nenhuma loja encontrada nesta categoria
+                    Nenhuma loja encontrada nesta categoria para sua região
                   </Text>
                 </View>
               }

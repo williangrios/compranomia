@@ -10,7 +10,7 @@ import {
 import { Ionicons } from '@expo/vector-icons'
 import { colors, spacing } from '@/theme'
 import { SellerProduct } from '@/types/sellerProduct'
-import { UserTags, MeasurementUnit } from '@wrcb/cb-common'
+import { MeasurementUnit } from '@wrcb/cb-common'
 import { DEFAULT_IMAGE } from '@/utils/constants'
 import { formatters } from '@/utils/formatters'
 import { DiscountBadge } from '../ui/DiscountBadge'
@@ -32,13 +32,6 @@ interface Props {
 
 const MEDICINE_IMAGE = require('../../../assets/medicine.png')
 const CARD_HEIGHT_SLIDER = 270
-const MEDICINE_TAGS: string[] = [UserTags.Medicines, UserTags.GenericMedicines]
-const UNIT_TYPES: string[] = [
-  MeasurementUnit.Un,
-  MeasurementUnit.Pack,
-  MeasurementUnit.Bandeja,
-  MeasurementUnit.Pct,
-]
 
 export function ConsumerProductCard({
   product,
@@ -49,11 +42,9 @@ export function ConsumerProductCard({
   const catalog = product.productCatalog
   const name = product.name || catalog?.name || 'Produto'
   const brand = product.brand || catalog?.brand
-  const category = product.productCategory || catalog?.productCategory || ''
   const unit = product.measurementUnit || catalog?.measurementUnit || 'Un'
   const step = product.step ?? 1
 
-  const isMedicine = MEDICINE_TAGS.includes(category)
   const isUnit = product.measurementUnit === MeasurementUnit.Un
   const increment = isUnit ? 1 : step
 
@@ -64,7 +55,7 @@ export function ConsumerProductCard({
       : catalog?.processedImages?.length
         ? catalog.processedImages
         : catalog?.originalImages
-  const imageSource = isMedicine
+  const imageSource = product.isPrescriptionRequired
     ? MEDICINE_IMAGE
     : { uri: images?.[0] ?? DEFAULT_IMAGE }
 

@@ -29,6 +29,7 @@ interface CreateOrderPayload {
   total: number
   paymentMethod: PaymentMethod
   estimatedDeliveryDate: string
+  observations?: string
 }
 
 export const orderService = {

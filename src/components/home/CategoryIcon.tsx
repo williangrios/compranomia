@@ -71,11 +71,11 @@ const CATEGORIES: CategoryConfig[] = [
   },
   {
     id: StoreCategory.Bakery,
-    label: 'Padaria',
+    label: 'Comida',
     colorBase: '#FB8C00',
     colorOverlay: '#FFCC80',
     iconLib: 'mci',
-    icon: 'bread-slice-outline',
+    icon: 'hamburger',
   },
   {
     id: StoreCategory.PetShop,
@@ -108,14 +108,6 @@ const CATEGORIES: CategoryConfig[] = [
     colorOverlay: '#B0BEC5',
     iconLib: 'mci',
     icon: 'hammer-wrench',
-  },
-  {
-    id: StoreCategory.Fishmonger,
-    label: 'Peixaria',
-    colorBase: '#0288D1',
-    colorOverlay: '#81D4FA',
-    iconLib: 'mci',
-    icon: 'fish-outline',
   },
   {
     id: StoreCategory.WaterAndGasSupplier,

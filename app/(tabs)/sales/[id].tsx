@@ -25,6 +25,7 @@ interface OrderItem {
   name: string
   price: number
   promotionalPrice?: number | null
+  barcode?: string
   quantity: number
   measurementUnit: string
   subtotal: number
@@ -49,6 +50,7 @@ interface Order {
   total: number
   paymentMethod: PaymentMethod
   estimatedDeliveryDate: string
+  observations: string
   createdAt: string
   customerId?: { nickName: string; name: string }
 }
@@ -273,7 +275,11 @@ export default function SaleDetail() {
             onPress={() => router.push(`/(tabs)/sales/${id}/chat`)}
             hitSlop={10}
           >
-            <Ionicons name="chatbubble" size={28} color={colors.success} />
+            <Ionicons
+              name="chatbubble-outline"
+              size={28}
+              color={colors.success}
+            />
           </TouchableOpacity>
         </View>
 
@@ -322,6 +328,9 @@ export default function SaleDetail() {
                 <View key={idx} style={s.itemRow}>
                   <View style={{ flex: 1 }}>
                     <Text style={s.itemName}>{item.name}</Text>
+                    {item.barcode && (
+                      <Text style={s.itemName}>{item.barcode}</Text>
+                    )}
                     <Text style={s.itemMeta}>
                       {item.quantity} {item.measurementUnit} × R${' '}
                       {effectivePrice.toFixed(2)}
@@ -382,6 +391,19 @@ export default function SaleDetail() {
               <Text style={s.paymentHint}>(na entrega)</Text>
             </View>
           </View>
+
+          {/* Observações */}
+          {order.observations && (
+            <View style={s.section}>
+              <Text style={s.sectionTitle}>Observações</Text>
+              <View style={s.addressRow}>
+                <Ionicons name="alert" size={18} color={colors.primary} />
+                <View style={{ flex: 1, marginLeft: spacing.sm }}>
+                  <Text style={s.addressSecondary}>{order.observations}</Text>
+                </View>
+              </View>
+            </View>
+          )}
 
           {/* Resumo */}
           <View style={s.section}>

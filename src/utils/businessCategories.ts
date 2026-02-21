@@ -2,7 +2,7 @@
 import { Tenant, TenantDataService, UserCategory } from '@wrcb/cb-common'
 
 /**
- * Busca as categorias disponíveis para o tenant Compranomia
+ * Busca as categorias disponíveis para o tenant
  */
 export function getCategoriesList(): UserCategory[] {
   const categories = TenantDataService.getCategoriesForTenant(
@@ -30,13 +30,13 @@ export const CATEGORY_NAMES: Record<UserCategory, string> = {
   [UserCategory.Pharmacy]: 'Farmácia',
   [UserCategory.Butcher]: 'Açougue',
   [UserCategory.Greengrocer]: 'Sacolão',
-  [UserCategory.Bakery]: 'Padaria',
+  [UserCategory.Food]: 'Comida',
   [UserCategory.PetShop]: 'Pet Shop',
   [UserCategory.ConvenienceStore]: 'Conveniência',
-  [UserCategory.Fishmonger]: 'Peixaria',
   [UserCategory.AgricultureStore]: 'Agropecuária',
+  [UserCategory.WaterAndGasSupplier]: 'Água e gás',
   [UserCategory.Services]: 'Serviços',
-  // Outros que não são usados no Compranomia mas precisam estar aqui
+  // Outros que não são usados no AquiTem mas precisam estar aqui
   [UserCategory.Female]: 'Feminino',
   [UserCategory.Male]: 'Masculino',
   [UserCategory.Couple]: 'Casal',

@@ -17,6 +17,10 @@ export interface SellerProduct {
   stock: number
   minStockAlert?: number
   isActive: boolean
+  isPrescriptionRequired: boolean
+  isProhibitedForMinors: boolean
+  sellerSpotlighted: boolean
+  adminSpotlighted: boolean
   originalImages?: string[]
   processedImages?: string[]
   discountPercent?: number
@@ -29,6 +33,10 @@ export interface SellerProduct {
     baseWeight?: number
     step?: number
     brand?: string
+    isPrescriptionRequired: boolean
+    isProhibitedForMinors: boolean
+    sellerSpotlighted: boolean
+    adminSpotlighted: boolean
     barcode?: string
     originalImages?: string[]
     processedImages?: string[]

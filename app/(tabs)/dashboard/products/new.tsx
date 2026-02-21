@@ -323,9 +323,24 @@ export default function NewProduct() {
                 />
                 <TouchableOpacity
                   onPress={removeImage}
-                  style={styles.scannerCloseButton}
+                  style={{
+                    position: 'absolute',
+                    top: 8,
+                    right: 8,
+                    backgroundColor: 'rgba(0,0,0,0.6)',
+                    width: 32,
+                    height: 32,
+                    borderRadius: 16,
+                    justifyContent: 'center',
+                    alignItems: 'center',
+                    zIndex: 10,
+                  }}
                 >
-                  <Text style={{ color: '#fff' }}>✕</Text>
+                  <Text
+                    style={{ color: '#fff', fontSize: 16, fontWeight: 'bold' }}
+                  >
+                    ✕
+                  </Text>
                 </TouchableOpacity>
               </View>
             ) : (

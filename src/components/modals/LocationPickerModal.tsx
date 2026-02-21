@@ -73,7 +73,7 @@ export function LocationPickerModal({
           `&addressdetails=1`,
         {
           headers: {
-            'User-Agent': 'Compranomia-App/1.0',
+            'User-Agent': 'Aqui-Tem-App/1.0',
           },
         },
       )

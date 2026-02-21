@@ -8,6 +8,7 @@ import {
   ActivityIndicator,
   Alert,
   StyleSheet,
+  TextInput,
 } from 'react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
 import { Ionicons } from '@expo/vector-icons'
@@ -64,6 +65,9 @@ export default function Checkout() {
   const [deliveryTime, setDeliveryTime] = useState(0)
   const [isLoading, setIsLoading] = useState(true)
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [observations, setObservations] = useState('')
+  const [needsChange, setNeedsChange] = useState(false)
+  const [changeAmount, setChangeAmount] = useState('')
 
   // Carregar dados do seller
   useEffect(() => {
@@ -100,6 +104,19 @@ export default function Checkout() {
   }, [id, coordinates, subtotal])
 
   const total = subtotal + deliveryFee
+  function buildObservations(): string {
+    const parts: string[] = []
+
+    // Primeiro o troco
+    if (selectedPayment === PaymentMethod.Cash && needsChange && changeAmount) {
+      parts.push(`Troco para: R$ ${parseFloat(changeAmount).toFixed(2)}`)
+    }
+
+    // Depois as observações do usuário
+    if (observations.trim()) parts.push(observations.trim())
+
+    return parts.join('. ')
+  }
 
   // ─── Estimativa de entrega ────────────────────────────────────────────────
 
@@ -164,6 +181,7 @@ export default function Checkout() {
                 total,
                 paymentMethod: selectedPayment,
                 estimatedDeliveryDate: getEstimatedDeliveryDate().toISOString(),
+                observations: buildObservations(),
               }
               const { order } = await orderService.createOrder(payload)
               console.log(
@@ -369,6 +387,58 @@ export default function Checkout() {
               </TouchableOpacity>
             )
           })}
+        </View>
+
+        {/* Troco — só aparece se pagamento for Dinheiro */}
+        {selectedPayment === PaymentMethod.Cash && (
+          <View style={s.changeContainer}>
+            <TouchableOpacity
+              style={s.changeRow}
+              onPress={() => {
+                setNeedsChange(!needsChange)
+                if (needsChange) setChangeAmount('')
+              }}
+              activeOpacity={0.7}
+            >
+              <Ionicons
+                name={needsChange ? 'checkbox' : 'square-outline'}
+                size={22}
+                color={colors.primary}
+              />
+              <Text style={s.changeLabel}>Precisa de troco?</Text>
+            </TouchableOpacity>
+
+            {needsChange && (
+              <View style={s.changeInputRow}>
+                <Text style={s.changeInputLabel}>Troco para quanto?</Text>
+                <TextInput
+                  style={s.changeInput}
+                  placeholder="Ex: 50"
+                  placeholderTextColor={colors.textSecondary}
+                  value={changeAmount}
+                  onChangeText={(text) =>
+                    setChangeAmount(text.replace(',', '.'))
+                  }
+                  keyboardType="numeric"
+                  maxLength={10}
+                />
+              </View>
+            )}
+          </View>
+        )}
+        {/* Observações */}
+        <View style={s.section}>
+          <Text style={s.sectionTitle}>Observações</Text>
+          <TextInput
+            style={s.observationsInput}
+            placeholder="Alguma instrução para o vendedor? (opcional)"
+            placeholderTextColor={colors.textSecondary}
+            value={observations}
+            onChangeText={setObservations}
+            multiline
+            maxLength={5000}
+            numberOfLines={3}
+          />
         </View>
 
         {/* Resumo */}
@@ -746,5 +816,44 @@ const s = StyleSheet.create({
     color: '#FFF',
     fontSize: 16,
     fontWeight: '700',
+  },
+  observationsInput: {
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 10,
+    padding: 12,
+    fontSize: 14,
+    color: colors.textPrimary,
+    minHeight: 80,
+    textAlignVertical: 'top',
+  },
+  changeContainer: {
+    marginTop: 12,
+    paddingHorizontal: 18,
+  },
+  changeRow: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    gap: 10,
+  },
+  changeLabel: {
+    fontSize: 15,
+    color: colors.textPrimary,
+  },
+  changeInputRow: {
+    marginTop: 12,
+    gap: 6,
+  },
+  changeInputLabel: {
+    fontSize: 14,
+    color: colors.textSecondary,
+  },
+  changeInput: {
+    borderWidth: 1,
+    borderColor: colors.border,
+    borderRadius: 10,
+    padding: 12,
+    fontSize: 16,
+    color: colors.textPrimary,
   },
 })

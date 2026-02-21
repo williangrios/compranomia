@@ -38,7 +38,7 @@ export interface User {
   city?: string
   state?: string
 
-  // Localização (Compranomia)
+  // Localização
   location?: {
     type: 'Point'
     coordinates: [number, number]

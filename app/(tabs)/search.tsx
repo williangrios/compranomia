@@ -60,8 +60,6 @@ export default function Search() {
           { limit: 20, skip },
         )
 
-        console.log('[SEARCH][FRONT][RESPONSE]', response)
-
         if (skip === 0) {
           setResults(response.products)
         } else {

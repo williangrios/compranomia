@@ -80,7 +80,6 @@ export default function SellerStore() {
   const [total, setTotal] = useState(0)
   const [selectedCategory, setSelectedCategory] = useState<string | null>(null)
   const [categories, setCategories] = useState<UserTags[]>([])
-  const [searchMode, setSearchMode] = useState(false)
   const [searchQuery, setSearchQuery] = useState('')
   const [categoryProducts, setCategoryProducts] = useState<
     Record<string, SellerProductResult[]>
@@ -88,6 +87,9 @@ export default function SellerStore() {
   const [viewMode, setViewMode] = useState<'all' | 'category' | 'search'>('all')
   const [isLoading, setIsLoading] = useState(true)
   const [isRefreshing, setIsRefreshing] = useState(false)
+  const [spotlightedProducts, setSpotlightedProducts] = useState<
+    SellerProductResult[]
+  >([])
   const [isLoadingMore, setIsLoadingMore] = useState(false)
 
   const translatedCategories = sortByLabel(
@@ -148,6 +150,9 @@ export default function SellerStore() {
         ),
       ]
       setCategories(uniqueCategories)
+      setSpotlightedProducts(
+        productsRes.products.filter((p: any) => p.sellerSpotlighted === true),
+      )
     } catch (error) {
       console.error('Error loading seller data:', error)
     }
@@ -175,6 +180,15 @@ export default function SellerStore() {
               limit: 10,
               skip: 0,
             })
+            // 🔍 DEBUG: verificar spotlighted por categoria
+            const spotInCat = response.products.filter(
+              (p: any) => p.sellerSpotlighted,
+            )
+            if (spotInCat.length > 0) {
+              console.log(
+                `[SELLER_STORE]------- Category "${cat}" has ${spotInCat.length} spotlighted products`,
+              )
+            }
             categoryProductsMap[cat] = response.products
           }),
         )
@@ -715,18 +729,12 @@ export default function SellerStore() {
               <ActivityIndicator size="large" color={colors.primary} />
             </View>
           ) : (
-            translatedCategories.map((cat) => {
-              const categoryProductsList = categoryProducts[cat] || []
-              if (categoryProductsList.length === 0) return null
-
-              const label =
-                (userTagsLabels as Record<string, string>)[cat] ?? cat
-
-              return (
-                <View key={cat} style={styles.categorySection}>
-                  <Text style={styles.categorySectionTitle}>{label}</Text>
+            <>
+              {spotlightedProducts.length > 0 && (
+                <View style={styles.categorySection}>
+                  <Text style={styles.categorySectionTitle}>⭐ Destaques</Text>
                   <FlatList
-                    data={categoryProductsList}
+                    data={spotlightedProducts}
                     keyExtractor={(item) => item.id}
                     horizontal
                     showsHorizontalScrollIndicator={false}
@@ -753,8 +761,47 @@ export default function SellerStore() {
                     )}
                   />
                 </View>
-              )
-            })
+              )}
+
+              {translatedCategories.map((cat) => {
+                const categoryProductsList = categoryProducts[cat] || []
+                if (categoryProductsList.length === 0) return null
+                const label =
+                  (userTagsLabels as Record<string, string>)[cat] ?? cat
+                return (
+                  <View key={cat} style={styles.categorySection}>
+                    <Text style={styles.categorySectionTitle}>{label}</Text>
+                    <FlatList
+                      data={categoryProductsList}
+                      keyExtractor={(item) => item.id}
+                      horizontal
+                      showsHorizontalScrollIndicator={false}
+                      contentContainerStyle={styles.categorySliderContainer}
+                      renderItem={({ item }) => (
+                        <View style={{ marginRight: spacing.sm }}>
+                          <ConsumerProductCard
+                            product={item as any}
+                            size="slider"
+                            onAddToCart={(qty) =>
+                              addProductToCart(
+                                id!,
+                                {
+                                  name: seller?.nickName ?? 'Vendedor',
+                                  photo: seller?.profilePhoto ?? '',
+                                },
+                                item,
+                                qty,
+                              )
+                            }
+                            onPress={() => redirectToItemPage(id, item.id)}
+                          />
+                        </View>
+                      )}
+                    />
+                  </View>
+                )
+              })}
+            </>
           )}
         </ScrollView>
       )}

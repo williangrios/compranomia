@@ -25,6 +25,7 @@ interface OrderItem {
   name: string
   price: number
   promotionalPrice?: number | null
+  barcode?: string
   quantity: number
   measurementUnit: string
   subtotal: number
@@ -49,6 +50,7 @@ interface Order {
   total: number
   paymentMethod: PaymentMethod
   estimatedDeliveryDate: string
+  observations: string
   createdAt: string
   sellerId?: { nickName: string; name: string }
 }
@@ -252,7 +254,11 @@ export default function OrderDetail() {
             onPress={() => router.push(`/(tabs)/orders/${id}/chat`)}
             hitSlop={10}
           >
-            <Ionicons name="chatbubble" size={28} color={colors.success} />
+            <Ionicons
+              name="chatbubble-outline"
+              size={28}
+              color={colors.success}
+            />
           </TouchableOpacity>
         </View>
 
@@ -365,6 +371,20 @@ export default function OrderDetail() {
               <Text style={s.paymentHint}>(na entrega)</Text>
             </View>
           </View>
+
+          {/* Observações */}
+          <Text style={s.sectionTitle}>Observações</Text>
+          {order.observations && (
+            <View style={s.section}>
+              <Text style={s.sectionTitle}>Observações</Text>
+              <View style={s.addressRow}>
+                <Ionicons name="alert" size={18} color={colors.primary} />
+                <View style={{ flex: 1, marginLeft: spacing.sm }}>
+                  <Text style={s.addressSecondary}>{order.observations}</Text>
+                </View>
+              </View>
+            </View>
+          )}
 
           {/* Resumo financeiro */}
           <View style={s.section}>

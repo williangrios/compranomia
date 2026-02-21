@@ -61,7 +61,7 @@ const s = StyleSheet.create({
     position: 'absolute',
     top: 6,
     right: 6,
-    backgroundColor: colors.primary,
+    backgroundColor: colors.success,
     zIndex: 10,
   },
   text: {

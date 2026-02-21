@@ -1,5 +1,4 @@
 // src/components/home/PromotionCard.tsx
-
 import { View, Text, Image, TouchableOpacity, Dimensions } from 'react-native'
 import { homeStyles as styles } from '@/styles/home.styles'
 import { SellerProductResult } from '@/types'
@@ -8,6 +7,7 @@ import { Ionicons } from '@expo/vector-icons'
 import { capitalizeFullName } from '@/utils/capitalizeFullName'
 import { formatters } from '@/utils/formatters'
 import { DiscountBadge } from '../ui/DiscountBadge'
+import { colors, spacing } from '@/theme'
 
 interface Props {
   product: SellerProductResult
@@ -18,11 +18,10 @@ export function PromotionCard({ product, onPress }: Props) {
   const images = product.processedImages?.length
     ? product.processedImages
     : product.originalImages
-
   const imageUri = images?.[0] ?? DEFAULT_IMAGE
   const displayPrice = product.promotionalPrice ?? product.price
   const SCREEN_WIDTH = Dimensions.get('window').width
-  const HORIZONTAL_PADDING = 2 // igual ao FlatList paddingHorizontal
+  const HORIZONTAL_PADDING = 2
   const PROMO_SLIDER_WIDTH = (SCREEN_WIDTH - HORIZONTAL_PADDING) / 2.4
 
   return (
@@ -53,6 +52,7 @@ export function PromotionCard({ product, onPress }: Props) {
             {capitalizeFullName(product.seller?.nickName)}
           </Text>
         </View>
+
         <Text style={styles.promoCardBody} numberOfLines={2}>
           {product.name}
         </Text>
@@ -66,11 +66,40 @@ export function PromotionCard({ product, onPress }: Props) {
             )}
           </Text>
         </View>
+
         {product.promotionalPrice != null && (
           <Text style={styles.promoCardPriceOriginal}>
             {formatters.showOriginalPrice(product.price)}
           </Text>
         )}
+
+        <View
+          style={{
+            flexDirection: 'row',
+            alignItems: 'center',
+            justifyContent: 'center',
+            backgroundColor: colors.primary,
+            borderRadius: 8,
+            paddingVertical: 6,
+            marginTop: spacing.sm,
+            gap: 4,
+          }}
+        >
+          <Ionicons
+            name="storefront-outline"
+            size={14}
+            color={colors.textInverse}
+          />
+          <Text
+            style={{
+              fontSize: 12,
+              fontWeight: '700',
+              color: colors.textInverse,
+            }}
+          >
+            Ir para a loja
+          </Text>
+        </View>
       </View>
     </TouchableOpacity>
   )

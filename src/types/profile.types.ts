@@ -33,6 +33,7 @@ export interface SellerSettings {
   sellerActive: boolean
   adminActive: boolean
   acceptedPaymentMethods: PaymentMethod[]
+  allowOrdersWhenClosed?: boolean
   createdAt: string
   updatedAt: string
 }

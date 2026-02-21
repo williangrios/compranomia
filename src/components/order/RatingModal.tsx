@@ -14,6 +14,9 @@ import { Ionicons } from '@expo/vector-icons'
 import { colors, spacing } from '@/theme'
 import { ratingService } from '@/services/rating.service'
 import Toast from 'react-native-toast-message'
+import { ErrorMessage } from '../ui/ErrorMessage'
+import { getApiErrors } from '@/utils/getApiErrors'
+import { ApiError } from '@/types'
 
 interface RatingModalProps {
   visible: boolean
@@ -33,7 +36,7 @@ const CRITERIA_LABELS: Record<string, string> = {
   PriceValue: 'Custo-Benefício',
 }
 
-// Critérios do Compranomia
+// Critérios
 const COMPRANOMIA_CRITERIA = [
   'ProductQuality',
   'DeliverySpeed',
@@ -53,6 +56,7 @@ export function RatingModal({
   const [ratings, setRatings] = useState<Record<string, number>>({})
   const [comment, setComment] = useState('')
   const [isSubmitting, setIsSubmitting] = useState(false)
+  const [apiErrors, setApiErrors] = useState<ApiError[] | null>(null)
 
   const handleStarPress = (criterion: string, star: number) => {
     setRatings((prev) => ({
@@ -73,6 +77,7 @@ export function RatingModal({
   }
 
   const handleSubmit = async () => {
+    setApiErrors(null)
     if (!isValid()) {
       Toast.show({
         type: 'error',
@@ -105,12 +110,7 @@ export function RatingModal({
       onRatingSubmitted?.()
       onClose()
     } catch (error: any) {
-      console.error('[RATING ERROR]', error)
-      Toast.show({
-        type: 'error',
-        text1: 'Erro ao enviar avaliação',
-        text2: error?.response?.data?.errors?.[0]?.message || 'Tente novamente',
-      })
+      setApiErrors(getApiErrors(error))
     } finally {
       setIsSubmitting(false)
     }
@@ -186,6 +186,9 @@ export function RatingModal({
               />
             </View>
           </ScrollView>
+
+          {/* Erros da API */}
+          <ErrorMessage errors={apiErrors} />
 
           {/* Botão de Enviar */}
           <TouchableOpacity

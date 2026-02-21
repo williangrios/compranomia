@@ -171,6 +171,7 @@ export default function SellerSettings() {
   const [acceptedPaymentMethods, setAcceptedPaymentMethods] = useState<
     PaymentMethod[]
   >([])
+  const [allowOrdersWhenClosed, setAllowOrdersWhenClosed] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [isLoadingData, setIsLoadingData] = useState(true)
   const [apiErrors, setApiErrors] = useState<ApiError[] | null>(null)
@@ -206,6 +207,9 @@ export default function SellerSettings() {
           )
           setPreparationTime(String(sellerSettings.preparationTime))
           setSellerActive(sellerSettings.sellerActive)
+          setAllowOrdersWhenClosed(
+            sellerSettings.allowOrdersWhenClosed ?? false,
+          )
         }
       } catch (error) {
         console.log('Sem configurações salvas, usando defaults')
@@ -445,6 +449,7 @@ export default function SellerSettings() {
         preparationTime: parseInt(preparationTime, 10),
         sellerActive,
         acceptedPaymentMethods,
+        allowOrdersWhenClosed,
       }
 
       await sellerSettingsService.upsertSettings(payload)
@@ -772,6 +777,96 @@ export default function SellerSettings() {
 
         <View style={{ marginBottom: 24 }} />
 
+        {/* ─── PEDIDOS FORA DO HORÁRIO ─────────────────────────── */}
+        <View style={{ marginBottom: 24 }}>
+          <View
+            style={{
+              backgroundColor: colors.backgroundSecondary,
+              padding: 16,
+              borderRadius: 12,
+              gap: 10,
+            }}
+          >
+            <View
+              style={{
+                flexDirection: 'row',
+                alignItems: 'center',
+                justifyContent: 'space-between',
+              }}
+            >
+              <View style={{ flex: 1, paddingRight: 12 }}>
+                <Text
+                  style={{
+                    fontSize: 15,
+                    fontWeight: '600',
+                    color: colors.textPrimary,
+                  }}
+                >
+                  Receber pedidos fora do horário
+                </Text>
+
+                <Text
+                  style={{
+                    fontSize: 13,
+                    color: colors.textSecondary,
+                    marginTop: 4,
+                    lineHeight: 18,
+                  }}
+                >
+                  Clientes poderão fazer pedidos mesmo quando a loja estiver
+                  fechada. Os pedidos serão preparados automaticamente no
+                  próximo horário de funcionamento.
+                </Text>
+              </View>
+
+              <TouchableOpacity
+                style={{
+                  width: 50,
+                  height: 28,
+                  borderRadius: 14,
+                  backgroundColor: allowOrdersWhenClosed
+                    ? colors.primary
+                    : colors.border,
+                  justifyContent: 'center',
+                  paddingHorizontal: 2,
+                }}
+                onPress={() => {
+                  setAllowOrdersWhenClosed((prev) => !prev)
+                  clearMessages()
+                }}
+              >
+                <View
+                  style={{
+                    width: 24,
+                    height: 24,
+                    borderRadius: 12,
+                    backgroundColor: colors.background,
+                    alignSelf: allowOrdersWhenClosed
+                      ? 'flex-end'
+                      : 'flex-start',
+                  }}
+                />
+              </TouchableOpacity>
+            </View>
+
+            {/* Aviso importante */}
+            {allowOrdersWhenClosed && (
+              <View
+                style={{
+                  backgroundColor: colors.primary + '12',
+                  borderRadius: 10,
+                  padding: 10,
+                }}
+              >
+                <Text style={{ fontSize: 12, color: colors.primary }}>
+                  Pedidos feitos após o horário de corte serão automaticamente
+                  agendados para o próximo dia útil.
+                </Text>
+              </View>
+            )}
+          </View>
+        </View>
+
         {/* ─── PREPARATION TIME ─────────────────────────────────────────────── */}
         <View style={{ marginBottom: 16 }}>
           <Text style={components.input.label}>Tempo de Preparação *</Text>
@@ -816,7 +911,7 @@ export default function SellerSettings() {
         </View>
 
         {/* Tags selecionadas */}
-        <Text style={components.input.label}>Seções</Text>
+        {/* <Text style={components.input.label}>Seções</Text>
         {translatedCategories.length > 0 ? (
           <View style={{ marginBottom: 16 }}>
             <View
@@ -860,7 +955,7 @@ export default function SellerSettings() {
           >
             Você ainda não tem produtos à venda
           </Text>
-        )}
+        )} */}
 
         {/* ─── FORMAS DE PAGAMENTO ──────────────────────────────────────── */}
         <Text

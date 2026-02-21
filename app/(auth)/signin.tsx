@@ -17,6 +17,7 @@ import { validators } from '@/utils/validators'
 import { useAuth } from '@/contexts/AuthContext'
 import { ErrorMessage } from '@/components/ui/ErrorMessage'
 import { getApiErrors } from '@/utils/getApiErrors'
+import { tenantData } from '@/utils/constants'
 
 interface ApiError {
   message: string
@@ -84,7 +85,7 @@ export default function SignIn() {
             <Ionicons name="log-in" size={64} color={colors.primary} />
             <Text style={components.auth.title}>Entrar</Text>
             <Text style={components.auth.subtitle}>
-              Acesse sua conta no Compranomia
+              Acesse sua conta no {tenantData.SITE_NAME}
             </Text>
           </View>
 

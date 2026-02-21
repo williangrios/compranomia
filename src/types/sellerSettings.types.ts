@@ -5,6 +5,7 @@ export interface DeliveryRange {
   maxKm: number
   fee: number
   freeAbove: number
+  averageDeliveryTime: number
 }
 
 export interface SchedulePeriod {
@@ -16,6 +17,7 @@ export interface ScheduleDay {
   dayOfWeek: number
   isOpen: boolean
   periods: SchedulePeriod[]
+  cutoffTime?: string
 }
 
 export interface SellerSettingsPayload {
@@ -24,5 +26,5 @@ export interface SellerSettingsPayload {
   schedule?: ScheduleDay[]
   acceptedPaymentMethods?: PaymentMethod[]
   preparationTime?: number
-  cutoffTime?: string
+  allowOrdersWhenClosed?: boolean
 }

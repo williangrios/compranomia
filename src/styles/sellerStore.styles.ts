@@ -35,7 +35,7 @@ export const sellerStoreStyles = StyleSheet.create({
     borderBottomColor: colors.border,
   },
   categoryChip: {
-    height: 36, // 🔥 fixa de vez
+    height: 36,
     paddingHorizontal: spacing.md,
     borderRadius: 18,
     borderWidth: 1,
@@ -55,8 +55,8 @@ export const sellerStoreStyles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '600',
     color: colors.textSecondary,
-    lineHeight: 13, // 🔥 igual ao fontSize
-    includeFontPadding: false, // 🔥 ANDROID FIX
+    lineHeight: 13,
+    includeFontPadding: false,
     textAlignVertical: 'center',
   },
   categoryChipTextActive: {

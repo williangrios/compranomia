@@ -54,6 +54,7 @@ export const sellerService = {
       `/api/business/compranomia/sellers/${sellerId}/products`,
       { params },
     )
+
     return response.data.data
   },
 
@@ -69,6 +70,7 @@ export const sellerService = {
       `/api/business/compranomia/sellers/${sellerId}/products/search`,
       { params: { q: query, ...params } },
     )
+
     return response.data.data
   },
 
@@ -85,6 +87,7 @@ export const sellerService = {
       '/api/business/compranomia/products/sponsored',
       { params: { lat, lng, ...params } },
     )
+
     return response.data.data
   },
 
@@ -100,6 +103,7 @@ export const sellerService = {
     const response = await api.get('/api/business/compranomia/sellers/nearby', {
       params: { lat, lng, ...params },
     })
+
     return response.data.data
   },
 

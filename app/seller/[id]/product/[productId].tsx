@@ -25,7 +25,6 @@ import { sellerProductService } from '@/services/sellerProduct.service'
 
 const SCREEN_WIDTH = Dimensions.get('window').width
 const MEDICINE_IMAGE = require('../../../../assets/medicine.png')
-const MEDICINE_TAGS: string[] = [UserTags.Medicines, UserTags.GenericMedicines]
 
 export default function ProductDetail() {
   const { id, productId } = useLocalSearchParams<{
@@ -95,7 +94,6 @@ export default function ProductDetail() {
 
   const isUnit = product.measurementUnit === MeasurementUnit.Un
   const increment = isUnit ? 1 : step
-  const isMedicine = MEDICINE_TAGS.includes(category)
 
   const images = product.processedImages?.length
     ? product.processedImages
@@ -123,7 +121,7 @@ export default function ProductDetail() {
     })
   }
 
-  const imageSource = isMedicine
+  const imageSource = product.isPrescriptionRequired
     ? MEDICINE_IMAGE
     : { uri: images[activeImageIndex] || DEFAULT_IMAGE }
   console.log('PRODUCT DETAIL:', product)
@@ -156,7 +154,7 @@ export default function ProductDetail() {
         </View>
 
         {/* Thumbnails */}
-        {images.length > 1 && !isMedicine && (
+        {images.length > 1 && !product.isPrescriptionRequired && (
           <ScrollView
             horizontal
             showsHorizontalScrollIndicator={false}
