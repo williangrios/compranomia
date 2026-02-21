@@ -10,15 +10,18 @@ import { Ionicons } from '@expo/vector-icons'
 import { colors, components, spacing } from '@/theme'
 import { useAuth } from '@/contexts/AuthContext'
 import { AddressForm } from '@/components/forms/AddressForm'
+import { useAddress } from '@/contexts/AddressContext'
 
 export default function CompleteAddress() {
   const { user, updateUser } = useAuth()
+  const { checkIfHasDeliveryAddress } = useAddress()
 
   async function handleSuccess() {
     if (user) {
       const updatedUser = { ...user, isAddressDataProvided: true }
       updateUser(updatedUser)
     }
+    await checkIfHasDeliveryAddress()
     // AuthContext vai redirecionar automaticamente para (tabs)
   }
 

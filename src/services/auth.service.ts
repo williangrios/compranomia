@@ -6,6 +6,8 @@ import { User, SignUpData, SignInData, VerifyEmailData } from '@/types'
 
 export const authService = {
   async signUp(data: SignUpData): Promise<{ user: User }> {
+    await storageService.clearAuth()
+    apiCache.clear()
     console.log('[authService] signUp - Data enviada:', data)
     const response = await api.post('/api/auth/signup', data)
     console.log('[authService] signUp - Resposta:', response.data)
@@ -25,6 +27,8 @@ export const authService = {
   },
 
   async signIn(data: SignInData): Promise<{ user: User }> {
+    await storageService.clearAuth()
+    apiCache.clear()
     console.log('[authService] signIn - Data enviada:', data)
     const response = await api.post('/api/auth/signin', data)
     console.log('[authService] signIn - Resposta:', response.data)

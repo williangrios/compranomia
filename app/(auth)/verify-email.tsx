@@ -25,12 +25,13 @@ interface ApiError {
 
 export default function VerifyEmail() {
   const router = useRouter()
-  const { verifyEmail, user } = useAuth()
+  const { verifyEmail, user, logout } = useAuth()
   const params = useLocalSearchParams()
   const email = (params.email as string) || user?.email || ''
 
   const [code, setCode] = useState('')
   const [isLoading, setIsLoading] = useState(false)
+  const [isVerified, setIsVerified] = useState(false)
   const [apiErrors, setApiErrors] = useState<ApiError[] | null>(null)
   const [localError, setLocalError] = useState('')
 
@@ -54,6 +55,7 @@ export default function VerifyEmail() {
       console.log('📤 handleVerify - Verificando email:', { email, code })
 
       await verifyEmail(email, code)
+      setIsVerified(true)
 
       console.log('✅ handleVerify - Email verificado com sucesso!')
       // AuthContext vai redirecionar automaticamente baseado no role:
@@ -123,7 +125,7 @@ export default function VerifyEmail() {
             <TouchableOpacity
               style={components.auth.buttonPrimary}
               onPress={handleVerify}
-              disabled={isLoading || code.length !== 6}
+              disabled={isLoading || isVerified || code.length !== 6}
               activeOpacity={0.8}
             >
               {isLoading ? (
@@ -141,12 +143,12 @@ export default function VerifyEmail() {
             </TouchableOpacity>
           </View>
 
-          {/* Voltar */}
+          {/* Logout */}
           <TouchableOpacity
             style={components.auth.linkContainer}
-            onPress={() => router.back()}
+            onPress={logout}
           >
-            <Text style={components.auth.linkTextSmall}>Voltar</Text>
+            <Text style={components.auth.linkTextSmall}>Sair</Text>
           </TouchableOpacity>
         </View>
       </ScrollView>

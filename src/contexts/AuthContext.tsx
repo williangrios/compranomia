@@ -47,10 +47,10 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     if (isLoading) return
     if (!user) return
     if (!user.isEmailVerified) return
-    if (user.role !== UserRole.Consumer) return
+    // if (user.role !== UserRole.Consumer) return
 
     checkIfHasDeliveryAddress()
-  }, [isLoading, user?.id])
+  }, [isLoading, user?.id, user?.isEmailVerified])
 
   useEffect(() => {
     if (isLoading) return
@@ -64,7 +64,6 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
     }
     const inAuthGroup = segments[0] === '(auth)'
 
-    // 1️⃣ Não autenticado
     if (!user) {
       if (!inAuthGroup) {
         router.replace('/(auth)/welcome')
@@ -72,9 +71,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return
     }
 
-    // 2️⃣ Email NÃO verificado
     if (!user.isEmailVerified) {
-      if (!inAuthGroup) {
+      const inVerifyEmail = segments.join('/').includes('verify-email')
+      if (!inVerifyEmail) {
         router.replace({
           pathname: '/(auth)/verify-email',
           params: { email: user.email },
@@ -83,23 +82,14 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
       return
     }
 
-    // 3️⃣ Seller → nunca depende de endereço
-    if (user.role === UserRole.Seller) {
-      if (inAuthGroup) {
-        router.replace('/(tabs)')
-      }
-      return
-    }
-
-    // 4️⃣ Consumer SEM delivery address
     if (hasDeliveryAddress === false) {
-      if (!inAuthGroup) {
+      const inCompleteAddress = segments.join('/').includes('complete-address')
+      if (!inCompleteAddress) {
         router.replace('/(auth)/complete-address')
       }
       return
     }
 
-    // 5️⃣ Consumer COM delivery address
     if (hasDeliveryAddress === true) {
       if (inAuthGroup) {
         router.replace('/(tabs)')
@@ -109,15 +99,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
   }, [user, hasDeliveryAddress, segments, isLoading])
 
   async function checkAuth() {
-    console.log('🔴 [AuthContext] checkAuth INICIADO')
     try {
       setIsLoading(true)
       const cachedUser = await authService.getCachedUser()
 
       if (cachedUser) {
-        console.log('🟡 [AuthContext] Carregando do CACHE:', {
-          isAddressDataProvided: cachedUser.isAddressDataProvided,
-        })
         setUser(cachedUser) // ✅ Confia 100% no cache
       } else {
         setUser(null)

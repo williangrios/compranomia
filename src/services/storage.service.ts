@@ -54,6 +54,7 @@ export const storageService = {
       this.removeAuthToken(),
       this.removeUserData(),
       this.removeSelectedAddress(),
+      AsyncStorage.removeItem(STORAGE_KEYS.CART_DATA),
     ])
   },
 }

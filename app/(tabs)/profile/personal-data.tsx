@@ -45,7 +45,7 @@ export default function PersonalData() {
   const [success, setSuccess] = useState<{ message: string } | null>(null)
   const [errors, setErrors] = useState<FormErrors>({})
 
-  const WHATSAPP_BUSINESS_NUMBER = tenantData.SITE_WHATSAPP_BOT
+  const WHATSAPP_BUSINESS_NUMBER = '55' + tenantData.SITE_WHATSAPP_BOT
 
   useEffect(() => {
     if (user) {

@@ -64,6 +64,7 @@ export function AddressProvider({ children }: { children: React.ReactNode }) {
 
   async function clearAddress() {
     setAddressState(null)
+    setHasDeliveryAddress(null)
     await storageService.removeSelectedAddress()
   }
 
@@ -85,12 +86,12 @@ export function AddressProvider({ children }: { children: React.ReactNode }) {
   }
 
   async function checkIfHasDeliveryAddress() {
+    setHasDeliveryAddress(null)
     try {
       const response = await deliveryAddressService.list()
       const hasAddress =
         Array.isArray(response.deliveryAddresses) &&
         response.deliveryAddresses.length > 0
-
       setHasDeliveryAddress(hasAddress)
 
       if (hasAddress) {
