@@ -238,9 +238,7 @@ export default function PersonalData() {
 
       {/* WhatsApp */}
       <View style={{ marginBottom: 16 }}>
-        <Text style={components.input.label}>
-          WhatsApp {isSeller && <Text style={{ color: colors.error }}>*</Text>}
-        </Text>
+        <Text style={components.input.label}>WhatsApp</Text>
         <TextInput
           style={[
             components.input.container,
