@@ -81,6 +81,7 @@ export const errorMessages: Record<string, string> = {
     'Antes de cadastrar produtos, você deve terminar eu cadastro. Vá no menu Perfil > Dados pessoais.',
   RequireVerifiedWhatsapp:
     'Antes de cadastrar produtos, você deve verificar seu número de whatsapp. Vá no menu Perfil > Dados pessoais.',
+  TooManyLinkRequests: 'Ooops.. Aguarde 20 minutos para solicitar novamente',
 
   // Cadastro de vendedor
   ProfilePhotoRequired: 'Selecione uma foto de perfil.',

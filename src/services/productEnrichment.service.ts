@@ -28,9 +28,31 @@ export const productEnrichmentService = {
     )
 
     if (!response.ok) {
-      const error = await response.text()
-      console.error('[ENRICH] fetch error', error)
-      throw new Error('EnrichFailed')
+      let data: any = null
+
+      try {
+        data = await response.json()
+      } catch {
+        throw new Error('ConnectionError')
+      }
+
+      // 🔥 NORMALIZAÇÃO AQUI
+      if (!data?.errors && data?.message) {
+        data = {
+          errors: [
+            {
+              message: data.message,
+            },
+          ],
+        }
+      }
+
+      const error: any = new Error('ApiError')
+      error.response = {
+        data,
+      }
+
+      throw error
     }
 
     const json = await response.json()
