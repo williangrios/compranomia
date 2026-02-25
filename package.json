@@ -7,6 +7,8 @@
     "tunnel": "set EXPO_TUNNEL_TIMEOUT=120000&& npx expo start --tunnel --clear",
     "postinstall": "node fix-ngrok.js",
     "android": "expo start --android",
+    "buildandroid": "npx eas build --platform android --profile production",
+    "buildios": "npx eas build --platform ios --profile production",
     "ios": "expo start --ios",
     "web": "expo start --web",
     "dev": "REACT_NATIVE_PACKAGER_HOSTNAME=192.168.100.130 expo start",
@@ -19,8 +21,10 @@
     "@react-native-picker/picker": "2.11.1",
     "@wrcb/cb-common": "^1.0.741",
     "axios": "^1.13.3",
-    "expo": "~54.0.32",
+    "expo": "^54.0.32",
     "expo-camera": "~17.0.10",
+    "expo-constants": "~18.0.13",
+    "expo-font": "~14.0.11",
     "expo-image-manipulator": "~14.0.8",
     "expo-image-picker": "^17.0.10",
     "expo-linking": "~8.0.11",
@@ -28,6 +32,7 @@
     "expo-router": "~6.0.22",
     "expo-splash-screen": "~31.0.13",
     "expo-status-bar": "~3.0.9",
+    "lucide-react-native": "^0.575.0",
     "react": "19.1.0",
     "react-dom": "19.1.0",
     "react-hook-form": "^7.71.1",
@@ -36,13 +41,13 @@
     "react-native-maps": "1.20.1",
     "react-native-safe-area-context": "~5.6.0",
     "react-native-screens": "~4.16.0",
+    "react-native-svg": "15.12.1",
     "react-native-toast-message": "^2.3.3",
     "zod": "^4.3.6"
   },
   "devDependencies": {
     "@expo/ngrok": "^4.1.3",
     "@types/react": "~19.1.0",
-    "@types/react-native": "^0.72.8",
     "typescript": "~5.9.2"
   },
   "private": true

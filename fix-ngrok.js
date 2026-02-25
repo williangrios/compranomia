@@ -21,7 +21,6 @@
  *
  * Este script roda automaticamente via "postinstall" no package.json.
  */
-
 const fs = require('fs')
 const { execSync } = require('child_process')
 const path = require('path')
@@ -70,12 +69,21 @@ if (!utils.includes('delete opts.authtoken')) {
 }
 
 // Fix 3: AsyncNgrok.js - timeout muito curto
-const ngrokFile = 'node_modules/@expo/cli/build/src/start/server/AsyncNgrok.js'
-let ngrok = fs.readFileSync(ngrokFile, 'utf8')
-ngrok = ngrok.replace(
-    'const TUNNEL_TIMEOUT = 10 * 1000;',
-    'const TUNNEL_TIMEOUT = 60 * 1000;'
-)
-fs.writeFileSync(ngrokFile, ngrok)
+const ngrokPaths = [
+    'node_modules/@expo/cli/build/src/start/server/AsyncNgrok.js',
+    'node_modules/expo/node_modules/@expo/cli/build/src/start/server/AsyncNgrok.js',
+]
 
-console.log('✅ All ngrok fixes applied')
+for (const ngrokFile of ngrokPaths) {
+    try {
+        let ngrok = fs.readFileSync(ngrokFile, 'utf8')
+        ngrok = ngrok.replace(
+            'const TUNNEL_TIMEOUT = 10 * 1000;',
+            'const TUNNEL_TIMEOUT = 60 * 1000;'
+        )
+        fs.writeFileSync(ngrokFile, ngrok)
+        console.log(`✅ AsyncNgrok timeout fix applied: ${ngrokFile}`)
+    } catch (e) {
+        // skip if not found
+    }
+}
