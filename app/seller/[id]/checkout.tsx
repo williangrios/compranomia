@@ -11,7 +11,7 @@ import {
   TextInput,
 } from 'react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
-import { Ionicons } from '@expo/vector-icons'
+import { Icon, IconName } from '@/components/ui/Icon'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { PaymentMethod } from '@wrcb/cb-common'
 import { useCart, CartItem } from '@/contexts/CartContext'
@@ -21,25 +21,21 @@ import { orderService } from '@/services/order.service'
 import { colors, spacing } from '@/theme'
 import { DEFAULT_IMAGE } from '@/utils/constants'
 import { capitalizeFullName } from '@/utils/capitalizeFullName'
-import { translateError } from '@/utils/errorMessages'
+import { ApiError } from '@/types'
+import { getApiErrors } from '@/utils/getApiErrors'
+import { ErrorMessage } from '@/components/ui/ErrorMessage'
 
 // ─── Payment Labels ───────────────────────────────────────────────────────────
 
 const PAYMENT_LABELS: Record<PaymentMethod, { label: string; icon: string }> = {
-  [PaymentMethod.Pix]: { label: 'Pix', icon: 'qr-code-outline' },
-  [PaymentMethod.Cash]: { label: 'Dinheiro', icon: 'cash-outline' },
+  [PaymentMethod.Pix]: { label: 'Pix', icon: 'QrCode' },
+  [PaymentMethod.Cash]: { label: 'Dinheiro', icon: 'Banknote' },
   [PaymentMethod.CreditCard]: {
     label: 'Cartão de Crédito',
-    icon: 'card-outline',
+    icon: 'CreditCard',
   },
-  [PaymentMethod.DebitCard]: {
-    label: 'Cartão de Débito',
-    icon: 'card-outline',
-  },
-  [PaymentMethod.MealCard]: {
-    label: 'Vale Refeição',
-    icon: 'restaurant-outline',
-  },
+  [PaymentMethod.DebitCard]: { label: 'Cartão de Débito', icon: 'CreditCard' },
+  [PaymentMethod.MealCard]: { label: 'Vale Refeição', icon: 'Utensils' },
 }
 
 // ─── Component ────────────────────────────────────────────────────────────────
@@ -68,6 +64,7 @@ export default function Checkout() {
   const [observations, setObservations] = useState('')
   const [needsChange, setNeedsChange] = useState(false)
   const [changeAmount, setChangeAmount] = useState('')
+  const [apiErrors, setApiErrors] = useState<ApiError[] | null>(null)
 
   // Carregar dados do seller
   useEffect(() => {
@@ -129,6 +126,7 @@ export default function Checkout() {
   // ─── Submit ───────────────────────────────────────────────────────────────
 
   async function handleSubmit() {
+    setApiErrors(null)
     if (!cart || cart.items.length === 0) return
     if (!selectedPayment) {
       Alert.alert('Ooops..', 'Selecione uma forma de pagamento')
@@ -184,27 +182,6 @@ export default function Checkout() {
                 observations: buildObservations(),
               }
               const { order } = await orderService.createOrder(payload)
-              console.log(
-                '[CHECKOUT] Payload enviado:',
-                JSON.stringify(payload, null, 2),
-              )
-              console.log(
-                '[CHECKOUT] Subtotal calculado pelo contexto:',
-                subtotal,
-              )
-              console.log('[CHECKOUT] DeliveryFee:', deliveryFee)
-              console.log('[CHECKOUT] Total:', total)
-              console.log(
-                '[CHECKOUT] Items:',
-                cart.items.map((i) => ({
-                  name: i.name,
-                  price: i.price,
-                  promotionalPrice: i.promotionalPrice,
-                  quantity: i.quantity,
-                  step: i.step,
-                  measurementUnit: i.measurementUnit,
-                })),
-              )
 
               clearCart(id!)
 
@@ -222,10 +199,11 @@ export default function Checkout() {
                 ],
               )
             } catch (error: any) {
-              const errorKey =
-                error.normalizedErrors?.[0]?.message || 'GenericError'
-              const msg = translateError(errorKey)
-              Alert.alert('Ooops..', msg)
+              setApiErrors(getApiErrors(error))
+              // const errorKey =
+              //   error.normalizedErrors?.[0]?.message || 'GenericError'
+              // const msg = translateError(errorKey)
+              // Alert.alert('Ooops..', msg)
             } finally {
               setIsSubmitting(false)
             }
@@ -254,17 +232,13 @@ export default function Checkout() {
       <View style={[s.container, { paddingTop: insets.top }]}>
         <View style={s.header}>
           <TouchableOpacity onPress={() => router.back()} hitSlop={10}>
-            <Ionicons name="arrow-back" size={24} color={colors.textPrimary} />
+            <Icon icon="ArrowLeft" size={24} color={colors.textPrimary} />
           </TouchableOpacity>
           <Text style={s.headerTitle}>Carrinho</Text>
           <View style={{ width: 24 }} />
         </View>
         <View style={s.emptyContainer}>
-          <Ionicons
-            name="cart-outline"
-            size={64}
-            color={colors.textSecondary}
-          />
+          <Icon icon="ShoppingCart" size={64} color={colors.textSecondary} />
           <Text style={s.emptyText}>Seu carrinho está vazio</Text>
           <TouchableOpacity style={s.emptyButton} onPress={() => router.back()}>
             <Text style={s.emptyButtonText}>Voltar à loja</Text>
@@ -281,12 +255,11 @@ export default function Checkout() {
       {/* Header */}
       <View style={s.header}>
         <TouchableOpacity onPress={() => router.back()} hitSlop={10}>
-          <Ionicons name="arrow-back" size={24} color={colors.textPrimary} />
+          <Icon icon="ArrowLeft" size={24} color={colors.textPrimary} />
         </TouchableOpacity>
         <Text style={s.headerTitle}>Carrinho</Text>
         <View style={{ width: 24 }} />
       </View>
-
       <ScrollView
         showsVerticalScrollIndicator={false}
         contentContainerStyle={{ paddingBottom: 120 }}
@@ -322,11 +295,7 @@ export default function Checkout() {
           <Text style={s.sectionTitle}>Endereço de entrega</Text>
           {address ? (
             <View style={s.addressRow}>
-              <Ionicons
-                name="location-sharp"
-                size={20}
-                color={colors.primary}
-              />
+              <Icon icon="MapPin" size={20} color={colors.primary} />
               <View style={{ flex: 1, marginLeft: 10 }}>
                 <Text style={s.addressMain}>
                   {address.street}, {address.number}
@@ -342,11 +311,7 @@ export default function Checkout() {
           {/* Tempo estimado */}
           {deliveryTime > 0 && (
             <View style={s.deliveryTimeRow}>
-              <Ionicons
-                name="time-outline"
-                size={18}
-                color={colors.textSecondary}
-              />
+              <Icon icon="Clock" size={18} color={colors.textSecondary} />
               <Text style={s.deliveryTimeText}>
                 Entrega estimada: {deliveryTime} min
               </Text>
@@ -368,8 +333,8 @@ export default function Checkout() {
                 onPress={() => setSelectedPayment(method)}
                 activeOpacity={0.7}
               >
-                <Ionicons
-                  name={info.icon as any}
+                <Icon
+                  icon={info.icon as IconName}
                   size={22}
                   color={isSelected ? colors.primary : colors.textSecondary}
                 />
@@ -378,8 +343,8 @@ export default function Checkout() {
                 >
                   {info.label}
                 </Text>
-                <Ionicons
-                  name={isSelected ? 'radio-button-on' : 'radio-button-off'}
+                <Icon
+                  icon={isSelected ? 'CircleDot' : 'Circle'}
                   size={22}
                   color={isSelected ? colors.primary : colors.textSecondary}
                   style={{ marginLeft: 'auto' }}
@@ -400,8 +365,8 @@ export default function Checkout() {
               }}
               activeOpacity={0.7}
             >
-              <Ionicons
-                name={needsChange ? 'checkbox' : 'square-outline'}
+              <Icon
+                icon={needsChange ? 'SquareCheck' : 'Square'}
                 size={22}
                 color={colors.primary}
               />
@@ -465,33 +430,35 @@ export default function Checkout() {
           </View>
         </View>
       </ScrollView>
-
+      {/* Bottom bar */}
       {/* Bottom bar */}
       <View
         style={[
           s.bottomBar,
           {
-            backgroundColor: '#eee',
             paddingBottom: insets.bottom + spacing.md,
           },
         ]}
       >
-        <View>
-          <Text style={s.bottomTotal}>R$ {total.toFixed(2)}</Text>
-          <Text style={s.bottomItems}>{cart.items.length} item(ns)</Text>
+        <ErrorMessage errors={apiErrors} />
+        <View style={s.bottomBarRow}>
+          <View>
+            <Text style={s.bottomTotal}>R$ {total.toFixed(2)}</Text>
+            <Text style={s.bottomItems}>{cart.items.length} item(ns)</Text>
+          </View>
+          <TouchableOpacity
+            style={[s.submitButton, isSubmitting && { opacity: 0.6 }]}
+            onPress={handleSubmit}
+            disabled={isSubmitting}
+            activeOpacity={0.8}
+          >
+            {isSubmitting ? (
+              <ActivityIndicator color="#FFF" size="small" />
+            ) : (
+              <Text style={s.submitButtonText}>Finalizar Compra</Text>
+            )}
+          </TouchableOpacity>
         </View>
-        <TouchableOpacity
-          style={[s.submitButton, isSubmitting && { opacity: 0.6 }]}
-          onPress={handleSubmit}
-          disabled={isSubmitting}
-          activeOpacity={0.8}
-        >
-          {isSubmitting ? (
-            <ActivityIndicator color="#FFF" size="small" />
-          ) : (
-            <Text style={s.submitButtonText}>Finalizar Compra</Text>
-          )}
-        </TouchableOpacity>
       </View>
     </View>
   )
@@ -538,8 +505,8 @@ function CartItemRow({
                 }
               }}
             >
-              <Ionicons
-                name={item.quantity <= item.step ? 'trash-outline' : 'remove'}
+              <Icon
+                icon={item.quantity <= item.step ? 'Trash2' : 'Minus'}
                 size={16}
                 color={colors.primary}
               />
@@ -552,7 +519,7 @@ function CartItemRow({
               style={s.quantityButton}
               onPress={() => onUpdateQuantity(item.quantity + item.step)}
             >
-              <Ionicons name="add" size={16} color={colors.primary} />
+              <Icon icon="Plus" size={16} color={colors.primary} />
             </TouchableOpacity>
           </View>
           <Text style={s.cartItemTotal}>R$ {itemTotal.toFixed(2)}</Text>
@@ -788,14 +755,17 @@ const s = StyleSheet.create({
     bottom: 0,
     left: 0,
     right: 0,
-    flexDirection: 'row',
-    alignItems: 'center',
-    justifyContent: 'space-between',
+    flexDirection: 'column',
     paddingHorizontal: spacing.md,
     paddingTop: spacing.md,
     backgroundColor: colors.background,
     borderTopWidth: 1,
     borderTopColor: colors.border,
+  },
+  bottomBarRow: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    alignItems: 'center',
   },
   bottomTotal: {
     fontSize: 18,

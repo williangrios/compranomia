@@ -1,7 +1,7 @@
 xcelente escolha — essa logo funciona muito bem como ícone 👌
 Agora vou te passar uma paleta de laranja profissional, pensada para app mobile, com hierarquia clara (fundo, botões, destaque, sombra), baseada exatamente no visual da logo que você escolheu.
 
-🎨 Paleta oficial de laranja – Compranomia
+🎨 Paleta oficial de laranja
 🟠 Laranja principal (marca)
 
 Usar em:

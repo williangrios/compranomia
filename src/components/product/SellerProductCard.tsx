@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, Image } from 'react-native'
-import { Ionicons } from '@expo/vector-icons'
+import { Icon } from '@/components/ui/Icon'
 import { colors } from '@/theme'
 import { productStyles as styles } from '@/styles/product.styles'
 import { SellerProduct } from '@/types/sellerProduct'
@@ -109,7 +109,7 @@ export function SellerProductCard({ product, onEdit, onDelete }: Props) {
           onPress={onEdit}
           activeOpacity={0.8}
         >
-          <Ionicons name="create-outline" size={18} color={colors.primary} />
+          <Icon icon="Edit" size={18} color={colors.primary} />
         </TouchableOpacity>
 
         <TouchableOpacity
@@ -117,7 +117,7 @@ export function SellerProductCard({ product, onEdit, onDelete }: Props) {
           onPress={onDelete}
           activeOpacity={0.8}
         >
-          <Ionicons name="trash-outline" size={18} color={colors.error} />
+          <Icon icon="Trash" size={18} color={colors.error} />
         </TouchableOpacity>
       </View>
     </TouchableOpacity>

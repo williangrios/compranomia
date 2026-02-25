@@ -10,7 +10,7 @@ import {
   TouchableOpacity,
 } from 'react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
-import { Ionicons } from '@expo/vector-icons'
+import { Icon } from '@/components/ui/Icon'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { PromotionCard } from '@/components/home/PromotionCard'
 import { NearbySellerCard } from '@/components/home/NearbySellerCard'
@@ -184,7 +184,7 @@ export default function CategoryScreen() {
         }}
       >
         <TouchableOpacity onPress={() => router.back()} hitSlop={10}>
-          <Ionicons name="arrow-back" size={24} color="#FFF" />
+          <Icon icon="ArrowLeft" size={24} color="#FFF" />
         </TouchableOpacity>
         <Text
           style={{
@@ -296,11 +296,7 @@ export default function CategoryScreen() {
               onEndReachedThreshold={0.3}
               ListEmptyComponent={
                 <View style={styles.emptyContainer}>
-                  <Ionicons
-                    name="storefront-outline"
-                    size={48}
-                    color={colors.textSecondary}
-                  />
+                  <Icon icon="Store" size={48} color={colors.textSecondary} />
                   <Text style={styles.emptyText}>
                     Nenhuma loja encontrada nesta categoria para sua região
                   </Text>

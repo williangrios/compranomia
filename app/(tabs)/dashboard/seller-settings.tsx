@@ -10,7 +10,7 @@ import {
   Pressable,
   Modal,
 } from 'react-native'
-import { Ionicons } from '@expo/vector-icons'
+import { Icon } from '@/components/ui/Icon'
 import { Screen } from '@/components/layout/Screen'
 import { ErrorMessage } from '@/components/ui/ErrorMessage'
 import { SuccessMessage } from '@/components/ui/SuccessMessage'
@@ -212,7 +212,6 @@ export default function SellerSettings() {
           )
         }
       } catch (error) {
-        console.log('Sem configurações salvas, usando defaults')
       } finally {
         setIsLoadingData(false)
       }
@@ -512,12 +511,9 @@ export default function SellerSettings() {
               gap: 12,
             }}
           >
-            <Ionicons
-              name="warning-outline"
-              size={22}
-              color={colors.danger}
-              style={{ marginTop: 1 }}
-            />
+            <View style={{ marginTop: 1 }}>
+              <Icon icon="TriangleAlert" size={22} color={colors.danger} />
+            </View>
             <View style={{ flex: 1 }}>
               <Text
                 style={{
@@ -588,11 +584,7 @@ export default function SellerSettings() {
                 </Text>
                 {deliveryRanges.length > 1 && (
                   <TouchableOpacity onPress={() => removeRange(index)}>
-                    <Ionicons
-                      name="trash-outline"
-                      size={20}
-                      color={colors.danger}
-                    />
+                    <Icon icon="Trash2" size={20} color={colors.danger} />
                   </TouchableOpacity>
                 )}
               </View>
@@ -662,7 +654,7 @@ export default function SellerSettings() {
           }}
           onPress={addRange}
         >
-          <Ionicons name="add" size={20} color={colors.primary} />
+          <Icon icon="Plus" size={20} color={colors.primary} />
           <Text
             style={{
               color: colors.primary,
@@ -763,8 +755,8 @@ export default function SellerSettings() {
                             .map((p) => `${p.openTime}–${p.closeTime}`)
                             .join(', ')}
                     </Text>
-                    <Ionicons
-                      name="chevron-forward"
+                    <Icon
+                      icon="ChevronRight"
                       size={16}
                       color={hasError ? colors.danger : colors.primary}
                     />
@@ -1013,11 +1005,6 @@ export default function SellerSettings() {
               <View
                 style={{ flexDirection: 'row', alignItems: 'center', gap: 12 }}
               >
-                <Ionicons
-                  name={method.icon}
-                  size={22}
-                  color={isSelected ? colors.primary : colors.textSecondary}
-                />
                 <Text
                   style={{
                     fontSize: 15,
@@ -1030,8 +1017,8 @@ export default function SellerSettings() {
                   {method.label}
                 </Text>
               </View>
-              <Ionicons
-                name={isSelected ? 'checkbox' : 'square-outline'}
+              <Icon
+                icon={isSelected ? 'SquareCheck' : 'Square'}
                 size={24}
                 color={isSelected ? colors.primary : colors.textSecondary}
               />
@@ -1176,7 +1163,7 @@ export default function SellerSettings() {
                 {periodsModalDay !== null ? DAY_NAMES[periodsModalDay] : ''}
               </Text>
               <TouchableOpacity onPress={() => setPeriodsModalDay(null)}>
-                <Ionicons name="close" size={24} color={colors.textSecondary} />
+                <Icon icon="X" size={24} color={colors.textSecondary} />
               </TouchableOpacity>
             </View>
 
@@ -1277,8 +1264,8 @@ export default function SellerSettings() {
                             }
                             style={{ marginTop: 20 }}
                           >
-                            <Ionicons
-                              name="trash-outline"
+                            <Icon
+                              icon="Trash2"
                               size={20}
                               color={colors.danger}
                             />
@@ -1304,7 +1291,7 @@ export default function SellerSettings() {
                     periodsModalDay !== null && addPeriod(periodsModalDay)
                   }
                 >
-                  <Ionicons name="add" size={18} color={colors.primary} />
+                  <Icon icon="Plus" size={18} color={colors.primary} />
                   <Text
                     style={{
                       color: colors.primary,

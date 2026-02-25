@@ -1,5 +1,5 @@
 import { View, Text, TouchableOpacity, Alert } from 'react-native'
-import { Ionicons } from '@expo/vector-icons'
+import { Icon } from '@/components/ui/Icon'
 import { DeliveryAddress } from '@/types'
 import { colors } from '@/theme'
 
@@ -52,7 +52,7 @@ export function AddressCard({
         }}
       >
         <View style={{ flexDirection: 'row', alignItems: 'center', flex: 1 }}>
-          <Ionicons name="location" size={20} color={colors.primary} />
+          <Icon icon="MapPin" size={20} color={colors.primary} />
           <Text
             style={{
               fontSize: 16,
@@ -97,7 +97,7 @@ export function AddressCard({
               borderRadius: 20,
             }}
           >
-            <Ionicons name="pencil" size={20} color={colors.primary} />
+            <Icon icon="Pencil" size={20} color={colors.primary} />
           </TouchableOpacity>
 
           <TouchableOpacity
@@ -108,7 +108,7 @@ export function AddressCard({
               borderRadius: 20,
             }}
           >
-            <Ionicons name="trash" size={20} color={colors.error} />
+            <Icon icon="Trash" size={20} color={colors.error} />
           </TouchableOpacity>
         </View>
       </View>
@@ -168,11 +168,7 @@ export function AddressCard({
           onPress={onSetDefault}
           activeOpacity={0.8}
         >
-          <Ionicons
-            name="checkmark-circle"
-            size={16}
-            color={colors.textInverse}
-          />
+          <Icon icon="CheckCircle" size={16} color={colors.textInverse} />
           <Text
             style={{
               fontSize: 14,

@@ -10,7 +10,7 @@ import {
   Modal,
 } from 'react-native'
 import { useRouter } from 'expo-router'
-import { Ionicons } from '@expo/vector-icons'
+import { Icon } from '@/components/ui/Icon'
 import { Screen } from '@/components/layout/Screen'
 import { ErrorMessage } from '@/components/ui/ErrorMessage'
 import { SuccessMessage } from '@/components/ui/SuccessMessage'
@@ -147,14 +147,6 @@ export default function BusinessProfile() {
           type: profilePhotoFile.type,
         })
 
-        console.log('📤 Enviando FormData:', {
-          nickName: nickName.trim(),
-          bio: bio.trim(),
-          category,
-          iSpeakLanguages,
-          hasPhoto: true,
-        })
-
         const { user: updatedUser } =
           await profileService.updateBusinessProfileWithPhoto(formData)
         updateUser(updatedUser)
@@ -224,12 +216,9 @@ export default function BusinessProfile() {
               { backgroundColor: colors.backgroundSecondary },
             ]}
           >
-            <Ionicons
-              name="mail"
-              size={20}
-              color={colors.textSecondary}
-              style={{ marginRight: 8 }}
-            />
+            <View style={{ marginRight: 8 }}>
+              <Icon icon="Mail" size={20} color={colors.textSecondary} />
+            </View>
             <Text
               style={[components.input.text, { color: colors.textSecondary }]}
             >
@@ -345,8 +334,8 @@ export default function BusinessProfile() {
                 ? getCategoryName(category as UserCategory)
                 : 'Selecione uma categoria'}
             </Text>
-            <Ionicons
-              name={showCategoryDropdown ? 'chevron-up' : 'chevron-down'}
+            <Icon
+              icon={showCategoryDropdown ? 'ChevronUp' : 'ChevronDown'}
               size={20}
               color={colors.textSecondary}
             />
@@ -399,11 +388,7 @@ export default function BusinessProfile() {
                     <TouchableOpacity
                       onPress={() => setShowCategoryDropdown(false)}
                     >
-                      <Ionicons
-                        name="close"
-                        size={24}
-                        color={colors.textSecondary}
-                      />
+                      <Icon icon="X" size={24} color={colors.textSecondary} />
                     </TouchableOpacity>
                   </View>
 
@@ -443,11 +428,7 @@ export default function BusinessProfile() {
                           {getCategoryName(cat as UserCategory)}
                         </Text>
                         {category === cat && (
-                          <Ionicons
-                            name="checkmark"
-                            size={24}
-                            color={colors.primary}
-                          />
+                          <Icon icon="Check" color={colors.primary} />
                         )}
                       </TouchableOpacity>
                     ))}

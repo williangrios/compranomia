@@ -1,6 +1,6 @@
 import { View, Text, ActivityIndicator } from 'react-native'
 import { useRouter, useFocusEffect } from 'expo-router'
-import { Ionicons } from '@expo/vector-icons'
+import { Icon } from '@/components/ui/Icon'
 import { useCallback, useState } from 'react'
 import { DashboardActionItem } from '@/components/dashboard/DashboardActionItem'
 import { colors } from '@/theme'
@@ -8,6 +8,7 @@ import { useAuth } from '@/contexts/AuthContext'
 import { capitalizeFullName } from '@/utils/capitalizeFullName'
 import { Screen } from '@/components/layout/Screen'
 import { dashboardService, DashboardStats } from '@/services/dashboard.service'
+import { getDateRanges } from '@/utils/timezone'
 
 export default function Dashboard() {
   const router = useRouter()
@@ -28,8 +29,8 @@ export default function Dashboard() {
     try {
       setLoading(true)
       setError(null)
-
-      const data = await dashboardService.getStats()
+      const { todayStart } = getDateRanges(user!.timeZone)
+      const data = await dashboardService.getStats({ startDate: todayStart })
       setStatsData(data)
     } catch (err) {
       console.error(err)
@@ -60,26 +61,26 @@ export default function Dashboard() {
 
   const stats = [
     {
-      icon: 'cart',
+      icon: 'ShoppingCart',
       label: 'Vendas Hoje',
       value: todayOrders.toString(),
       color: colors.primary,
     },
     {
-      icon: 'cash',
-      label: 'Faturamento Hoje',
+      icon: 'Banknote',
+      label: 'Faturamento Hoje (vendas entregues)',
       value: formatCurrency(todaySales),
       color: '#10B981',
     },
     {
-      icon: 'time',
+      icon: 'Clock',
       label: 'Vendas pendentes',
       value: pending.toString(),
       color: '#F59E0B',
     },
     {
-      icon: 'checkmark-circle',
-      label: 'Concluídos',
+      icon: 'CheckCircle',
+      label: 'Vendas entregues',
       value: concluded.toString(),
       color: '#6366F1',
     },
@@ -141,7 +142,7 @@ export default function Dashboard() {
                   marginBottom: 12,
                 }}
               >
-                <Ionicons name={stat.icon} size={20} color={stat.color} />
+                <Icon icon={stat.icon} size={20} color={stat.color} />
               </View>
 
               <Text
@@ -183,42 +184,37 @@ export default function Dashboard() {
       <DashboardActionItem
         title="Ver todas as vendas"
         subtitle="Gerencie seus pedidos"
-        icon="receipt"
+        icon="ReceiptText"
         onPress={() => router.push('/sales')}
       />
-
       <DashboardActionItem
         title="Ver notificações"
         subtitle="Confira suas notificações recebidas"
-        icon="notifications"
+        icon="Bell"
         onPress={() => router.push('/notifications')}
       />
-
       <DashboardActionItem
         title="Gerenciar produtos"
         subtitle="Adicionar ou editar produtos"
-        icon="pricetag"
+        icon="Tag"
         onPress={() => router.push('/dashboard/products')}
       />
-
       <DashboardActionItem
         title="Perfil do negócio"
         subtitle="Informações públicas da loja"
-        icon="storefront"
+        icon="Store"
         onPress={() => router.push('/dashboard/business-profile')}
       />
-
       <DashboardActionItem
         title="Configurações do negócio"
         subtitle="Entrega, horários e taxas"
-        icon="settings"
+        icon="Settings"
         onPress={() => router.push('/dashboard/seller-settings')}
       />
-
       <DashboardActionItem
         title="Endereço do negócio"
         subtitle="Localização da loja"
-        icon="location"
+        icon="MapPin"
         onPress={() => router.push('/dashboard/business-address')}
       />
     </Screen>

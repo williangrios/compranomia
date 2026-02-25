@@ -1,10 +1,10 @@
 // src/components/profile/ProfileMenuItem.tsx
 import { TouchableOpacity, Text, View } from 'react-native'
-import { Ionicons } from '@expo/vector-icons'
+import { Icon, IconName } from '@/components/ui/Icon'
 import { colors } from '@/theme'
 
 interface ProfileMenuItemProps {
-  icon?: keyof typeof Ionicons.glyphMap // ← agora opcional
+  icon?: IconName
   title: string
   subtitle?: string
   onPress: () => void
@@ -49,8 +49,8 @@ export function ProfileMenuItem({
             marginRight: 12,
           }}
         >
-          <Ionicons
-            name={icon}
+          <Icon
+            icon={icon}
             size={20}
             color={isDestructive ? colors.error : colors.primary}
           />
@@ -87,7 +87,7 @@ export function ProfileMenuItem({
         />
       )}
 
-      <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+      <Icon icon="ChevronRight" size={20} color={colors.textSecondary} />
     </TouchableOpacity>
   )
 }

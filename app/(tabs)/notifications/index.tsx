@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
 } from 'react-native'
 import { Stack, useRouter } from 'expo-router'
-import { Ionicons } from '@expo/vector-icons'
+import { Icon } from '@/components/ui/Icon'
 import { colors, components } from '@/theme'
 import { ProfileMenuItem } from '@/components/profile/ProfileMenuItem'
 import {
@@ -127,11 +127,7 @@ export default function Notifications() {
         <View style={{ flex: 1, backgroundColor: colors.background }}>
           <ScrollView contentContainerStyle={{ padding: 16 }}>
             <View style={{ alignItems: 'center', paddingVertical: 60 }}>
-              <Ionicons
-                name="notifications-outline"
-                size={64}
-                color={colors.textSecondary}
-              />
+              <Icon icon="Bell" size={64} color={colors.textSecondary} />
               <Text
                 style={{
                   fontSize: 18,
@@ -237,7 +233,7 @@ function screenOptions(router: ReturnType<typeof useRouter>) {
         style={{ paddingHorizontal: 12 }}
         hitSlop={10}
       >
-        <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
+        <Icon icon="ArrowLeft" size={22} color="#FFFFFF" />
       </Pressable>
     ),
   }

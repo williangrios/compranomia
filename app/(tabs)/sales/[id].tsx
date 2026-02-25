@@ -10,7 +10,7 @@ import {
   StyleSheet,
 } from 'react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
-import { Ionicons } from '@expo/vector-icons'
+import { Icon, IconName } from '@/components/ui/Icon'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { OrderStatus, PaymentMethod } from '@wrcb/cb-common'
 import { orderService } from '@/services/order.service'
@@ -65,37 +65,37 @@ const STATUS_CONFIG: Record<
     label: 'Pendente',
     color: '#D97706',
     bg: '#FEF3C7',
-    icon: 'time-outline',
+    icon: 'Clock',
   },
   [OrderStatus.Confirmed]: {
     label: 'Confirmado',
     color: '#2563EB',
     bg: '#DBEAFE',
-    icon: 'checkmark-circle-outline',
+    icon: 'CheckCircle',
   },
   [OrderStatus.Preparing]: {
     label: 'Preparando',
     color: '#7C3AED',
     bg: '#EDE9FE',
-    icon: 'restaurant-outline',
+    icon: 'ChefHat',
   },
   [OrderStatus.Delivering]: {
     label: 'A caminho',
     color: '#0891B2',
     bg: '#CFFAFE',
-    icon: 'bicycle-outline',
+    icon: 'Bike',
   },
   [OrderStatus.Delivered]: {
     label: 'Entregue',
     color: '#16A34A',
     bg: '#DCFCE7',
-    icon: 'checkmark-done-outline',
+    icon: 'CheckCheck',
   },
   [OrderStatus.Cancelled]: {
     label: 'Cancelado',
     color: '#DC2626',
     bg: '#FEE2E2',
-    icon: 'close-circle-outline',
+    icon: 'XCircle',
   },
 }
 
@@ -217,7 +217,7 @@ export default function SaleDetail() {
       <View style={[s.container, { paddingTop: insets.top }]}>
         <View style={s.header}>
           <TouchableOpacity onPress={() => router.back()} hitSlop={10}>
-            <Ionicons name="arrow-back" size={24} color={colors.textPrimary} />
+            <Icon icon="ArrowLeft" size={24} color={colors.textPrimary} />
           </TouchableOpacity>
           <Text style={s.headerTitle}>Venda</Text>
           <View style={{ width: 24 }} />
@@ -234,7 +234,7 @@ export default function SaleDetail() {
       <View style={[s.container, { paddingTop: insets.top }]}>
         <View style={s.header}>
           <TouchableOpacity onPress={() => router.back()} hitSlop={10}>
-            <Ionicons name="arrow-back" size={24} color={colors.textPrimary} />
+            <Icon icon="ArrowLeft" size={24} color={colors.textPrimary} />
           </TouchableOpacity>
           <Text style={s.headerTitle}>Venda</Text>
           <View style={{ width: 24 }} />
@@ -268,18 +268,14 @@ export default function SaleDetail() {
             onPress={() => router.replace('/(tabs)/sales')}
             hitSlop={10}
           >
-            <Ionicons name="arrow-back" size={30} color={colors.textPrimary} />
+            <Icon icon="ArrowLeft" size={24} color={colors.textPrimary} />
           </TouchableOpacity>
           <Text style={s.headerTitle}>Detalhes da Venda</Text>
           <TouchableOpacity
             onPress={() => router.push(`/(tabs)/sales/${id}/chat`)}
             hitSlop={10}
           >
-            <Ionicons
-              name="chatbubble-outline"
-              size={28}
-              color={colors.success}
-            />
+            <Icon icon="MessageCircle" size={28} color={colors.success} />
           </TouchableOpacity>
         </View>
 
@@ -291,8 +287,8 @@ export default function SaleDetail() {
           <View style={s.section}>
             <View style={s.statusRow}>
               <View style={[s.statusBadge, { backgroundColor: config.bg }]}>
-                <Ionicons
-                  name={config.icon as any}
+                <Icon
+                  icon={config.icon as IconName}
                   size={16}
                   color={config.color}
                 />
@@ -304,11 +300,7 @@ export default function SaleDetail() {
             </View>
             <Text style={s.customerName}>Cliente: {customerName}</Text>
             <View style={s.estimatedRow}>
-              <Ionicons
-                name="time-outline"
-                size={15}
-                color={colors.textSecondary}
-              />
+              <Icon icon="Clock" size={15} color={colors.textSecondary} />
               <Text style={s.estimatedText}>
                 Previsão: {formatDateTime(order.estimatedDeliveryDate)}
               </Text>
@@ -348,11 +340,7 @@ export default function SaleDetail() {
           <View style={s.section}>
             <Text style={s.sectionTitle}>Endereço de entrega</Text>
             <View style={s.addressRow}>
-              <Ionicons
-                name="location-sharp"
-                size={18}
-                color={colors.primary}
-              />
+              <Icon icon="MapPin" size={18} color={colors.primary} />
               <View style={{ flex: 1, marginLeft: spacing.sm }}>
                 <Text style={s.addressMain}>
                   {order.deliveryAddress.street}, {order.deliveryAddress.number}
@@ -380,11 +368,7 @@ export default function SaleDetail() {
           <View style={s.section}>
             <Text style={s.sectionTitle}>Pagamento</Text>
             <View style={s.paymentRow}>
-              <Ionicons
-                name="card-outline"
-                size={18}
-                color={colors.textSecondary}
-              />
+              <Icon icon="CreditCard" size={18} color={colors.textSecondary} />
               <Text style={s.paymentText}>
                 {PAYMENT_LABELS[order.paymentMethod] ?? order.paymentMethod}
               </Text>
@@ -397,7 +381,7 @@ export default function SaleDetail() {
             <View style={s.section}>
               <Text style={s.sectionTitle}>Observações</Text>
               <View style={s.addressRow}>
-                <Ionicons name="alert" size={18} color={colors.primary} />
+                <Icon icon="AlertCircle" size={18} color={colors.primary} />
                 <View style={{ flex: 1, marginLeft: spacing.sm }}>
                   <Text style={s.addressSecondary}>{order.observations}</Text>
                 </View>
@@ -447,13 +431,10 @@ export default function SaleDetail() {
                 <ActivityIndicator color="#FFF" size="small" />
               ) : (
                 <>
-                  <Ionicons
-                    name="swap-horizontal-outline"
-                    size={18}
-                    color="#FFF"
-                  />
+                  <Icon icon="ArrowLeftRight" size={18} color="#FFF" />
+
                   <Text style={s.statusButtonText}>Alterar status</Text>
-                  <Ionicons name="chevron-up-outline" size={18} color="#FFF" />
+                  <Icon icon="ChevronUp" size={18} color="#FFF" />
                 </>
               )}
             </TouchableOpacity>
@@ -488,15 +469,16 @@ export default function SaleDetail() {
                     <View
                       style={[s.modalOptionIcon, { backgroundColor: cfg.bg }]}
                     >
-                      <Ionicons
-                        name={cfg.icon as any}
+                      <Icon
+                        icon={cfg.icon as IconName}
                         size={20}
                         color={cfg.color}
                       />
                     </View>
                     <Text style={s.modalOptionText}>{cfg.label}</Text>
-                    <Ionicons
-                      name="chevron-forward"
+
+                    <Icon
+                      icon="ChevronRight"
                       size={18}
                       color={colors.textSecondary}
                     />

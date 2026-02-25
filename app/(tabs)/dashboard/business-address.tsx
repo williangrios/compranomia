@@ -57,7 +57,6 @@ export default function BusinessAddress() {
   const [success, setSuccess] = useState<{ message: string } | null>(null)
   const [errors, setErrors] = useState<FormErrors>({})
 
-  console.log('[BusinessAddress] user do AuthContext:', user)
   useEffect(() => {
     if (user) {
       setPostalCode(user.postalCode ? formatters.cep(user.postalCode) : '')
@@ -121,9 +120,6 @@ export default function BusinessAddress() {
 
     if (coords) {
       setCoordinates([coords.lng, coords.lat])
-      console.log('✅ Coordenadas encontradas:', coords)
-    } else {
-      console.log('❌ Coordenadas não encontradas')
     }
   }
 
@@ -210,11 +206,6 @@ export default function BusinessAddress() {
         ...(coordinates && {
           location: { coordinates },
         }),
-      })
-
-      console.log('✅ User atualizado do updateAddress:', {
-        isAddressDataProvided: response.user.isAddressDataProvided,
-        hasLocation: !!response.user.location,
       })
 
       // ✅ Usa direto o user do response (NÃO chama refreshUser)

@@ -1,14 +1,14 @@
 // src/components/ui/ProfileHeader.tsx
 import { View, Text, TouchableOpacity, Platform, StatusBar } from 'react-native'
 import { useRouter } from 'expo-router'
-import { Ionicons } from '@expo/vector-icons'
+import { Icon, IconName } from '@/components/ui/Icon'
 import { colors } from '@/theme'
 
 interface ProfileHeaderProps {
   title?: string
   showBack?: boolean
   rightAction?: {
-    icon: keyof typeof Ionicons.glyphMap
+    icon: IconName
     onPress: () => void
   }
 }
@@ -56,11 +56,7 @@ export function ProfileHeader({
               }}
               activeOpacity={0.7}
             >
-              <Ionicons
-                name="arrow-back"
-                size={24}
-                color={colors.textPrimary}
-              />
+              <Icon icon="ArrowLeft" size={24} color={colors.textPrimary} />
             </TouchableOpacity>
           )}
         </View>
@@ -94,8 +90,8 @@ export function ProfileHeader({
               }}
               activeOpacity={0.7}
             >
-              <Ionicons
-                name={rightAction.icon}
+              <Icon
+                icon={rightAction.icon}
                 size={24}
                 color={colors.textPrimary}
               />

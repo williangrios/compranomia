@@ -143,7 +143,6 @@ const auth = StyleSheet.create({
   container: {
     flex: 1,
     backgroundColor: colors.background,
-    padding: spacing.lg,
     justifyContent: 'center',
   },
   scrollContainer: {

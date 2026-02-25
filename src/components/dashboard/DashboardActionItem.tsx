@@ -1,11 +1,11 @@
 import { View, Text, TouchableOpacity } from 'react-native'
-import { Ionicons } from '@expo/vector-icons'
+import { Icon, IconName } from '@/components/ui/Icon'
 import { colors } from '@/theme'
 
 interface Props {
   title: string
   subtitle: string
-  icon: keyof typeof Ionicons.glyphMap
+  icon: IconName
   onPress: () => void
 }
 
@@ -36,7 +36,7 @@ export function DashboardActionItem({ title, subtitle, icon, onPress }: Props) {
           marginRight: 14,
         }}
       >
-        <Ionicons name={icon} size={20} color={colors.primary} />
+        <Icon icon={icon} size={20} color={colors.primary} />
       </View>
 
       <View style={{ flex: 1 }}>
@@ -60,7 +60,7 @@ export function DashboardActionItem({ title, subtitle, icon, onPress }: Props) {
         </Text>
       </View>
 
-      <Ionicons name="chevron-forward" size={20} color={colors.textSecondary} />
+      <Icon icon="ChevronRight" size={20} color={colors.textSecondary} />
     </TouchableOpacity>
   )
 }

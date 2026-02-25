@@ -4,7 +4,7 @@ import { View, Text, Image, TouchableOpacity } from 'react-native'
 import { homeStyles as styles } from '@/styles/home.styles'
 import { SellerProductResult } from '@/types'
 import { DEFAULT_IMAGE } from '@/utils/constants'
-import { Ionicons } from '@expo/vector-icons'
+import { Icon } from '@/components/ui/Icon'
 import { capitalizeFullName } from '@/utils/capitalizeFullName'
 import { formatters } from '@/utils/formatters'
 import { DiscountBadge } from '../ui/DiscountBadge'
@@ -43,8 +43,8 @@ export function SearchProductCard({ product, onPress }: Props) {
 
         {product.seller && (
           <View style={{ flexDirection: 'row', alignItems: 'center' }}>
-            <Ionicons
-              name="storefront-outline"
+            <Icon
+              icon="Store"
               size={14}
               color={styles.searchCardSeller.color}
               style={{ marginRight: 4 }}

@@ -7,7 +7,9 @@ import {
   StyleSheet,
   Alert,
 } from 'react-native'
-import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'
+import { MaterialCommunityIcons } from '@expo/vector-icons'
+import { Icon } from '@/components/ui/Icon'
+import { IconName } from '@/components/ui/Icon'
 
 const CARD_WIDTH = 85
 const CARD_HEIGHT = 85
@@ -18,12 +20,11 @@ export enum StoreCategory {
   Pharmacy = 'Pharmacy',
   Butcher = 'Butcher',
   Greengrocer = 'Greengrocer',
-  Bakery = 'Bakery',
+  Food = 'Food',
   PetShop = 'PetShop',
   ConvenienceStore = 'ConvenienceStore',
   AgricultureStore = 'AgricultureStore',
   Services = 'Services',
-  Fishmonger = 'Fishmonger',
   WaterAndGasSupplier = 'WaterAndGasSupplier',
 }
 
@@ -32,7 +33,7 @@ type CategoryConfig = {
   label: string
   colorBase: string
   colorOverlay: string
-  iconLib: 'ion' | 'mci'
+  iconLib: 'mci' | 'lucide'
   icon: string
 }
 
@@ -42,90 +43,85 @@ const CATEGORIES: CategoryConfig[] = [
     label: 'Mercado',
     colorBase: '#43A047',
     colorOverlay: '#81C784',
-    iconLib: 'mci',
-    icon: 'cart-outline',
+    iconLib: 'lucide',
+    icon: 'ShoppingCart',
   },
   {
     id: StoreCategory.Pharmacy,
     label: 'Farmácia',
     colorBase: '#1E88E5',
     colorOverlay: '#64B5F6',
-    iconLib: 'mci',
-    icon: 'pill',
+    iconLib: 'lucide',
+    icon: 'Pill',
   },
   {
     id: StoreCategory.Butcher,
     label: 'Açougue',
     colorBase: '#E53935',
     colorOverlay: '#EF9A9A',
-    iconLib: 'mci',
-    icon: 'food-steak',
+    iconLib: 'lucide',
+    icon: 'Beef',
   },
   {
     id: StoreCategory.Greengrocer,
     label: 'Hortifruti',
     colorBase: '#7CB342',
     colorOverlay: '#AED581',
-    iconLib: 'mci',
-    icon: 'carrot',
+    iconLib: 'lucide',
+    icon: 'Salad',
   },
   {
-    id: StoreCategory.Bakery,
+    id: StoreCategory.Food,
     label: 'Comida',
     colorBase: '#FB8C00',
     colorOverlay: '#FFCC80',
-    iconLib: 'mci',
-    icon: 'hamburger',
+    iconLib: 'lucide',
+    icon: 'UtensilsCrossed',
   },
   {
     id: StoreCategory.PetShop,
     label: 'Pet Shop',
     colorBase: '#8E24AA',
     colorOverlay: '#CE93D8',
-    iconLib: 'mci',
-    icon: 'paw-outline',
+    iconLib: 'lucide',
+    icon: 'PawPrint',
   },
   {
     id: StoreCategory.ConvenienceStore,
     label: 'Conveniência',
     colorBase: '#00ACC1',
     colorOverlay: '#80DEEA',
-    iconLib: 'mci',
-    icon: 'store-outline',
+    iconLib: 'lucide',
+    icon: 'Store',
   },
   {
     id: StoreCategory.AgricultureStore,
     label: 'Agropecuária',
     colorBase: '#6D4C41',
     colorOverlay: '#BCAAA4',
-    iconLib: 'mci',
-    icon: 'tractor-variant',
+    iconLib: 'lucide',
+    icon: 'Tractor',
   },
   {
     id: StoreCategory.Services,
     label: 'Serviços',
     colorBase: '#546E7A',
     colorOverlay: '#B0BEC5',
-    iconLib: 'mci',
-    icon: 'hammer-wrench',
+    iconLib: 'lucide',
+    icon: 'Wrench',
   },
   {
     id: StoreCategory.WaterAndGasSupplier,
     label: 'Água e Gás',
     colorBase: '#039BE5',
     colorOverlay: '#B3E5FC',
-    iconLib: 'ion',
-    icon: 'water-outline',
+    iconLib: 'lucide',
+    icon: 'Droplets',
   },
 ]
 
 function CategoryIcon({ item }: { item: CategoryConfig }) {
-  if (item.iconLib === 'mci') {
-    return (
-      <MaterialCommunityIcons name={item.icon as any} size={32} color="#fff" />
-    )
-  }
-  return <Ionicons name={item.icon as any} size={32} color="#fff" />
+  return <Icon icon={item.icon as IconName} size={30} color="#fff" />
 }
 
 function splitIntoRows(
@@ -162,9 +158,7 @@ export function CategoryCards({ onSelect }: Props) {
       activeOpacity={0.8}
       style={styles.cardWrapper}
     >
-      {/* Camada base (cor escura) */}
       <View style={[styles.card, { backgroundColor: item.colorBase }]}>
-        {/* Overlay claro simulando gradiente diagonal */}
         <View
           style={[
             StyleSheet.absoluteFillObject,
@@ -172,7 +166,6 @@ export function CategoryCards({ onSelect }: Props) {
               borderRadius: 16,
               backgroundColor: item.colorOverlay,
               opacity: 0.35,
-              // Posiciona o overlay no canto inferior direito
               top: '40%',
               left: '40%',
             },
@@ -239,7 +232,7 @@ const styles = StyleSheet.create({
   },
   label: {
     color: '#fff',
-    fontSize: 11,
+    fontSize: 10,
     fontWeight: '600',
     textAlign: 'center',
     lineHeight: 14,

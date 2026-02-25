@@ -3,7 +3,7 @@ import { View, Text, Image, TouchableOpacity, Dimensions } from 'react-native'
 import { homeStyles as styles } from '@/styles/home.styles'
 import { SellerProductResult } from '@/types'
 import { DEFAULT_IMAGE } from '@/utils/constants'
-import { Ionicons } from '@expo/vector-icons'
+import { Icon } from '@/components/ui/Icon'
 import { capitalizeFullName } from '@/utils/capitalizeFullName'
 import { formatters } from '@/utils/formatters'
 import { DiscountBadge } from '../ui/DiscountBadge'
@@ -43,11 +43,7 @@ export function PromotionCard({ product, onPress }: Props) {
 
       <View style={styles.promoCardBody}>
         <View style={styles.promoCardSellerRow}>
-          <Ionicons
-            name="storefront-outline"
-            size={16}
-            color={styles.promoCardSeller.color}
-          />
+          <Icon icon="Store" size={16} color={styles.promoCardSeller.color} />
           <Text style={styles.promoCardName} numberOfLines={2}>
             {capitalizeFullName(product.seller?.nickName)}
           </Text>
@@ -85,11 +81,7 @@ export function PromotionCard({ product, onPress }: Props) {
             gap: 4,
           }}
         >
-          <Ionicons
-            name="storefront-outline"
-            size={14}
-            color={colors.textInverse}
-          />
+          <Icon icon="Store" size={14} color={colors.textInverse} />
           <Text
             style={{
               fontSize: 12,

@@ -32,7 +32,7 @@ export function useGeocode() {
           `&countrycodes=br`,
         {
           headers: {
-            'User-Agent': 'Aqui-Tem-App/1.0',
+            'User-Agent': 'App/1.0',
           },
         },
       )
@@ -56,7 +56,7 @@ export function useGeocode() {
           `&limit=1`,
         {
           headers: {
-            'User-Agent': 'Aqui-Tem-App/1.0',
+            'User-Agent': 'App/1.0',
           },
         },
       )

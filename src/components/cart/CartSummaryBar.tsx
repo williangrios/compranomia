@@ -1,6 +1,6 @@
 import React from 'react'
 import { View, Text, TouchableOpacity, StyleSheet } from 'react-native'
-import { Ionicons } from '@expo/vector-icons'
+import { Icon } from '@/components/ui/Icon'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useRouter } from 'expo-router'
 import { capitalizeFullName } from '@/utils/capitalizeFullName'
@@ -41,7 +41,7 @@ export function CartSummaryBar({
 
         {/* Ícone + quantidade */}
         <View style={styles.itemsRow}>
-          <Ionicons name="cart" size={22} color="#FFF" />
+          <Icon icon="ShoppingCart" size={22} color="#FFF" />
           <Text style={styles.itemsText}>
             {cartCount} {cartCount === 1 ? 'item' : 'itens'}
           </Text>

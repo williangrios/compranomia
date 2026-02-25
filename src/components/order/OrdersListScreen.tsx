@@ -7,7 +7,7 @@ import {
   ActivityIndicator,
   RefreshControl,
 } from 'react-native'
-import { Ionicons } from '@expo/vector-icons'
+import { Icon, IconName } from '@/components/ui/Icon'
 import { colors, spacing } from '@/theme'
 import { OrderStatus } from '@wrcb/cb-common'
 import { orderService } from '@/services/order.service'
@@ -46,7 +46,7 @@ interface Props {
   getDisplayName: (order: Order) => string
   emptyTitle: string
   emptySubtitle: string
-  emptyIcon: keyof typeof Ionicons.glyphMap
+  emptyIcon: IconName
   onRateOrder?: (orderId: string, sellerId: string, sellerName: string) => void
 }
 
@@ -58,37 +58,37 @@ const STATUS_CONFIG: Record<
     label: 'Pendente',
     color: '#D97706',
     bg: '#FEF3C7',
-    icon: 'time-outline',
+    icon: 'Clock',
   },
   [OrderStatus.Confirmed]: {
     label: 'Confirmado',
     color: '#2563EB',
     bg: '#DBEAFE',
-    icon: 'checkmark-circle-outline',
+    icon: 'CheckCircle',
   },
   [OrderStatus.Preparing]: {
     label: 'Preparando',
     color: '#7C3AED',
     bg: '#EDE9FE',
-    icon: 'restaurant-outline',
+    icon: 'ChefHat',
   },
   [OrderStatus.Delivering]: {
     label: 'A caminho',
     color: '#0891B2',
     bg: '#CFFAFE',
-    icon: 'bicycle-outline',
+    icon: 'Bike',
   },
   [OrderStatus.Delivered]: {
     label: 'Entregue',
     color: '#16A34A',
     bg: '#DCFCE7',
-    icon: 'checkmark-done-outline',
+    icon: 'CheckCheck',
   },
   [OrderStatus.Cancelled]: {
     label: 'Cancelado',
     color: '#DC2626',
     bg: '#FEE2E2',
-    icon: 'close-circle-outline',
+    icon: 'XCircle',
   },
 }
 
@@ -199,8 +199,8 @@ export function OrdersListScreen({
           </View>
 
           <View style={[s.statusBadge, { backgroundColor: config.bg }]}>
-            <Ionicons
-              name={config.icon as any}
+            <Icon
+              icon={config.icon as IconName}
               size={13}
               color={config.color}
             />
@@ -229,7 +229,7 @@ export function OrdersListScreen({
             onPress={() => onViewOrder(item.id)}
             activeOpacity={0.8}
           >
-            <Ionicons name="receipt-outline" size={16} color={colors.primary} />
+            <Icon icon="ReceiptText" size={16} color={colors.primary} />
             <Text style={s.actionButtonText}>Ver pedido</Text>
           </TouchableOpacity>
 
@@ -238,11 +238,7 @@ export function OrdersListScreen({
             onPress={() => onOpenChat(item.id)}
             activeOpacity={0.8}
           >
-            <Ionicons
-              name="chatbubble-outline"
-              size={16}
-              color={colors.textInverse}
-            />
+            <Icon icon="MessageCircle" size={16} color={colors.textInverse} />
             <Text style={[s.actionButtonText, { color: colors.textInverse }]}>
               Chat
             </Text>
@@ -263,8 +259,8 @@ export function OrdersListScreen({
               disabled={item.wasRated}
               activeOpacity={0.8}
             >
-              <Ionicons
-                name={item.wasRated ? 'checkmark-circle' : 'star'}
+              <Icon
+                icon={item.wasRated ? 'CheckCircle' : 'Star'}
                 size={16}
                 color={item.wasRated ? colors.textSecondary : colors.primary}
               />
@@ -330,11 +326,7 @@ export function OrdersListScreen({
           }
           ListEmptyComponent={
             <View style={s.emptyContainer}>
-              <Ionicons
-                name={emptyIcon}
-                size={64}
-                color={colors.textSecondary}
-              />
+              <Icon icon={emptyIcon} size={64} color={colors.textSecondary} />
               <Text style={s.emptyTitle}>{emptyTitle}</Text>
               <Text style={s.emptySubtitle}>{emptySubtitle}</Text>
             </View>

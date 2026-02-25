@@ -1,10 +1,9 @@
-// app/_layout.tsx
 import 'react-native-gesture-handler'
 import { Stack } from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
 import { useEffect } from 'react'
 import { AuthProvider } from '@/contexts/AuthContext'
-import { AddressProvider } from '@/contexts/AddressContext' // ← ADICIONA
+import { AddressProvider } from '@/contexts/AddressContext'
 import { StatusBar } from 'expo-status-bar'
 import { NotificationProvider } from '@/contexts/NotificationContext'
 import { CartProvider } from '@/contexts/CartContext'

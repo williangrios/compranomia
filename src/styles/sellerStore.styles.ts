@@ -91,7 +91,7 @@ export const sellerStoreStyles = StyleSheet.create({
   // ═══════════ HEADER EXPANDIDO ═══════════
   headerExpanded: {
     paddingHorizontal: spacing.md,
-    paddingBottom: spacing.md,
+    paddingBottom: spacing.xs,
     backgroundColor: colors.primary,
   },
   headerTopRow: {
@@ -180,16 +180,16 @@ export const sellerStoreStyles = StyleSheet.create({
   headerInfoBadges: {
     flexDirection: 'row',
     flexWrap: 'wrap',
-    marginTop: spacing.md,
-    gap: spacing.sm,
+    marginTop: spacing.xs,
+    gap: spacing.xs,
   },
   headerBadge: {
     flexDirection: 'row',
     alignItems: 'center',
     backgroundColor: 'rgba(255,255,255,0.9)',
     borderRadius: 10,
-    paddingHorizontal: 10,
-    paddingVertical: 6,
+    paddingHorizontal: 6,
+    paddingVertical: 2,
     gap: 5,
     shadowColor: '#000',
     shadowOffset: { width: 0, height: 1 },

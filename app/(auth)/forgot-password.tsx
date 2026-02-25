@@ -12,13 +12,14 @@ import {
   Alert,
 } from 'react-native'
 import { useRouter } from 'expo-router'
-import { Ionicons } from '@expo/vector-icons'
+import { Icon } from '@/components/ui/Icon'
 import { colors, components } from '@/theme'
 import { validators } from '@/utils/validators'
 import { Tenant } from '@wrcb/cb-common'
 import { ErrorMessage } from '@/components/ui/ErrorMessage'
 import api from '@/services/api'
 import { getApiErrors } from '@/utils/getApiErrors'
+import { Screen } from '@/components/layout/Screen'
 
 interface ApiError {
   message: string
@@ -51,14 +52,10 @@ export default function ForgotPassword() {
         return
       }
 
-      console.log('📤 handleSubmit - Enviando requisição para gerar nova senha')
-
       const response = await api.post('/api/auth/generatenewpassword', {
         email: email.toLowerCase().trim(),
         tenant: Tenant.Compranomia,
       })
-
-      console.log('✅ handleSubmit - Nova senha enviada com sucesso')
 
       setSuccess(true)
 
@@ -76,81 +73,85 @@ export default function ForgotPassword() {
   }
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
-      <ScrollView
-        contentContainerStyle={components.auth.scrollContainer}
-        keyboardShouldPersistTaps="handled"
+    <Screen>
+      <KeyboardAvoidingView
+        style={{ flex: 1 }}
+        behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
       >
-        <View style={components.auth.container}>
-          {/* Header */}
-          <View style={components.auth.header}>
-            <Ionicons name="key" size={64} color={colors.primary} />
-            <Text style={components.auth.title}>Esqueci minha senha</Text>
-            <Text style={components.auth.subtitle}>
-              Digite seu email para receber uma nova senha
-            </Text>
-          </View>
-
-          {/* Form */}
-          <View style={components.auth.formContainer}>
-            {/* Email */}
-            <View>
-              <Text style={components.input.label}>Email</Text>
-              <TextInput
-                style={[
-                  components.input.container,
-                  components.input.text,
-                  localError && components.input.error,
-                ]}
-                value={email}
-                onChangeText={(text) => {
-                  setEmail(text)
-                  setLocalError('')
-                  setApiErrors(null)
-                }}
-                placeholder="seu@email.com"
-                keyboardType="email-address"
-                autoCapitalize="none"
-                autoCorrect={false}
-                editable={!success}
-              />
-              {localError && (
-                <Text style={components.auth.errorText}>{localError}</Text>
-              )}
+        <ScrollView
+          contentContainerStyle={components.auth.scrollContainer}
+          keyboardShouldPersistTaps="handled"
+        >
+          <View style={components.auth.container}>
+            {/* Header */}
+            <View style={components.auth.header}>
+              <Icon icon="KeyRound" size={64} color={colors.primary} />
+              <Text style={components.auth.title}>Esqueci minha senha</Text>
+              <Text style={components.auth.subtitle}>
+                Digite seu email para receber uma nova senha
+              </Text>
             </View>
 
-            {/* Erros da API */}
-            <ErrorMessage errors={apiErrors} />
+            {/* Form */}
+            <View style={components.auth.formContainer}>
+              {/* Email */}
+              <View>
+                <Text style={components.input.label}>Email</Text>
+                <TextInput
+                  style={[
+                    components.input.container,
+                    components.input.text,
+                    localError && components.input.error,
+                  ]}
+                  value={email}
+                  onChangeText={(text) => {
+                    setEmail(text)
+                    setLocalError('')
+                    setApiErrors(null)
+                  }}
+                  placeholder="seu@email.com"
+                  keyboardType="email-address"
+                  autoCapitalize="none"
+                  autoCorrect={false}
+                  editable={!success}
+                />
+                {localError && (
+                  <Text style={components.auth.errorText}>{localError}</Text>
+                )}
+              </View>
 
-            {/* Botão Enviar */}
+              {/* Erros da API */}
+              <ErrorMessage errors={apiErrors} />
+
+              {/* Botão Enviar */}
+              <TouchableOpacity
+                style={components.auth.buttonPrimary}
+                onPress={handleSubmit}
+                disabled={isLoading || success}
+                activeOpacity={0.8}
+              >
+                {isLoading ? (
+                  <ActivityIndicator color={colors.textInverse} />
+                ) : (
+                  <Text style={components.auth.buttonText}>
+                    Enviar nova senha
+                  </Text>
+                )}
+              </TouchableOpacity>
+            </View>
+
+            {/* Voltar */}
             <TouchableOpacity
-              style={components.auth.buttonPrimary}
-              onPress={handleSubmit}
-              disabled={isLoading || success}
-              activeOpacity={0.8}
+              style={components.auth.linkContainer}
+              onPress={() => router.back()}
             >
-              {isLoading ? (
-                <ActivityIndicator color={colors.textInverse} />
-              ) : (
-                <Text style={components.auth.buttonText}>
-                  Enviar nova senha
-                </Text>
-              )}
+              <Text style={components.auth.linkTextSmall}>
+                Voltar para login
+              </Text>
             </TouchableOpacity>
           </View>
-
-          {/* Voltar */}
-          <TouchableOpacity
-            style={components.auth.linkContainer}
-            onPress={() => router.back()}
-          >
-            <Text style={components.auth.linkTextSmall}>Voltar para login</Text>
-          </TouchableOpacity>
-        </View>
-      </ScrollView>
-    </KeyboardAvoidingView>
+        </ScrollView>
+      </KeyboardAvoidingView>
+    </Screen>
   )
 }

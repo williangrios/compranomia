@@ -14,7 +14,7 @@ import MapView, {
   MarkerDragEvent, // ✅ CORRIGIDO
   MarkerDragStartEndEvent,
 } from 'react-native-maps'
-import { Ionicons } from '@expo/vector-icons'
+import { Icon } from '@/components/ui/Icon'
 import { colors, spacing, components } from '@/theme'
 
 interface LocationPickerModalProps {
@@ -73,7 +73,7 @@ export function LocationPickerModal({
           `&addressdetails=1`,
         {
           headers: {
-            'User-Agent': 'Aqui-Tem-App/1.0',
+            'User-Agent': 'App/1.0',
           },
         },
       )
@@ -92,10 +92,8 @@ export function LocationPickerModal({
 
         if (city && state) {
           setAddressInfo({ city, state })
-          console.log('✅ Reverse geocode:', { city, state })
         } else {
           setAddressInfo(null)
-          console.log('⚠️ Reverse geocode incompleto')
         }
       }
     } catch (error) {
@@ -215,11 +213,7 @@ export function LocationPickerModal({
               marginBottom: spacing.md,
             }}
           >
-            <Ionicons
-              name="information-circle"
-              size={20}
-              color={colors.primary}
-            />
+            <Icon icon="Info" size={20} color={colors.primary} />
             <Text
               style={{
                 flex: 1,
@@ -244,11 +238,7 @@ export function LocationPickerModal({
             onPress={handleConfirm}
             activeOpacity={0.8}
           >
-            <Ionicons
-              name="checkmark-circle"
-              size={20}
-              color={colors.textInverse}
-            />
+            <Icon icon="CheckCircle" size={20} color={colors.textInverse} />
             <Text
               style={[components.auth.buttonText, { marginLeft: spacing.sm }]}
             >

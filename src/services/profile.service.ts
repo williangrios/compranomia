@@ -9,7 +9,6 @@ export const profileService = {
    */
   async getCurrentUserData(): Promise<{ user: User }> {
     const response = await api.get('/api/auth/getcurrentuserdata')
-    console.log('buscou no banco---', response.data.data.user)
     if (response.data.status === 'success') {
       return { user: response.data.data.user }
     }
@@ -46,7 +45,6 @@ export const profileService = {
       const { user, token } = response.data.data
       if (token) {
         await storageService.saveAuthToken(token)
-        console.log('✅ Token atualizado após salvar endereço')
       }
       return { user }
     }
@@ -80,7 +78,6 @@ export const profileService = {
         const { user, token } = response.data.data
         if (token) {
           await storageService.saveAuthToken(token)
-          console.log('✅ Token atualizado após upload de foto')
         }
         return { user }
       }

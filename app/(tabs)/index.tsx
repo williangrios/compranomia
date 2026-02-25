@@ -10,7 +10,7 @@ import {
   RefreshControl,
 } from 'react-native'
 import { useRouter } from 'expo-router'
-import { Ionicons } from '@expo/vector-icons'
+import { Ionicons, MaterialCommunityIcons } from '@expo/vector-icons'
 import { Header } from '@/components/ui/Header'
 import { PromotionCard } from '@/components/home/PromotionCard'
 import { NearbySellerCard } from '@/components/home/NearbySellerCard'
@@ -22,6 +22,7 @@ import { colors } from '@/theme'
 import { toastService } from '@/services/toast.service'
 import { capitalizeFullName } from '@/utils/capitalizeFullName'
 import { CategoryCards } from '@/components/home/CategoryIcon'
+import { Icon } from '@/components/ui/Icon'
 
 export default function Home() {
   const router = useRouter()
@@ -159,7 +160,7 @@ export default function Home() {
       <View style={styles.container}>
         <Header />
         <View style={styles.noAddressContainer}>
-          <Ionicons name="location-outline" size={64} color={colors.primary} />
+          <Icon icon="MapPin" size={64} color={colors.primary} />
           <Text style={styles.noAddressTitle}>Selecione um endereço</Text>
           <Text style={styles.noAddressSubtitle}>
             Para ver lojas e produtos perto de você, selecione um endereço de
@@ -176,7 +177,7 @@ export default function Home() {
       <View style={styles.container}>
         <Header />
         <View style={styles.noAddressContainer}>
-          <Ionicons name="warning-outline" size={64} color={colors.primary} />
+          <Icon icon="TriangleAlert" size={64} color={colors.primary} />
           <Text style={styles.noAddressTitle}>Endereço sem localização</Text>
           <Text style={styles.noAddressSubtitle}>
             O endereço selecionado não possui coordenadas. Edite o endereço ou
@@ -292,11 +293,7 @@ export default function Home() {
 
           {sellers.length === 0 ? (
             <View style={styles.emptyContainer}>
-              <Ionicons
-                name="storefront-outline"
-                size={48}
-                color={colors.textSecondary}
-              />
+              <Icon icon="Store" size={48} color={colors.textSecondary} />
               <Text style={styles.emptyText}>
                 Nenhuma loja encontrada na sua região
               </Text>
@@ -310,11 +307,7 @@ export default function Home() {
               onEndReachedThreshold={0.3}
               ListEmptyComponent={
                 <View style={styles.emptyContainer}>
-                  <Ionicons
-                    name="storefront-outline"
-                    size={48}
-                    color={colors.textSecondary}
-                  />
+                  <Icon icon="Store" size={48} color={colors.textSecondary} />
                   <Text style={styles.emptyText}>
                     Nenhuma loja encontrada na sua região
                   </Text>

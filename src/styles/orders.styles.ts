@@ -146,6 +146,7 @@ export const orderStyles = StyleSheet.create({
   emptyTitle: {
     fontSize: 18,
     fontWeight: '600',
+    textAlign: 'center',
     color: colors.textPrimary,
   },
   emptySubtitle: {

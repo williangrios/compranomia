@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
 } from 'react-native'
 import { useRouter } from 'expo-router'
-import { Ionicons } from '@expo/vector-icons'
+import { Icon } from '@/components/ui/Icon'
 import { Header } from '@/components/ui/Header'
 import { SearchProductCard } from '@/components/home/SearchProductCard'
 import { useAddress } from '@/contexts/AddressContext'
@@ -129,7 +129,7 @@ export default function Search() {
       <View style={styles.container}>
         <Header />
         <View style={styles.noAddressContainer}>
-          <Ionicons name="location-outline" size={64} color={colors.primary} />
+          <Icon icon="MapPin" size={64} color={colors.primary} />
           <Text style={styles.noAddressTitle}>Selecione um endereço</Text>
           <Text style={styles.noAddressSubtitle}>
             Para buscar produtos, selecione um endereço de entrega.
@@ -146,12 +146,7 @@ export default function Search() {
       {/* Search Input */}
       <View style={searchStyles.inputWrapper}>
         <View style={searchStyles.inputContainer}>
-          <Ionicons
-            name="search"
-            size={20}
-            color={colors.textSecondary}
-            style={searchStyles.inputIcon}
-          />
+          <Icon icon="Search" size={20} color={colors.textSecondary} />
           <TextInput
             ref={inputRef}
             style={searchStyles.input}
@@ -165,11 +160,7 @@ export default function Search() {
           />
           {query.length > 0 && (
             <TouchableOpacity onPress={handleClear} hitSlop={10}>
-              <Ionicons
-                name="close-circle"
-                size={20}
-                color={colors.textSecondary}
-              />
+              <Icon icon="XCircle" size={20} color={colors.textSecondary} />
             </TouchableOpacity>
           )}
         </View>
@@ -182,11 +173,7 @@ export default function Search() {
         </View>
       ) : !hasSearched ? (
         <View style={styles.emptyContainer}>
-          <Ionicons
-            name="search-outline"
-            size={48}
-            color={colors.textSecondary}
-          />
+          <Icon icon="Search" size={48} color={colors.textSecondary} />
           <Text style={styles.emptyText}>
             Digite para buscar produtos nas lojas da sua região
           </Text>
@@ -209,11 +196,7 @@ export default function Search() {
               </View>
             ) : (
               <View style={styles.emptyContainer}>
-                <Ionicons
-                  name="sad-outline"
-                  size={48}
-                  color={colors.textSecondary}
-                />
+                <Icon icon="Frown" size={48} color={colors.textSecondary} />
                 <Text style={styles.emptyText}>
                   Ooops... Nenhum produto encontrado para "{query}"
                 </Text>

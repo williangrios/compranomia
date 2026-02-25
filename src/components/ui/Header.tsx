@@ -1,7 +1,7 @@
 // components/ui/Header.tsx
 import { useState } from 'react'
 import { View, Text, Pressable, Image } from 'react-native'
-import { Ionicons } from '@expo/vector-icons'
+import { Icon } from '@/components/ui/Icon'
 import { useRouter } from 'expo-router'
 import { components, colors } from '@/theme'
 import { useAddress } from '@/contexts/AddressContext'
@@ -44,19 +44,11 @@ export function Header() {
             style={styles.addressButton}
             hitSlop={8}
           >
-            <Ionicons
-              name="location-sharp"
-              size={16}
-              color={colors.background}
-            />
+            <Icon icon="MapPin" size={16} color={colors.background} />
             <Text style={styles.addressText} numberOfLines={1}>
               {displayAddress}
             </Text>
-            <Ionicons
-              name="chevron-down"
-              size={14}
-              color={colors.textInverse}
-            />
+            <Icon icon="ChevronDown" size={14} color={colors.textInverse} />
           </Pressable>
         </View>
 
@@ -66,8 +58,8 @@ export function Header() {
           onPress={() => router.push('/notifications')}
           hitSlop={10}
         >
-          <Ionicons
-            name={hasUnread ? 'notifications' : 'notifications-outline'}
+          <Icon
+            icon={hasUnread ? 'BellDot' : 'Bell'}
             size={20}
             color={colors.primary}
           />

@@ -10,7 +10,7 @@ import {
 } from 'react-native'
 import { useRouter } from 'expo-router'
 import { CameraView } from 'expo-camera'
-import { Ionicons } from '@expo/vector-icons'
+import { Icon } from '@/components/ui/Icon'
 import { Screen } from '@/components/layout/Screen'
 import { ErrorMessage } from '@/components/ui/ErrorMessage'
 import { colors, components } from '@/theme'
@@ -107,7 +107,7 @@ export default function AddProduct() {
                   setStep('choice')
                 }}
               >
-                <Ionicons name="close" size={24} color="#fff" />
+                <Icon icon="X" size={24} color="#fff" />
               </TouchableOpacity>
 
               <TouchableOpacity

@@ -14,7 +14,7 @@ import {
   StyleSheet,
 } from 'react-native'
 import { useRouter } from 'expo-router'
-import { Ionicons } from '@expo/vector-icons'
+import { Icon } from '@/components/ui/Icon'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import * as ImagePicker from 'expo-image-picker'
 import { UserRole } from '@wrcb/cb-common'
@@ -224,24 +224,10 @@ export function OrderChat({
         type: asset.mimeType ?? 'image/jpeg',
       }
 
-      console.log('[IMAGE ASSET]', {
-        uri: asset.uri,
-        fileName: asset.fileName,
-        mimeType: asset.mimeType,
-        fileSize: asset.fileSize,
-        width: asset.width,
-        height: asset.height,
-      })
-
       const data = await orderService.sendMessage(orderId, undefined, image)
       setMessages(data.order.messages ?? [])
       setTimeout(() => listRef.current?.scrollToEnd({ animated: true }), 100)
     } catch (error: any) {
-      console.log(
-        '[SEND IMAGE ERROR]',
-        JSON.stringify(error?.response?.data || error?.message || error),
-      )
-
       const key = error.normalizedErrors?.[0]?.message || 'GenericError'
       Alert.alert('Erro', translateError(key))
     } finally {
@@ -314,7 +300,7 @@ export function OrderChat({
           onPress={() => router.push(backHref as any)}
           hitSlop={10}
         >
-          <Ionicons name="arrow-back" size={24} color={colors.textPrimary} />
+          <Icon icon="ArrowLeft" size={24} color={colors.textPrimary} />
         </TouchableOpacity>
         <Text style={s.headerTitle} numberOfLines={1}>
           {title}
@@ -336,8 +322,8 @@ export function OrderChat({
           contentContainerStyle={s.listContent}
           ListEmptyComponent={
             <View style={s.emptyContainer}>
-              <Ionicons
-                name="chatbubble-outline"
+              <Icon
+                icon="MessageCircle"
                 size={48}
                 color={colors.textSecondary}
               />
@@ -359,7 +345,7 @@ export function OrderChat({
           disabled={isSending}
           activeOpacity={0.7}
         >
-          <Ionicons name="image-outline" size={24} color={colors.primary} />
+          <Icon icon="Image" size={24} color={colors.primary} />
         </TouchableOpacity>
 
         <TextInput
@@ -385,7 +371,7 @@ export function OrderChat({
           {isSending ? (
             <ActivityIndicator size="small" color="#FFF" />
           ) : (
-            <Ionicons name="send" size={18} color="#FFF" />
+            <Icon icon="Send" size={18} color="#FFF" />
           )}
         </TouchableOpacity>
       </View>

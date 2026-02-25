@@ -177,18 +177,10 @@ export const sellerService = {
       skip?: number
     },
   ): Promise<PaginatedProductsResponse> {
-    console.log('[SEARCH][SERVICE][REQUEST]', {
-      query,
-      lat,
-      lng,
-      params,
-    })
     const response = await api.get(
       '/api/business/compranomia/products/search',
       { params: { q: query, lat, lng, ...params } },
     )
-
-    console.log('[SEARCH][SERVICE][RAW RESPONSE]', response.data)
     return response.data.data
   },
 }

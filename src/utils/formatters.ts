@@ -153,9 +153,7 @@ export const formatters = {
   },
 
   cleanPhone(value: string): string {
-    console.log('phone antes---', value)
     const cleaned = value.replace(/\D/g, '')
-    console.log('phone depois---', cleaned)
     return cleaned
   },
 

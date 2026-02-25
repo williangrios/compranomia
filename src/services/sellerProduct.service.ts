@@ -85,53 +85,38 @@ export const sellerProductService = {
   ) {
     const formData = new FormData()
 
-    // Obrigatórios
     formData.append('name', payload.name)
     formData.append('price', String(payload.price))
     formData.append('stock', String(payload.stock))
 
-    // Opcionais
     if (payload.description) formData.append('description', payload.description)
-
     if (payload.brand) formData.append('brand', payload.brand)
-
     if (payload.productCategory)
       formData.append('productCategory', payload.productCategory)
-
     if (payload.measurementUnit)
       formData.append('measurementUnit', payload.measurementUnit)
-
     if (typeof payload.baseWeight === 'number')
       formData.append('baseWeight', String(payload.baseWeight))
-
     if (typeof payload.step === 'number')
       formData.append('step', String(payload.step))
-
     if (typeof payload.minStockAlert === 'number')
       formData.append('minStockAlert', String(payload.minStockAlert))
-
     if (typeof payload.promotionalPrice === 'number')
       formData.append('promotionalPrice', String(payload.promotionalPrice))
-
     if (payload.barcode) formData.append('barcode', payload.barcode)
-
-    // 🔥 Flags boolean (sempre converter para string)
     if (typeof payload.sellerSpotlighted === 'boolean')
       formData.append('sellerSpotlighted', String(payload.sellerSpotlighted))
-
     if (typeof payload.isProhibitedForMinors === 'boolean')
       formData.append(
         'isProhibitedForMinors',
         String(payload.isProhibitedForMinors),
       )
-
     if (typeof payload.isPrescriptionRequired === 'boolean')
       formData.append(
         'isPrescriptionRequired',
         String(payload.isPrescriptionRequired),
       )
 
-    // Imagens
     if (payload.images?.length) {
       payload.images.forEach((img, index) => {
         formData.append('originalImages', {
@@ -142,27 +127,17 @@ export const sellerProductService = {
       })
     }
 
-    const token = await storageService.getAuthToken()
-
-    const response = await fetch(
-      `${API_URL}/api/business/compranomia/catalog/new`,
+    const response = await api.post(
+      '/api/business/compranomia/catalog/new',
+      formData,
       {
-        method: 'POST',
         headers: {
-          ...(token ? { Authorization: `Bearer ${token}` } : {}),
-          // ⚠️ NÃO setar Content-Type manualmente no React Native
+          'Content-Type': 'multipart/form-data',
         },
-        body: formData,
       },
     )
 
-    if (!response.ok) {
-      const error = await response.json().catch(() => null)
-      console.log('[CREATE] error response:', error)
-      throw { response: { data: error } }
-    }
-
-    return await response.json()
+    return response.data
   },
 
   async adopt(payload: AdoptPayload) {
@@ -174,7 +149,6 @@ export const sellerProductService = {
   },
 
   async update(id: string, payload: UpdatePayload) {
-    console.log('-------------', payload)
     const { data } = await api.patch(
       `/api/business/compranomia/seller-product/${id}`,
       payload,
@@ -186,7 +160,6 @@ export const sellerProductService = {
     const { data } = await api.get(
       `/api/business/compranomia/product-catalog-by-id/${id}`,
     )
-    console.log('retorno get product by id--------', data)
     return data
   },
 

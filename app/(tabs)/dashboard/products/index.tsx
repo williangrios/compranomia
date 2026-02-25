@@ -9,7 +9,7 @@ import {
   Alert,
 } from 'react-native'
 import { useRouter } from 'expo-router'
-import { Ionicons } from '@expo/vector-icons'
+import { Icon } from '@/components/ui/Icon'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { ErrorMessage } from '@/components/ui/ErrorMessage'
 import { colors } from '@/theme'
@@ -105,11 +105,7 @@ export default function Products() {
 
         {products.length === 0 ? (
           <View style={styles.emptyContainer}>
-            <Ionicons
-              name="cube-outline"
-              size={64}
-              color={colors.textSecondary}
-            />
+            <Icon icon="Package" size={64} color={colors.textSecondary} />
             <Text style={styles.emptyText}>Nenhum produto cadastrado</Text>
           </View>
         ) : (
@@ -143,7 +139,7 @@ export default function Products() {
           elevation: 6,
         }}
       >
-        <Ionicons name="add" size={28} color={colors.textInverse} />
+        <Icon icon="Plus" size={28} color={colors.textInverse} />
       </TouchableOpacity>
     </View>
   )

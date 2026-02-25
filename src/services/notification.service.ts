@@ -37,8 +37,6 @@ export const notificationService = {
   },
 
   async markAsRead(notificationId: string): Promise<void> {
-    console.log('[notificationService] markAsRead() id:', notificationId)
     await api.patch(`/api/notifications/${notificationId}/read`)
-    console.log('[notificationService] markAsRead success')
   },
 }

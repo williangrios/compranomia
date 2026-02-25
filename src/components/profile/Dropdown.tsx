@@ -7,7 +7,7 @@ import {
   Modal,
   Pressable,
 } from 'react-native'
-import { Ionicons } from '@expo/vector-icons'
+import { Icon } from '@/components/ui/Icon'
 import { colors, components } from '@/theme'
 
 interface DropdownProps {
@@ -53,7 +53,7 @@ export function Dropdown({
         >
           {value || placeholder}
         </Text>
-        <Ionicons name="chevron-down" size={20} color={colors.textSecondary} />
+        <Icon icon="ChevronDown" size={20} color={colors.textSecondary} />
       </TouchableOpacity>
 
       {error && (
@@ -106,7 +106,7 @@ export function Dropdown({
                 {label}
               </Text>
               <TouchableOpacity onPress={() => setIsOpen(false)}>
-                <Ionicons name="close" size={24} color={colors.textSecondary} />
+                <Icon icon="X" size={24} color={colors.textSecondary} />
               </TouchableOpacity>
             </View>
 
@@ -138,11 +138,7 @@ export function Dropdown({
                     {option}
                   </Text>
                   {value === option && (
-                    <Ionicons
-                      name="checkmark"
-                      size={24}
-                      color={colors.primary}
-                    />
+                    <Icon icon="Check" size={24} color={colors.primary} />
                   )}
                 </TouchableOpacity>
               ))}

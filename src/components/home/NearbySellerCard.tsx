@@ -1,14 +1,13 @@
 // src/components/home/NearbySellerCard.tsx
 
 import { View, Text, Image, TouchableOpacity } from 'react-native'
-import { Ionicons } from '@expo/vector-icons'
+import { Icon } from '@/components/ui/Icon'
 import { colors } from '@/theme'
 import { homeStyles as styles } from '@/styles/home.styles'
 import { NearbySeller } from '@/types'
 import { userTagsLabels } from '@/utils/enumLabels/userTags.labels'
 import { capitalizeFullName } from '@/utils/capitalizeFullName'
-
-const DEFAULT_AVATAR = 'https://static.compranomia.com/defaults/seller.png'
+import { DEFAULT_AVATAR } from '@/utils/constants'
 
 interface Props {
   seller: NearbySeller
@@ -35,11 +34,7 @@ export function NearbySellerCard({ seller, onPress }: Props) {
 
       <View style={styles.nearbyCardContent}>
         <View style={styles.promoCardSellerRow}>
-          <Ionicons
-            name="storefront-outline"
-            size={16}
-            color={styles.promoCardSeller.color}
-          />
+          <Icon icon="Store" size={16} color={styles.promoCardSeller.color} />
 
           <Text style={styles.promoCardName} numberOfLines={2}>
             {capitalizeFullName(seller.nickName)}
@@ -56,22 +51,14 @@ export function NearbySellerCard({ seller, onPress }: Props) {
         )}
         <View style={styles.nearbyCardInfoRow}>
           <View style={styles.nearbyCardInfo}>
-            <Ionicons
-              name="location-outline"
-              size={14}
-              color={colors.textSecondary}
-            />
+            <Icon icon="MapPin" size={14} color={colors.textSecondary} />
             <Text style={styles.nearbyCardInfoText}>
               {seller.distanceKm} km
             </Text>
           </View>
 
           <View style={styles.nearbyCardInfo}>
-            <Ionicons
-              name="time-outline"
-              size={14}
-              color={colors.textSecondary}
-            />
+            <Icon icon="Clock" size={14} color={colors.textSecondary} />
             <Text style={styles.nearbyCardInfoText}>
               {seller.averageDeliveryTime} min
             </Text>
@@ -81,11 +68,7 @@ export function NearbySellerCard({ seller, onPress }: Props) {
             <Text style={styles.nearbyCardFreeTag}>Grátis</Text>
           ) : (
             <View style={styles.nearbyCardInfo}>
-              <Ionicons
-                name="bicycle-outline"
-                size={14}
-                color={colors.textSecondary}
-              />
+              <Icon icon="Bike" size={14} color={colors.textSecondary} />
               <Text style={styles.nearbyCardInfoText}>
                 R$ {seller.deliveryFee.toFixed(2)}
               </Text>
@@ -94,8 +77,8 @@ export function NearbySellerCard({ seller, onPress }: Props) {
         </View>
       </View>
 
-      <Ionicons
-        name="chevron-forward"
+      <Icon
+        icon="ChevronRight"
         size={20}
         color={colors.textSecondary}
         style={styles.nearbyCardArrow}

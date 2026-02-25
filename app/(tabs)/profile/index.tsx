@@ -96,7 +96,7 @@ export default function Profile() {
 
       {/* Menu Items */}
       <ProfileMenuItem
-        icon="person"
+        icon="User"
         title="Dados Pessoais"
         subtitle="Nome, CPF, telefone"
         onPress={() => router.push('/profile/personal-data')}
@@ -104,14 +104,14 @@ export default function Profile() {
       />
 
       <ProfileMenuItem
-        icon="location"
+        icon="MapPin"
         title="Endereços"
         subtitle="Gerenciar meus endereços de entrega"
         onPress={() => router.push('/profile/addresses')}
       />
 
       <ProfileMenuItem
-        icon="lock-closed"
+        icon="Key"
         title="Alterar senha"
         subtitle="Alterar sua senha de acesso"
         onPress={() => router.push('/profile/update-password')}
@@ -119,27 +119,27 @@ export default function Profile() {
       />
 
       <ProfileMenuItem
-        icon="document-text"
+        icon="FileText"
         title="Política de Privacidade"
         subtitle="Como seus dados são utilizados"
         onPress={() =>
-          Linking.openURL('https://compranomia.com.br/privacy-policy')
+          Linking.openURL('https://www.wrsolucoesdigitais.com.br/privacypolicy')
         }
       />
 
       <ProfileMenuItem
-        icon="shield-checkmark"
+        icon="ShieldCheck"
         title="Termos e Condições"
         subtitle="Regras de uso da plataforma"
         onPress={() =>
-          Linking.openURL('https://compranomia.com.br/terms-and-conditions')
+          Linking.openURL('https://www.wrsolucoesdigitais.com.br/service')
         }
       />
 
       {/* Logout */}
       <View>
         <ProfileMenuItem
-          icon="log-out"
+          icon="LogOut"
           title="Sair"
           onPress={handleLogout}
           isDestructive

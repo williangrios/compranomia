@@ -10,7 +10,7 @@ import {
   ScrollView,
   ActivityIndicator,
 } from 'react-native'
-import { Ionicons } from '@expo/vector-icons'
+import { Icon } from '@/components/ui/Icon'
 import { colors, spacing } from '@/theme'
 import { ratingService } from '@/services/rating.service'
 import Toast from 'react-native-toast-message'
@@ -126,10 +126,12 @@ export function RatingModal({
             onPress={() => handleStarPress(criterion, star)}
             disabled={isSubmitting}
           >
-            <Ionicons
-              name={star <= currentRating ? 'star' : 'star-outline'}
+            <Icon
+              icon="Star"
               size={32}
-              color={star <= currentRating ? colors.primary : colors.disabled}
+              color={star <= currentRating ? colors.primary : colors.border}
+              strokeWidth={star <= currentRating ? 0 : 1.5}
+              fill={star <= currentRating ? colors.primary : 'none'}
             />
           </TouchableOpacity>
         ))}
@@ -150,7 +152,7 @@ export function RatingModal({
           <View style={styles.header}>
             <Text style={styles.title}>Avaliar {sellerName}</Text>
             <TouchableOpacity onPress={onClose} disabled={isSubmitting}>
-              <Ionicons name="close" size={28} color={colors.textPrimary} />
+              <Icon icon="XCircle" size={28} color={colors.textPrimary} />
             </TouchableOpacity>
           </View>
 

@@ -152,9 +152,6 @@ export function AddressForm({
 
     if (coords) {
       setCoordinates([coords.lng, coords.lat])
-      console.log('✅ Coordenadas encontradas:', coords)
-    } else {
-      console.log('❌ Coordenadas não encontradas')
     }
   }
 
@@ -252,7 +249,6 @@ export function AddressForm({
     if (address) {
       setCity(address.city)
       setState(address.state)
-      console.log('✅ Cidade/Estado atualizados:', address)
     }
 
     setShowLocationPicker(false)

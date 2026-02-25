@@ -9,7 +9,7 @@ import {
   ActivityIndicator,
   Pressable,
 } from 'react-native'
-import { Ionicons } from '@expo/vector-icons'
+import { Icon } from '@/components/ui/Icon'
 import { colors } from '@/theme'
 import { deliveryAddressService } from '@/services/deliveryAddress.service'
 import { useAddress } from '@/contexts/AddressContext'
@@ -100,7 +100,7 @@ export function AddressSelectorModal({
               Selecionar endereço de entrega
             </Text>
             <TouchableOpacity onPress={onClose} hitSlop={10}>
-              <Ionicons name="close" size={24} color={colors.textPrimary} />
+              <Icon icon="X" size={24} color={colors.textPrimary} />
             </TouchableOpacity>
           </View>
 
@@ -111,11 +111,7 @@ export function AddressSelectorModal({
             </View>
           ) : addresses.length === 0 ? (
             <View style={{ padding: 40, alignItems: 'center' }}>
-              <Ionicons
-                name="location-outline"
-                size={48}
-                color={colors.textSecondary}
-              />
+              <Icon icon="MapPin" size={48} color={colors.textSecondary} />
               <Text
                 style={{
                   fontSize: 14,
@@ -160,8 +156,8 @@ export function AddressSelectorModal({
                             marginBottom: 4,
                           }}
                         >
-                          <Ionicons
-                            name="location"
+                          <Icon
+                            icon="MapPin"
                             size={16}
                             color={colors.primary}
                           />
@@ -218,8 +214,8 @@ export function AddressSelectorModal({
                       </View>
 
                       {isSelected && (
-                        <Ionicons
-                          name="checkmark-circle"
+                        <Icon
+                          icon="CheckCircle"
                           size={24}
                           color={colors.primary}
                           style={{ marginLeft: 8 }}

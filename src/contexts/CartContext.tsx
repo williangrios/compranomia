@@ -245,9 +245,6 @@ export function CartProvider({ children }: { children: ReactNode }) {
 
       // ✅ Garante step válido
       const step = product.step && product.step > 0 ? product.step : 1
-      console.log('step------', step)
-      console.log('unidade------', product.measurementUnit)
-      console.log('quantidade------', quantity)
 
       // ✅ Cria o CartItem
       const cartItem: CartItem = {

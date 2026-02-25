@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { API_URL } from '@/utils/constants'
+import { API_URL, APP_VERSION } from '@/utils/constants'
 import { storageService } from './storage.service'
 import { translateError } from '@/utils/errorMessages'
 import { Alert, Linking, Platform } from 'react-native'
@@ -28,11 +28,7 @@ api.interceptors.request.use(
     }
 
     config.headers['x-tenant'] = Tenant.Compranomia
-    config.headers['x-app-version'] = '1'
-
-    if (config.data instanceof FormData) {
-      console.log('→ multipart/form-data detected (RN will handle boundary)')
-    }
+    config.headers['x-app-version'] = APP_VERSION
 
     return config
   },

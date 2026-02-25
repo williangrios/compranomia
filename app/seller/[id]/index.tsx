@@ -10,11 +10,10 @@ import {
   ActivityIndicator,
   TouchableOpacity,
   RefreshControl,
-  StyleSheet,
   TextInput,
 } from 'react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
-import { Ionicons } from '@expo/vector-icons'
+import { Icon } from '@/components/ui/Icon'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { ConsumerProductCard } from '@/components/product/ConsumerProductCard'
 import { userTagsLabels, sortByLabel } from '@/utils/enumLabels/userTags.labels'
@@ -27,8 +26,7 @@ import { PaymentMethod, UserTags } from '@wrcb/cb-common'
 import { capitalizeFullName } from '@/utils/capitalizeFullName'
 import { useCart } from '@/contexts/CartContext'
 import { CartSummaryBar } from '@/components/cart/CartSummaryBar'
-
-const DEFAULT_AVATAR = 'https://static.compranomia.com/defaults/seller.png'
+import { DEFAULT_AVATAR } from '@/utils/constants'
 
 interface SellerProfile {
   seller: {
@@ -180,15 +178,6 @@ export default function SellerStore() {
               limit: 10,
               skip: 0,
             })
-            // 🔍 DEBUG: verificar spotlighted por categoria
-            const spotInCat = response.products.filter(
-              (p: any) => p.sellerSpotlighted,
-            )
-            if (spotInCat.length > 0) {
-              console.log(
-                `[SELLER_STORE]------- Category "${cat}" has ${spotInCat.length} spotlighted products`,
-              )
-            }
             categoryProductsMap[cat] = response.products
           }),
         )
@@ -323,7 +312,7 @@ export default function SellerStore() {
       <View style={styles.container}>
         <View style={[styles.backButton, { top: insets.top + spacing.sm }]}>
           <TouchableOpacity onPress={() => router.back()} hitSlop={10}>
-            <Ionicons name="arrow-back" size={24} color="#FFF" />
+            <Icon icon="ArrowLeft" size={24} color="#FFF" />
           </TouchableOpacity>
         </View>
         <View style={styles.loadingContainer}>
@@ -343,7 +332,7 @@ export default function SellerStore() {
         <View style={styles.headerTopRow}>
           {/* Voltar */}
           <TouchableOpacity onPress={() => router.back()} hitSlop={10}>
-            <Ionicons name="arrow-back" size={24} color="#FFF" />
+            <Icon icon="ArrowLeft" size={24} color="#FFF" />
           </TouchableOpacity>
 
           {/* Avatar + infos */}
@@ -357,8 +346,8 @@ export default function SellerStore() {
 
               <View style={styles.headerMainInfo}>
                 <View style={styles.promoCardSellerRow}>
-                  <Ionicons
-                    name="storefront-outline"
+                  <Icon
+                    icon="Store"
                     size={16}
                     color={styles.promoCardSeller.color}
                   />
@@ -380,17 +369,25 @@ export default function SellerStore() {
                   {seller.ratingCount > 0 ? (
                     <>
                       {[1, 2, 3, 4, 5].map((star) => (
-                        <Ionicons
+                        <Icon
                           key={star}
-                          name={
+                          icon={
                             star <= Math.floor(seller.averageRating)
-                              ? 'star'
+                              ? 'Star'
                               : star - seller.averageRating < 1
-                                ? 'star-half'
-                                : 'star-outline'
+                                ? 'StarHalf'
+                                : 'Star'
                           }
                           size={14}
                           color="#FFD166"
+                          strokeWidth={0}
+                          fill={
+                            star <= Math.floor(seller.averageRating)
+                              ? '#FFD166'
+                              : star - seller.averageRating < 1
+                                ? '#FFD166'
+                                : 'none'
+                          }
                         />
                       ))}
                       <Text style={styles.headerRatingText}>
@@ -415,8 +412,8 @@ export default function SellerStore() {
               isOpenToday ? styles.headerBadgeOpen : styles.headerBadgeClosed,
             ]}
           >
-            <Ionicons
-              name={isOpenToday ? 'time-outline' : 'close-circle-outline'}
+            <Icon
+              icon={isOpenToday ? 'Clock' : 'XCircle'}
               size={14}
               color={isOpenToday ? colors.success : colors.error}
             />
@@ -434,11 +431,7 @@ export default function SellerStore() {
           {/* Entrega */}
           {deliveryRange && (
             <View style={styles.headerBadge}>
-              <Ionicons
-                name="bicycle-outline"
-                size={14}
-                color={colors.textSecondary}
-              />
+              <Icon icon="Bike" size={14} color={colors.textSecondary} />
               {deliveryRange.fee === 0 ? (
                 <Text style={styles.headerFreeTag}>Entrega grátis</Text>
               ) : (
@@ -449,14 +442,19 @@ export default function SellerStore() {
             </View>
           )}
 
+          {deliveryRange && deliveryRange.freeAbove > 0 && (
+            <View style={styles.headerBadge}>
+              <Icon icon="Gift" size={14} color={colors.success} />
+              <Text style={styles.headerFreeTag}>
+                Grátis acima de R$ {deliveryRange.freeAbove.toFixed(2)}
+              </Text>
+            </View>
+          )}
+
           {/* Tempo de entrega */}
           {deliveryRange && (
             <View style={styles.headerBadge}>
-              <Ionicons
-                name="car-outline"
-                size={14}
-                color={colors.textSecondary}
-              />
+              <Icon icon="Car" size={14} color={colors.textSecondary} />
               <Text style={styles.headerBadgeText}>
                 {deliveryRange.averageDeliveryTime} min
               </Text>
@@ -487,8 +485,8 @@ export default function SellerStore() {
               }}
               activeOpacity={0.8}
             >
-              <Ionicons
-                name="search-outline"
+              <Icon
+                icon="Search"
                 size={14}
                 color={
                   viewMode === 'search'
@@ -563,7 +561,7 @@ export default function SellerStore() {
           {/* Input de busca */}
           <View style={styles.searchContainer}>
             <View style={styles.searchInputWrapper}>
-              <Ionicons name="search" size={20} color={colors.textSecondary} />
+              <Icon icon="Search" size={20} color={colors.textSecondary} />
               <TextInput
                 style={styles.searchInput}
                 value={searchQuery}
@@ -575,11 +573,7 @@ export default function SellerStore() {
               />
               {searchQuery.length > 0 && (
                 <TouchableOpacity onPress={() => handleSearch('')} hitSlop={10}>
-                  <Ionicons
-                    name="close-circle"
-                    size={20}
-                    color={colors.textSecondary}
-                  />
+                  <Icon icon="XCircle" size={20} color={colors.textSecondary} />
                 </TouchableOpacity>
               )}
             </View>
@@ -625,11 +619,7 @@ export default function SellerStore() {
                 </View>
               ) : (
                 <View style={styles.emptyContainer}>
-                  <Ionicons
-                    name="search-outline"
-                    size={48}
-                    color={colors.textSecondary}
-                  />
+                  <Icon icon="Search" size={48} color={colors.textSecondary} />
                   <Text style={styles.emptyText}>
                     {searchQuery.length < 2
                       ? 'Digite pelo menos 2 letras'
@@ -688,11 +678,7 @@ export default function SellerStore() {
           )}
           ListEmptyComponent={
             <View style={styles.emptyContainer}>
-              <Ionicons
-                name="cube-outline"
-                size={48}
-                color={colors.textSecondary}
-              />
+              <Icon icon="Package" size={48} color={colors.textSecondary} />
               <Text style={styles.emptyText}>
                 Nenhum produto nesta categoria
               </Text>

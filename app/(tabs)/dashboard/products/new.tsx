@@ -83,14 +83,14 @@ export default function NewProduct() {
   }, [user])
 
   const [form, setForm] = useState<ProductForm>({
-    name: 'nome',
-    description: 'descricao',
-    brand: 'marca',
+    name: '',
+    description: '',
+    brand: '',
     productCategory: '',
     measurementUnit: MeasurementUnit.Un,
-    baseWeight: '50',
+    baseWeight: '',
     step: '1',
-    price: '52',
+    price: '',
     sellerSpotlighted: false,
     isProhibitedForMinors: false,
     isPrescriptionRequired: false,
@@ -166,13 +166,14 @@ export default function NewProduct() {
   // ═══════════════════════════════════════
 
   async function handleEnrichFromImage() {
-    if (!image || hasEnrichedRef.current) return
+    if (!image || hasEnrichedRef.current) {
+      return
+    }
 
     try {
       setIsEnriching(true)
       setApiErrors(null)
       setSuccess(null)
-
       const enriched = await productEnrichmentService.enrich(image)
       hasEnrichedRef.current = true
 

@@ -1,6 +1,6 @@
 // app/(tabs)/_layout.tsx
 import { Tabs, useRouter } from 'expo-router'
-import { Ionicons } from '@expo/vector-icons'
+import { Icon } from '@/components/ui/Icon'
 import { useAuth } from '@/contexts/AuthContext'
 import { UserRole } from '@wrcb/cb-common'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
@@ -45,10 +45,11 @@ export default function TabsLayout() {
         options={{
           title: 'Início',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? 'home' : 'home-outline'}
+            <Icon
+              icon="House"
               size={24}
               color={color}
+              strokeWidth={focused ? 2.5 : 1.5}
             />
           ),
         }}
@@ -58,10 +59,11 @@ export default function TabsLayout() {
         options={{
           title: 'Busca',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? 'search' : 'search-outline'}
+            <Icon
+              icon="Search"
               size={24}
               color={color}
+              strokeWidth={focused ? 2.5 : 1.5}
             />
           ),
         }}
@@ -71,10 +73,11 @@ export default function TabsLayout() {
         options={{
           title: 'Compras',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? 'cart' : 'cart-outline'}
+            <Icon
+              icon="ShoppingCart"
               size={24}
               color={color}
+              strokeWidth={focused ? 2.5 : 1.5}
             />
           ),
         }}
@@ -85,10 +88,11 @@ export default function TabsLayout() {
           title: 'Vendas',
           href: isSeller ? '/sales' : null,
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? 'receipt' : 'receipt-outline'}
+            <Icon
+              icon="Receipt"
               size={24}
               color={color}
+              strokeWidth={focused ? 2.5 : 1.5}
             />
           ),
         }}
@@ -99,10 +103,11 @@ export default function TabsLayout() {
           title: 'Loja',
           href: isSeller ? '/dashboard' : null,
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? 'storefront' : 'storefront-outline'}
+            <Icon
+              icon="Store"
               size={24}
               color={color}
+              strokeWidth={focused ? 2.5 : 1.5}
             />
           ),
         }}
@@ -113,10 +118,11 @@ export default function TabsLayout() {
           title: 'Notificações',
           href: null,
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? 'stats-chart' : 'stats-chart-outline'}
+            <Icon
+              icon="BarChart3"
               size={24}
               color={color}
+              strokeWidth={focused ? 2.5 : 1.5}
             />
           ),
         }}
@@ -126,10 +132,11 @@ export default function TabsLayout() {
         options={{
           title: 'Perfil',
           tabBarIcon: ({ color, focused }) => (
-            <Ionicons
-              name={focused ? 'person' : 'person-outline'}
+            <Icon
+              icon="User"
               size={24}
               color={color}
+              strokeWidth={focused ? 2.5 : 1.5}
             />
           ),
         }}

@@ -37,7 +37,6 @@ export const orderService = {
     const response = await api.post('/api/business/compranomia/orders', payload)
     return response.data.data
   },
-
   async getOrders(params: {
     mode: 'sale' | 'purchase'
     status?: string
@@ -84,13 +83,6 @@ export const orderService = {
       if (message) formData.append('message', message)
       formData.append('image', image as any)
 
-      console.log('[SEND IMAGE SERVICE]', {
-        orderId,
-        imageUri: image.uri,
-        imageName: image.name,
-        imageType: image.type,
-      })
-
       try {
         const response = await api.post(
           `/api/business/compranomia/orders/${orderId}/messages`,
@@ -103,11 +95,6 @@ export const orderService = {
         )
         return response.data.data
       } catch (error: any) {
-        console.log('[SEND IMAGE SERVICE ERROR]', {
-          status: error?.response?.status,
-          data: JSON.stringify(error?.response?.data),
-          message: error?.message,
-        })
         throw error
       }
     }

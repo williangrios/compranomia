@@ -6,18 +6,17 @@ import {
   TextInput,
   TouchableOpacity,
   ScrollView,
-  KeyboardAvoidingView,
-  Platform,
   ActivityIndicator,
 } from 'react-native'
 import { useRouter, useLocalSearchParams } from 'expo-router'
-import { Ionicons } from '@expo/vector-icons'
+import { Icon } from '@/components/ui/Icon'
 import { UserRole } from '@wrcb/cb-common'
 import { colors, components } from '@/theme'
 import { validators } from '@/utils/validators'
 import { useAuth } from '@/contexts/AuthContext'
 import { ErrorMessage } from '@/components/ui/ErrorMessage'
 import { getApiErrors } from '@/utils/getApiErrors'
+import { Screen } from '@/components/layout/Screen'
 
 interface ApiError {
   message: string
@@ -31,10 +30,10 @@ export default function SignUp() {
   const role = (params.role as string) || 'consumer'
   const isSeller = role === 'seller'
 
-  const [email, setEmail] = useState('williangrios@yahoo.com.br')
-  const [password, setPassword] = useState('123123')
-  const [passwordConfirmation, setPasswordConfirmation] = useState('123123')
-  const [nickName, setNickName] = useState('bill')
+  const [email, setEmail] = useState('')
+  const [password, setPassword] = useState('')
+  const [passwordConfirmation, setPasswordConfirmation] = useState('')
+  const [nickName, setNickName] = useState('')
   const [showPassword, setShowPassword] = useState(false)
   const [isLoading, setIsLoading] = useState(false)
   const [apiErrors, setApiErrors] = useState<ApiError[] | null>(null)
@@ -83,8 +82,6 @@ export default function SignUp() {
         return
       }
 
-      console.log('📤 handleSignUp - Chamando signUp do AuthContext')
-
       await signUp({
         email: email.toLowerCase().trim(),
         password,
@@ -92,8 +89,6 @@ export default function SignUp() {
         nickName: nickName.trim(),
         role: isSeller ? UserRole.Seller : UserRole.Consumer,
       })
-
-      console.log('✅ handleSignUp - SignUp sucesso, redirecionando...')
 
       // Redirecionar para verificação de email
       router.push({
@@ -108,10 +103,7 @@ export default function SignUp() {
   }
 
   return (
-    <KeyboardAvoidingView
-      style={{ flex: 1 }}
-      behavior={Platform.OS === 'ios' ? 'padding' : 'height'}
-    >
+    <Screen>
       <ScrollView
         contentContainerStyle={components.auth.scrollContainer}
         keyboardShouldPersistTaps="handled"
@@ -119,8 +111,8 @@ export default function SignUp() {
         <View style={components.auth.container}>
           {/* Header */}
           <View style={components.auth.header}>
-            <Ionicons
-              name={isSeller ? 'storefront' : 'cart'}
+            <Icon
+              icon={isSeller ? 'Store' : 'ShoppingCart'}
               size={64}
               color={isSeller ? colors.success : colors.primary}
             />
@@ -211,8 +203,8 @@ export default function SignUp() {
                   }}
                   onPress={() => setShowPassword(!showPassword)}
                 >
-                  <Ionicons
-                    name={showPassword ? 'eye-off' : 'eye'}
+                  <Icon
+                    icon={showPassword ? 'EyeOff' : 'Eye'}
                     size={20}
                     color={colors.textSecondary}
                   />
@@ -280,6 +272,6 @@ export default function SignUp() {
           </TouchableOpacity>
         </View>
       </ScrollView>
-    </KeyboardAvoidingView>
+    </Screen>
   )
 }

@@ -7,7 +7,7 @@ import {
   StyleSheet,
   Dimensions,
 } from 'react-native'
-import { Ionicons } from '@expo/vector-icons'
+import { Icon } from '@/components/ui/Icon'
 import { colors, spacing } from '@/theme'
 import { SellerProduct } from '@/types/sellerProduct'
 import { MeasurementUnit } from '@wrcb/cb-common'
@@ -181,7 +181,7 @@ export function ConsumerProductCard({
               disabled={quantity <= 0}
               activeOpacity={0.8}
             >
-              <Ionicons name="remove" size={18} color="#FFF" />
+              <Icon icon="Minus" size={18} color="#FFF" />
             </TouchableOpacity>
 
             <Text style={s.qtyText}>{formatQuantity(quantity, unit)}</Text>
@@ -191,7 +191,7 @@ export function ConsumerProductCard({
               onPress={handleIncrement}
               activeOpacity={0.8}
             >
-              <Ionicons name="add" size={18} color="#FFF" />
+              <Icon icon="Plus" size={18} color="#FFF" />
             </TouchableOpacity>
           </View>
 
@@ -205,7 +205,7 @@ export function ConsumerProductCard({
             disabled={quantity <= 0}
             activeOpacity={0.8}
           >
-            <Ionicons name="cart-outline" size={14} color="#FFF" />
+            <Icon icon="ShoppingCart" size={14} color="#FFF" />
             <Text style={s.addButtonText}>
               {formatters.calculatePrice(quantity, displayPrice, isUnit, step)}
             </Text>

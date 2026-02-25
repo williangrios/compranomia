@@ -1,6 +1,6 @@
 // src/components/ui/ErrorMessage.tsx
 import { View, Text } from 'react-native'
-import { Ionicons } from '@expo/vector-icons'
+import { Icon } from '@/components/ui/Icon'
 import { colors, spacing } from '@/theme'
 import { translateError } from '@/utils/errorMessages'
 
@@ -28,12 +28,9 @@ export function ErrorMessage({ errors }: ErrorMessageProps) {
       }}
     >
       <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
-        <Ionicons
-          name="alert-circle"
-          size={20}
-          color={colors.error}
-          style={{ marginRight: spacing.sm, marginTop: 2 }}
-        />
+        <View style={{ marginRight: spacing.sm, marginTop: 2 }}>
+          <Icon icon="AlertCircle" size={20} color={colors.error} />
+        </View>
         <View style={{ flex: 1 }}>
           {errors.map((err, idx) => (
             <Text

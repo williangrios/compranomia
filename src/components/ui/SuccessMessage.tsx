@@ -1,5 +1,5 @@
 import { View, Text } from 'react-native'
-import { Ionicons } from '@expo/vector-icons'
+import { Icon } from '@/components/ui/Icon'
 import { colors, spacing } from '@/theme'
 
 interface SuccessResponse {
@@ -26,8 +26,8 @@ export function SuccessMessage({ success }: SuccessMessageProps) {
       }}
     >
       <View style={{ flexDirection: 'row', alignItems: 'flex-start' }}>
-        <Ionicons
-          name="checkmark-circle"
+        <Icon
+          icon="CheckCircle"
           size={20}
           color={colors.success ?? '#16A34A'}
           style={{ marginRight: spacing.sm, marginTop: 2 }}

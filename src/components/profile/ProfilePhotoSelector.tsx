@@ -1,6 +1,6 @@
 import { View, Text, TouchableOpacity, Image, Alert } from 'react-native'
 import * as ImagePicker from 'expo-image-picker'
-import { Ionicons } from '@expo/vector-icons'
+import { Icon } from '@/components/ui/Icon'
 import { colors } from '@/theme'
 
 interface ProfilePhotoSelectorProps {
@@ -87,7 +87,7 @@ export function ProfilePhotoSelector({
             style={{ width: '100%', height: '100%' }}
           />
         ) : (
-          <Ionicons name="person" size={50} color={colors.textSecondary} />
+          <Icon icon="User" size={50} color={colors.textSecondary} />
         )}
       </View>
 
@@ -110,7 +110,7 @@ export function ProfilePhotoSelector({
             gap: 8,
           }}
         >
-          <Ionicons name="camera" size={20} color={colors.textInverse} />
+          <Icon icon="Camera" size={20} color={colors.textInverse} />
           <Text style={{ color: colors.textInverse, fontWeight: '600' }}>
             {currentPhoto ? 'Alterar Foto' : 'Escolher Foto'}
           </Text>
@@ -129,7 +129,7 @@ export function ProfilePhotoSelector({
               gap: 8,
             }}
           >
-            <Ionicons name="trash" size={20} color={colors.textInverse} />
+            <Icon icon="Trash" size={20} color={colors.textInverse} />
             <Text style={{ color: colors.textInverse, fontWeight: '600' }}>
               Remover
             </Text>

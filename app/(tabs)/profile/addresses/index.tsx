@@ -9,7 +9,7 @@ import {
   Alert,
 } from 'react-native'
 import { useRouter } from 'expo-router'
-import { Ionicons } from '@expo/vector-icons'
+import { Icon } from '@/components/ui/Icon'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { useFocusEffect } from '@react-navigation/native'
 import { AddressCard } from '@/components/profile/AddressCard'
@@ -133,11 +133,7 @@ export default function Addresses() {
 
         {addresses.length === 0 ? (
           <View style={{ alignItems: 'center', paddingVertical: 40 }}>
-            <Ionicons
-              name="location-outline"
-              size={64}
-              color={colors.textSecondary}
-            />
+            <Icon icon="MapPin" size={64} color={colors.textSecondary} />
             <Text
               style={{
                 fontSize: 16,
@@ -181,7 +177,7 @@ export default function Addresses() {
           elevation: 6,
         }}
       >
-        <Ionicons name="add" size={28} color={colors.textInverse} />
+        <Icon icon="Plus" size={28} color={colors.textInverse} />
       </TouchableOpacity>
     </View>
   )

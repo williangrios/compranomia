@@ -10,7 +10,7 @@ import {
   ActivityIndicator,
 } from 'react-native'
 import { useRouter } from 'expo-router'
-import { Ionicons } from '@expo/vector-icons'
+import { Icon } from '@/components/ui/Icon'
 import { Screen } from '@/components/layout/Screen'
 import { ErrorMessage } from '@/components/ui/ErrorMessage'
 import { colors, components } from '@/theme'
@@ -105,7 +105,7 @@ export default function SearchCatalog() {
           onPress={() => handleAdopt(item)}
           activeOpacity={0.8}
         >
-          <Ionicons name="add" size={22} color={colors.textInverse} />
+          <Icon icon="Plus" size={22} color={colors.textInverse} />
         </TouchableOpacity>
       </View>
     )
@@ -116,11 +116,7 @@ export default function SearchCatalog() {
 
     return (
       <View style={styles.emptyContainer}>
-        <Ionicons
-          name="search-outline"
-          size={48}
-          color={colors.textSecondary}
-        />
+        <Icon icon="Search" size={48} color={colors.textSecondary} />
         <Text style={styles.emptyText}>Nenhum produto encontrado</Text>
         <TouchableOpacity
           style={[components.auth.buttonPrimary, { marginTop: 16 }]}

@@ -36,7 +36,7 @@ export const CATEGORY_NAMES: Record<UserCategory, string> = {
   [UserCategory.AgricultureStore]: 'Agropecuária',
   [UserCategory.WaterAndGasSupplier]: 'Água e gás',
   [UserCategory.Services]: 'Serviços',
-  // Outros que não são usados no AquiTem mas precisam estar aqui
+  // Outros que não são usados no Compranomia mas precisam estar aqui
   [UserCategory.Female]: 'Feminino',
   [UserCategory.Male]: 'Masculino',
   [UserCategory.Couple]: 'Casal',

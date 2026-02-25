@@ -11,7 +11,7 @@ import {
   Dimensions,
 } from 'react-native'
 import { useLocalSearchParams, useRouter } from 'expo-router'
-import { Ionicons } from '@expo/vector-icons'
+import { Icon } from '@/components/ui/Icon'
 import { useSafeAreaInsets } from 'react-native-safe-area-context'
 import { MeasurementUnit, UserTags } from '@wrcb/cb-common'
 import { useCart } from '@/contexts/CartContext'
@@ -124,15 +124,13 @@ export default function ProductDetail() {
   const imageSource = product.isPrescriptionRequired
     ? MEDICINE_IMAGE
     : { uri: images[activeImageIndex] || DEFAULT_IMAGE }
-  console.log('PRODUCT DETAIL:', product)
-  console.log('SELLER:', product?.seller)
 
   return (
     <View style={[s.container, { paddingTop: insets.top }]}>
       {/* Header */}
       <View style={s.header}>
         <TouchableOpacity onPress={() => router.back()} hitSlop={10}>
-          <Ionicons name="arrow-back" size={24} color={colors.textPrimary} />
+          <Icon icon="ArrowLeft" size={24} color={colors.textPrimary} />
         </TouchableOpacity>
         <Text style={s.headerTitle} numberOfLines={1}>
           Item: {name}
@@ -214,11 +212,7 @@ export default function ProductDetail() {
             <View style={s.descriptionSection}>
               <Text style={s.sectionLabel}>Código de barras</Text>
               <Text style={s.metaText}>
-                <Ionicons
-                  name="barcode-outline"
-                  size={16}
-                  color={colors.textSecondary}
-                />
+                <Icon icon="Barcode" size={16} color={colors.textSecondary} />
                 {product.barcode}
               </Text>
             </View>
@@ -279,7 +273,7 @@ export default function ProductDetail() {
             disabled={quantity <= 0}
             activeOpacity={0.8}
           >
-            <Ionicons name="remove" size={20} color="#FFF" />
+            <Icon icon="Minus" size={20} color="#FFF" />
           </TouchableOpacity>
 
           <Text style={s.qtyText}>
@@ -291,7 +285,7 @@ export default function ProductDetail() {
             onPress={handleIncrement}
             activeOpacity={0.8}
           >
-            <Ionicons name="add" size={20} color="#FFF" />
+            <Icon icon="Plus" size={20} color="#FFF" />
           </TouchableOpacity>
         </View>
 
@@ -315,7 +309,7 @@ export default function ProductDetail() {
           disabled={quantity <= 0}
           activeOpacity={0.8}
         >
-          <Ionicons name="cart-outline" size={18} color="#FFF" />
+          <Icon icon="ShoppingCart" size={18} color="#FFF" />
           <Text style={s.addButtonText}>
             {formatters.calculatePrice(quantity, displayPrice, isUnit, step)}
           </Text>

@@ -44,6 +44,7 @@ interface FormData {
   baseWeight: string
   productCategory: UserTags | ''
   price: string
+  barcode: string
   stock: string
   step: string
   minStockAlert: string
@@ -107,6 +108,7 @@ export function SellerProductForm({
     description: '',
     brand: '',
     baseWeight: '',
+    barcode: '',
     productCategory: '',
     price: '',
     stock: '0',
@@ -156,10 +158,22 @@ export function SellerProductForm({
 
       const response = await sellerProductService.getById(id)
       const sp = response?.data?.sellerProduct
-
       if (!sp) return
 
-      setCatalog(sp.productCatalog ?? null)
+      setCatalog({
+        id: sp.productCatalogId,
+        name: sp.name,
+        description: sp.description,
+        productCategory: sp.productCategory,
+        measurementUnit: sp.measurementUnit,
+        baseWeight: sp.baseWeight,
+        brand: sp.brand,
+        barcode: sp.barcode,
+        isProhibitedForMinors: sp.isProhibitedForMinors,
+        isPrescriptionRequired: sp.isPrescriptionRequired,
+        originalImages: sp.originalImages,
+        processedImages: sp.processedImages,
+      })
 
       setForm({
         name: sp.name || '',
@@ -168,6 +182,7 @@ export function SellerProductForm({
         baseWeight: sp.baseWeight ? String(sp.baseWeight) : '',
         price: String(sp.price),
         stock: String(sp.stock),
+        barcode: String(sp.barcode),
         step: String(sp.step ?? 1),
         productCategory: sp.productCategory as UserTags,
 

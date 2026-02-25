@@ -9,7 +9,7 @@ import {
   TouchableOpacity,
 } from 'react-native'
 import { Stack, useRouter, useLocalSearchParams } from 'expo-router'
-import { Ionicons } from '@expo/vector-icons'
+import { Icon, IconName } from '@/components/ui/Icon'
 import { colors } from '@/theme'
 import {
   notificationService,
@@ -31,30 +31,22 @@ function formatDate(dateString: string): string {
 
 function subjectLabel(subject: string): {
   label: string
-  icon: keyof typeof Ionicons.glyphMap
+  icon: IconName
   color: string
 } {
   switch (subject) {
     case 'OrderCreated':
       return {
         label: 'Novo pedido',
-        icon: 'cart-outline',
+        icon: 'ShoppingCart',
         color: colors.primary,
       }
     case 'OrderStatusChanged':
-      return {
-        label: 'Status atualizado',
-        icon: 'refresh-outline',
-        color: '#F59E0B',
-      }
+      return { label: 'Status atualizado', icon: 'RefreshCw', color: '#F59E0B' }
     case 'OrderMessageSent':
-      return { label: 'Nova mensagem', icon: 'barbell', color: '#8B5CF6' }
+      return { label: 'Nova mensagem', icon: 'MessageCircle', color: '#8B5CF6' }
     default:
-      return {
-        label: 'Notificação',
-        icon: 'notifications-outline',
-        color: colors.textSecondary,
-      }
+      return { label: 'Notificação', icon: 'Bell', color: colors.textSecondary }
   }
 }
 
@@ -109,11 +101,7 @@ export default function NotificationDetail() {
         <View style={{ flex: 1, backgroundColor: colors.background }}>
           <ScrollView contentContainerStyle={{ padding: 16 }}>
             <View style={{ alignItems: 'center', paddingVertical: 60 }}>
-              <Ionicons
-                name="alert-circle-outline"
-                size={64}
-                color={colors.textSecondary}
-              />
+              <Icon icon="AlertCircle" size={64} color={colors.textSecondary} />
               <Text
                 style={{
                   fontSize: 18,
@@ -183,7 +171,7 @@ export default function NotificationDetail() {
                 gap: 6,
               }}
             >
-              <Ionicons name={icon} size={16} color={color} />
+              <Icon icon={icon} size={16} color={color} />
               <Text style={{ fontSize: 13, fontWeight: '600', color }}>
                 {label}
               </Text>
@@ -255,11 +243,7 @@ export default function NotificationDetail() {
                 onPress={() => goto(notification.destinationRole)}
                 activeOpacity={0.7}
               >
-                <Ionicons
-                  name="cart-outline"
-                  size={20}
-                  color={colors.primary}
-                />
+                <Icon icon="ShoppingCart" size={20} color={colors.primary} />
                 <Text
                   style={{
                     fontSize: 15,
@@ -292,7 +276,7 @@ function screenOptions(router: ReturnType<typeof useRouter>) {
         style={{ paddingHorizontal: 12 }}
         hitSlop={10}
       >
-        <Ionicons name="arrow-back" size={22} color="#FFFFFF" />
+        <Icon icon="ArrowLeft" size={22} color="#FFFFFF" />
       </Pressable>
     ),
   }

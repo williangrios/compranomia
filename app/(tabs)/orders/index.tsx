@@ -54,8 +54,8 @@ export default function Orders() {
             ? capitalizeFullName(order.sellerId.nickName)
             : 'Vendedor'
         }
-        emptyTitle="Nenhuma compra realizada"
-        emptySubtitle="Quando você fizer pedidos, eles aparecerão aqui"
+        emptyTitle="Nenhuma compra realizada com o status selecionado"
+        emptySubtitle="Já tentou procurar com outro status? O vendedor pode ter alterado o status de sua compra."
         emptyIcon="cart-outline"
         onViewOrder={(id) => router.push(`/(tabs)/orders/${id}`)}
         onOpenChat={(id) => router.push(`/(tabs)/orders/${id}/chat`)}

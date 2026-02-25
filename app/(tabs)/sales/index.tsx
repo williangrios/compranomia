@@ -14,8 +14,8 @@ export default function Sales() {
             ? capitalizeFullName(order.customerId.name)
             : 'Cliente'
       }
-      emptyTitle="Nenhuma venda realizada.."
-      emptySubtitle="Quando você receber pedidos, eles aparecerão aqui"
+      emptyTitle="Nenhuma venda realizada com o status selecionado"
+      emptySubtitle="Já experimentou procurar com outro status? Pode haver vendas com outro status."
       emptyIcon="receipt-outline"
       onViewOrder={(id) => router.push(`/(tabs)/sales/${id}`)}
       onOpenChat={(id) => router.push(`/(tabs)/sales/${id}/chat`)}
