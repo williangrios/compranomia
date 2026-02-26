@@ -446,7 +446,7 @@ export default function SellerStore() {
             <View style={styles.headerBadge}>
               <Icon icon="Gift" size={14} color={colors.success} />
               <Text style={styles.headerFreeTag}>
-                Grátis acima de R$ {deliveryRange.freeAbove.toFixed(2)}
+                Entrega grátis acima de R$ {deliveryRange.freeAbove.toFixed(2)}
               </Text>
             </View>
           )}

@@ -435,6 +435,7 @@ export default function NewProduct() {
           value={form.name}
           onChangeText={(v) => setField('name', v)}
           placeholder="Nome do produto"
+          placeholderTextColor={colors.textSecondary}
         />
         {errors.name && (
           <Text style={components.auth.errorText}>{errors.name}</Text>
@@ -453,6 +454,7 @@ export default function NewProduct() {
           value={form.description}
           onChangeText={(v) => setField('description', v)}
           placeholder="Capriche na descrição do produto"
+          placeholderTextColor={colors.textSecondary}
           multiline
         />
         {errors.description && (
@@ -468,6 +470,7 @@ export default function NewProduct() {
           value={form.brand}
           onChangeText={(v) => setField('brand', v)}
           placeholder="Marca do produto"
+          placeholderTextColor={colors.textSecondary}
         />
       </View>
 
@@ -476,12 +479,16 @@ export default function NewProduct() {
         <Text style={components.input.label}>Categoria *</Text>
         <View
           style={[
-            components.input.container,
-            { padding: 0 },
-            errors.productCategory && components.input.error,
+            styles.pickerContainer,
+            errors.productCategory && { borderColor: '#FF4D4F' },
           ]}
         >
           <Picker<UserTags | undefined>
+            style={{
+              color: '#111111',
+              backgroundColor: '#FFFFFF',
+            }}
+            dropdownIconColor="#111111"
             selectedValue={
               form.productCategory ? form.productCategory : undefined
             }
@@ -507,12 +514,13 @@ export default function NewProduct() {
               }
             }}
           >
-            <Picker.Item label="Selecione" value={undefined} />
+            <Picker.Item label="Selecione" value={undefined} color="#111111" />
             {sortedTags.map((tag) => (
               <Picker.Item
                 key={tag}
                 value={tag}
                 label={userTagsLabels[tag] ?? tag}
+                color="#111111"
               />
             ))}
           </Picker>
@@ -535,13 +543,18 @@ export default function NewProduct() {
           ]}
         >
           <Picker<MeasurementUnit>
+            style={{
+              color: '#111111',
+              backgroundColor: '#FFFFFF',
+            }}
+            dropdownIconColor="#111111"
             selectedValue={form.measurementUnit}
             onValueChange={(v) =>
               setForm((prev) => ({ ...prev, measurementUnit: v }))
             }
           >
             {Object.values(MeasurementUnit).map((u) => (
-              <Picker.Item key={u} label={u} value={u} />
+              <Picker.Item key={u} label={u} value={u} color="#111111" />
             ))}
           </Picker>
         </View>
@@ -563,6 +576,7 @@ export default function NewProduct() {
             onChangeText={(v) => setField('baseWeight', v)}
             placeholder="Ex: 500"
             keyboardType="numeric"
+            placeholderTextColor={colors.textSecondary}
           />
         </View>
       )}
@@ -609,6 +623,7 @@ export default function NewProduct() {
           onChangeText={(v) => setField('price', v)}
           placeholder="0.00"
           keyboardType="numeric"
+          placeholderTextColor={colors.textSecondary}
         />
         {errors.price && (
           <Text style={components.auth.errorText}>{errors.price}</Text>
@@ -645,6 +660,7 @@ export default function NewProduct() {
             onChangeText={(v) => setField('promotionalPrice', v)}
             placeholder="0.00"
             keyboardType="numeric"
+            placeholderTextColor={colors.textSecondary}
           />
           {form.price && form.promotionalPrice && (
             <Text style={styles.hintText}>

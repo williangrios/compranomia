@@ -261,6 +261,7 @@ export default function BusinessAddress() {
               }
             }}
             placeholder="00000-000"
+            placeholderTextColor={colors.textSecondary}
             keyboardType="number-pad"
             maxLength={9}
           />
@@ -293,6 +294,7 @@ export default function BusinessAddress() {
             setSuccess(null)
           }}
           placeholder="Nome da rua"
+          placeholderTextColor={colors.textSecondary}
           autoCapitalize="words"
         />
         <Text
@@ -322,6 +324,7 @@ export default function BusinessAddress() {
             setSuccess(null)
           }}
           placeholder="Número"
+          placeholderTextColor={colors.textSecondary}
           keyboardType="number-pad"
         />
         {errors.number && (
@@ -341,6 +344,7 @@ export default function BusinessAddress() {
             setSuccess(null)
           }}
           placeholder="Apto, bloco, etc."
+          placeholderTextColor={colors.textSecondary}
           autoCapitalize="words"
         />
       </View>
@@ -362,6 +366,7 @@ export default function BusinessAddress() {
             setSuccess(null)
           }}
           placeholder="Bairro"
+          placeholderTextColor={colors.textSecondary}
           autoCapitalize="words"
         />
         <Text

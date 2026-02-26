@@ -399,6 +399,7 @@ export function SellerProductForm({
               value={form.name}
               onChangeText={(v) => setField('name', v)}
               placeholder="Nome do produto"
+              placeholderTextColor={colors.textSecondary}
             />
           </View>
 
@@ -409,6 +410,7 @@ export function SellerProductForm({
               value={form.description}
               onChangeText={(v) => setField('description', v)}
               placeholder="Descrição do produto"
+              placeholderTextColor={colors.textSecondary}
               multiline
             />
           </View>
@@ -420,13 +422,19 @@ export function SellerProductForm({
               value={form.brand}
               onChangeText={(v) => setField('brand', v)}
               placeholder="Marca do produto"
+              placeholderTextColor={colors.textSecondary}
             />
           </View>
 
           <View style={styles.fieldWrapper}>
             <Text style={components.input.label}>Categoria</Text>
-            <View style={[components.input.container, { padding: 0 }]}>
+            <View style={styles.pickerContainer}>
               <Picker<UserTags | ''>
+                style={{
+                  color: '#111111',
+                  backgroundColor: '#FFFFFF',
+                }}
+                dropdownIconColor="#111111"
                 selectedValue={
                   form.productCategory ? form.productCategory : undefined
                 }
@@ -434,12 +442,17 @@ export function SellerProductForm({
                   setForm((prev) => ({ ...prev, productCategory: v }))
                 }
               >
-                <Picker.Item label="Selecione" value={undefined} />
+                <Picker.Item
+                  label="Selecione"
+                  value={undefined}
+                  color="#111111"
+                />
                 {sortedTags.map((tag) => (
                   <Picker.Item
                     key={tag}
                     value={tag}
                     label={userTagsLabels[tag] ?? tag}
+                    color="#111111"
                   />
                 ))}
               </Picker>
@@ -451,15 +464,20 @@ export function SellerProductForm({
       {/* Unidade de medida */}
       <View style={styles.fieldWrapper}>
         <Text style={components.input.label}>Unidade de medida</Text>
-        <View style={[components.input.container, { padding: 0 }]}>
+        <View style={styles.pickerContainer}>
           <Picker<MeasurementUnit>
+            style={{
+              color: '#111111',
+              backgroundColor: '#FFFFFF',
+            }}
+            dropdownIconColor="#111111"
             selectedValue={form.measurementUnit}
             onValueChange={(v) =>
               setForm((prev) => ({ ...prev, measurementUnit: v }))
             }
           >
             {Object.values(MeasurementUnit).map((u) => (
-              <Picker.Item key={u} label={u} value={u} />
+              <Picker.Item key={u} label={u} value={u} color="#111111" />
             ))}
           </Picker>
         </View>
@@ -479,6 +497,7 @@ export function SellerProductForm({
             editable={isUnit}
             onChangeText={(v) => setField('baseWeight', v)}
             placeholder="Ex: 500"
+            placeholderTextColor={colors.textSecondary}
             keyboardType="numeric"
           />
         </View>
@@ -527,6 +546,7 @@ export function SellerProductForm({
           value={form.price}
           onChangeText={(v) => setField('price', v)}
           placeholder="0.00"
+          placeholderTextColor={colors.textSecondary}
           keyboardType="numeric"
         />
         {errors.price && (
@@ -563,6 +583,7 @@ export function SellerProductForm({
             value={form.promotionalPrice}
             onChangeText={(v) => setField('promotionalPrice', v)}
             placeholder="0.00"
+            placeholderTextColor={colors.textSecondary}
             keyboardType="numeric"
           />
           {form.price && form.promotionalPrice && (

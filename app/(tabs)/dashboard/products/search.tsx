@@ -163,6 +163,7 @@ export default function SearchCatalog() {
               setApiErrors(null)
             }}
             placeholder="Ex: alface, arroz, shampoo..."
+            placeholderTextColor={colors.textSecondary}
             returnKeyType="search"
             onSubmitEditing={handleSearch}
           />

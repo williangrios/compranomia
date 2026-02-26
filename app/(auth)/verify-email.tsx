@@ -127,6 +127,7 @@ export default function VerifyEmail() {
                     setApiErrors(null)
                   }}
                   placeholder="000000"
+                  placeholderTextColor={colors.textSecondary}
                   keyboardType="number-pad"
                   maxLength={6}
                   autoFocus

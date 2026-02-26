@@ -617,7 +617,7 @@ export default function SellerSettings() {
                   suffix="R$"
                 />
                 <RangeField
-                  label="Grátis acima (R$)"
+                  label="Entrega grátis acima (R$)"
                   value={String(range.freeAbove)}
                   onChangeText={(v) => updateRange(index, 'freeAbove', v)}
                   error={rangeError.freeAbove}

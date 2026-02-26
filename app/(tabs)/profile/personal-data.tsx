@@ -179,6 +179,7 @@ export default function PersonalData() {
             setSuccess(null)
           }}
           placeholder="Seu nome completo"
+          placeholderTextColor={colors.textSecondary}
           autoCapitalize="words"
         />
         {errors.name && (
@@ -203,6 +204,7 @@ export default function PersonalData() {
             setSuccess(null)
           }}
           placeholder="000.000.000-00"
+          placeholderTextColor={colors.textSecondary}
           keyboardType="number-pad"
           maxLength={14}
         />
@@ -228,6 +230,7 @@ export default function PersonalData() {
             setSuccess(null)
           }}
           placeholder="DD/MM/AAAA"
+          placeholderTextColor={colors.textSecondary}
           keyboardType="number-pad"
           maxLength={10}
         />
@@ -253,6 +256,7 @@ export default function PersonalData() {
             setSuccess(null)
           }}
           placeholder="(00) 00000-0000"
+          placeholderTextColor={colors.textSecondary}
           keyboardType="phone-pad"
           maxLength={15}
         />
@@ -332,6 +336,7 @@ export default function PersonalData() {
             setSuccess(null)
           }}
           placeholder="(00) 00000-0000"
+          placeholderTextColor={colors.textSecondary}
           keyboardType="phone-pad"
           maxLength={15}
         />

@@ -398,4 +398,13 @@ export const productStyles = StyleSheet.create({
     color: colors.error,
     fontWeight: '600',
   },
+  pickerContainer: {
+    backgroundColor: '#FFFFFF',
+    borderWidth: 1,
+    borderColor: '#D0D0D0',
+    borderRadius: 8,
+    height: 52,
+    padding: 0,
+    justifyContent: 'center',
+  },
 })

@@ -298,6 +298,7 @@ export function AddressForm({
               }
             }}
             placeholder="00000-000"
+            placeholderTextColor={colors.textSecondary}
             keyboardType="number-pad"
             maxLength={9}
           />
@@ -330,6 +331,7 @@ export function AddressForm({
             setSuccess(null)
           }}
           placeholder="Nome da rua"
+          placeholderTextColor={colors.textSecondary}
           autoCapitalize="words"
           editable={true}
         />
@@ -360,6 +362,7 @@ export function AddressForm({
             setSuccess(null)
           }}
           placeholder="Número"
+          placeholderTextColor={colors.textSecondary}
           keyboardType="number-pad"
         />
         {errors.number && (
@@ -375,6 +378,7 @@ export function AddressForm({
           value={complement}
           onChangeText={setComplement}
           placeholder="Apto, bloco, etc"
+          placeholderTextColor={colors.textSecondary}
           autoCapitalize="words"
         />
       </View>
@@ -396,6 +400,7 @@ export function AddressForm({
             setSuccess(null)
           }}
           placeholder="Seu bairro"
+          placeholderTextColor={colors.textSecondary}
           autoCapitalize="words"
         />
         <Text
@@ -416,6 +421,7 @@ export function AddressForm({
           value={reference}
           onChangeText={setReference}
           placeholder="Próximo ao mercado..."
+          placeholderTextColor={colors.textSecondary}
           maxLength={200}
         />
       </View>

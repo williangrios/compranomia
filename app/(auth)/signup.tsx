@@ -142,6 +142,7 @@ export default function SignUp() {
                   setApiErrors(null)
                 }}
                 placeholder="seu@email.com"
+                placeholderTextColor={colors.textSecondary}
                 keyboardType="email-address"
                 autoCapitalize="none"
                 autoCorrect={false}
@@ -167,6 +168,7 @@ export default function SignUp() {
                   setApiErrors(null)
                 }}
                 placeholder="Como quer ser chamado?"
+                placeholderTextColor={colors.textSecondary}
                 autoCapitalize="none"
                 autoCorrect={false}
                 maxLength={20}
@@ -193,6 +195,7 @@ export default function SignUp() {
                     setApiErrors(null)
                   }}
                   placeholder="Mínimo 6 caracteres"
+                  placeholderTextColor={colors.textSecondary}
                   secureTextEntry={!showPassword}
                 />
                 <TouchableOpacity
@@ -234,6 +237,7 @@ export default function SignUp() {
                   setApiErrors(null)
                 }}
                 placeholder="Digite a senha novamente"
+                placeholderTextColor={colors.textSecondary}
                 secureTextEntry={!showPassword}
               />
               {errors.passwordConfirmation && (

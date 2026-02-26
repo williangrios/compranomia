@@ -162,6 +162,7 @@ export default function AddProduct() {
                 setApiErrors(null)
               }}
               placeholder="Ex: 7891234567890"
+              placeholderTextColor={colors.textSecondary}
               keyboardType="number-pad"
               autoFocus
             />

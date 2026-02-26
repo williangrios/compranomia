@@ -110,6 +110,7 @@ export default function ForgotPassword() {
                     setApiErrors(null)
                   }}
                   placeholder="seu@email.com"
+                  placeholderTextColor={colors.textSecondary}
                   keyboardType="email-address"
                   autoCapitalize="none"
                   autoCorrect={false}
