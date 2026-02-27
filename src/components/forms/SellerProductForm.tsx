@@ -434,6 +434,7 @@ export function SellerProductForm({
                   color: '#111111',
                   backgroundColor: '#FFFFFF',
                 }}
+                mode="dropdown"
                 dropdownIconColor="#111111"
                 selectedValue={
                   form.productCategory ? form.productCategory : undefined
@@ -470,6 +471,7 @@ export function SellerProductForm({
               color: '#111111',
               backgroundColor: '#FFFFFF',
             }}
+            mode="dropdown"
             dropdownIconColor="#111111"
             selectedValue={form.measurementUnit}
             onValueChange={(v) =>
