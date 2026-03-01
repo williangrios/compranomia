@@ -4,7 +4,7 @@
     "slug": "compranomia",
     "version": "1.0.0",
     "orientation": "portrait",
-    "icon": "./assets/icon.png",
+    "icon": "./assets/small-icon.png",
     "userInterfaceStyle": "light",
     "newArchEnabled": true,
     "splash": {
@@ -19,7 +19,8 @@
       "infoPlist": {
         "NSCameraUsageDescription": "O Compranomia Delivery precisa acessar sua câmera para tirar fotos de produtos.",
         "NSPhotoLibraryUsageDescription": "O Compranomia Delivery precisa acessar suas fotos para enviar imagens de produtos.",
-        "NSLocationWhenInUseUsageDescription": "O Compranomia Delivery precisa da sua localização para encontrar lojas e entregas próximas."
+        "NSLocationWhenInUseUsageDescription": "O Compranomia Delivery precisa da sua localização para encontrar lojas e entregas próximas.",
+        "ITSAppUsesNonExemptEncryption": false
       },
       "config": {
         "googleMapsApiKey": "AIzaSyDbx1scguWeUrv-OMJyjLLheiuDnN2WNX0"

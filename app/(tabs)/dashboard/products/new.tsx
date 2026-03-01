@@ -479,8 +479,9 @@ export default function NewProduct() {
         <Text style={components.input.label}>Categoria *</Text>
         <View
           style={[
-            styles.pickerContainer,
-            errors.productCategory && { borderColor: '#FF4D4F' },
+            components.input.container,
+            { padding: 0 },
+            errors.productCategory && components.input.error,
           ]}
         >
           <Picker<UserTags | undefined>
@@ -488,7 +489,6 @@ export default function NewProduct() {
               color: '#111111',
               backgroundColor: '#FFFFFF',
             }}
-            mode="dropdown"
             dropdownIconColor="#111111"
             selectedValue={
               form.productCategory ? form.productCategory : undefined
@@ -548,7 +548,6 @@ export default function NewProduct() {
               color: '#111111',
               backgroundColor: '#FFFFFF',
             }}
-            mode="dropdown"
             dropdownIconColor="#111111"
             selectedValue={form.measurementUnit}
             onValueChange={(v) =>

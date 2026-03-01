@@ -428,13 +428,12 @@ export function SellerProductForm({
 
           <View style={styles.fieldWrapper}>
             <Text style={components.input.label}>Categoria</Text>
-            <View style={styles.pickerContainer}>
+            <View style={[components.input.container, { padding: 0 }]}>
               <Picker<UserTags | ''>
                 style={{
                   color: '#111111',
                   backgroundColor: '#FFFFFF',
                 }}
-                mode="dropdown"
                 dropdownIconColor="#111111"
                 selectedValue={
                   form.productCategory ? form.productCategory : undefined
@@ -465,13 +464,12 @@ export function SellerProductForm({
       {/* Unidade de medida */}
       <View style={styles.fieldWrapper}>
         <Text style={components.input.label}>Unidade de medida</Text>
-        <View style={styles.pickerContainer}>
+        <View style={[components.input.container, { padding: 0 }]}>
           <Picker<MeasurementUnit>
             style={{
               color: '#111111',
               backgroundColor: '#FFFFFF',
             }}
-            mode="dropdown"
             dropdownIconColor="#111111"
             selectedValue={form.measurementUnit}
             onValueChange={(v) =>

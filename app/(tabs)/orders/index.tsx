@@ -56,7 +56,7 @@ export default function Orders() {
         }
         emptyTitle="Nenhuma compra realizada com o status selecionado"
         emptySubtitle="Já tentou procurar com outro status? O vendedor pode ter alterado o status de sua compra."
-        emptyIcon="cart-outline"
+        emptyIcon="ShoppingCart"
         onViewOrder={(id) => router.push(`/(tabs)/orders/${id}`)}
         onOpenChat={(id) => router.push(`/(tabs)/orders/${id}/chat`)}
         onRateOrder={handleRateOrder}

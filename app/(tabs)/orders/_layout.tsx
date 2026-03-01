@@ -1,7 +1,7 @@
-// app/(tabs)/sales/_layout.tsx
+// app/(tabs)/orders/_layout.tsx
 import { Stack } from 'expo-router'
 
-export default function SalesLayout() {
+export default function OrdersLayout() {
   return (
     <Stack>
       <Stack.Screen
