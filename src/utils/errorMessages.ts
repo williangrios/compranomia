@@ -92,6 +92,10 @@ export const errorMessages: Record<string, string> = {
   // Compra
   CannotBuyFromYourself: 'Não pode comprar de sua própria loja.',
   AlreadyRated: 'Ooops.... Você já fez a avaliação.',
+  MinimumOrderValueMustBePositive:
+    'O valor mínimo do pedido deve ser positivo.',
+  SubtotalBelowMinimum:
+    'O subtotal do pedido é menor que o valor mínimo permitido pelo vendedor.',
 
   // Chat
   CannotSendMessageToDeliveredOrder: 'A venda já foi finalizada',

@@ -17,7 +17,6 @@ import { SuccessMessage } from '@/components/ui/SuccessMessage'
 import { sellerSettingsService } from '@/services/sellerSettings.service'
 import { colors, components } from '@/theme'
 import { getApiErrors } from '@/utils/getApiErrors'
-import { userTagsLabels, sortByLabel } from '@/utils/enumLabels/userTags.labels'
 import { PaymentMethod, UserTags } from '@wrcb/cb-common'
 
 // ─── Types ────────────────────────────────────────────────────────────────────
@@ -58,6 +57,7 @@ interface FormErrors {
     }
   }
   preparationTime?: string
+  minimumOrderValue?: string
   acceptedPaymentMethods?: string
 }
 
@@ -168,6 +168,7 @@ export default function SellerSettings() {
   const [sellerActive, setSellerActive] = useState(true)
   const [adminActive, setAdminActive] = useState(true)
   const [tags, setTags] = useState<UserTags[]>([])
+  const [minimumOrderValue, setMinimumOrderValue] = useState('0')
   const [acceptedPaymentMethods, setAcceptedPaymentMethods] = useState<
     PaymentMethod[]
   >([])
@@ -181,8 +182,6 @@ export default function SellerSettings() {
   // Modal: editar períodos + cutoffTime de um dia
   const [periodsModalDay, setPeriodsModalDay] = useState<number | null>(null)
 
-  const translatedCategories = sortByLabel(tags, userTagsLabels)
-
   // ── Load data ───────────────────────────────────────────────────────────────
   useEffect(() => {
     async function loadSettings() {
@@ -195,6 +194,7 @@ export default function SellerSettings() {
             Object.values(UserTags).includes(tag as UserTags),
           ),
         )
+        setMinimumOrderValue(String(sellerSettings.minimumOrderValue ?? 0))
         if (sellerSettings) {
           setAcceptedPaymentMethods(sellerSettings.acceptedPaymentMethods || [])
           setDeliveryRanges(sellerSettings.deliveryRanges)
@@ -414,6 +414,13 @@ export default function SellerSettings() {
     const prep = parseInt(preparationTime, 10)
     if (isNaN(prep) || prep < 0) newErrors.preparationTime = 'Deve ser ≥ 0'
 
+    //  minimumOrderValue
+    const minOrder = parseFloat(minimumOrderValue)
+    if (isNaN(minOrder) || minOrder < 0) {
+      newErrors.minimumOrderValue = 'Deve ser ≥ 0'
+    }
+
+    // acceptedPaymentMethods
     if (acceptedPaymentMethods.length === 0) {
       // pode usar um novo campo em FormErrors ou simplesmente um alert
       newErrors.acceptedPaymentMethods =
@@ -446,6 +453,7 @@ export default function SellerSettings() {
           cutoffTime: day.isOpen ? day.cutoffTime : undefined,
         })),
         preparationTime: parseInt(preparationTime, 10),
+        minimumOrderValue: parseFloat(minimumOrderValue) || 0,
         sellerActive,
         acceptedPaymentMethods,
         allowOrdersWhenClosed,
@@ -902,6 +910,50 @@ export default function SellerSettings() {
           )}
         </View>
 
+        {/* ─── PEDIDO MÍNIMO ──────────────────────────────────────────────────── */}
+        <View style={{ marginBottom: 16 }}>
+          <Text style={components.input.label}>Pedido Mínimo (R$)</Text>
+          <View style={{ flexDirection: 'row', alignItems: 'center' }}>
+            <TextInput
+              style={[
+                components.input.container,
+                components.input.text,
+                errors.minimumOrderValue && components.input.error,
+                { flex: 1 },
+              ]}
+              value={minimumOrderValue}
+              onChangeText={(text) => {
+                setMinimumOrderValue(formatNumber(text))
+                setErrors((prev) => ({ ...prev, minimumOrderValue: undefined }))
+                clearMessages()
+              }}
+              keyboardType="decimal-pad"
+              placeholder="0"
+              placeholderTextColor={colors.textSecondary}
+            />
+            <Text
+              style={{
+                color: colors.textSecondary,
+                fontSize: 13,
+                marginLeft: 8,
+              }}
+            >
+              R$
+            </Text>
+          </View>
+          <Text
+            style={{ fontSize: 12, color: colors.textSecondary, marginTop: 4 }}
+          >
+            Valor mínimo para o cliente realizar um pedido. Use 0 para sem
+            mínimo.
+          </Text>
+          {errors.minimumOrderValue && (
+            <Text style={components.auth.errorText}>
+              {errors.minimumOrderValue}
+            </Text>
+          )}
+        </View>
+
         {/* Tags selecionadas */}
         {/* <Text style={components.input.label}>Seções</Text>
         {translatedCategories.length > 0 ? (
@@ -965,17 +1017,17 @@ export default function SellerSettings() {
           {
             key: PaymentMethod.Pix,
             label: 'Pix',
-            icon: 'qr-code-outline' as const,
+            icon: 'QrCode' as const,
           },
           {
             key: PaymentMethod.Cash,
             label: 'Dinheiro',
-            icon: 'cash-outline' as const,
+            icon: 'Cash' as const,
           },
           {
             key: PaymentMethod.CreditCard,
             label: 'Cartão de Crédito',
-            icon: 'card-outline' as const,
+            icon: 'CreditCard' as const,
           },
           // { key: PaymentMethod.DebitCard, label: 'Cartão de Débito', icon: 'card-outline' as const },
           // { key: PaymentMethod.MealCard, label: 'Vale Refeição', icon: 'restaurant-outline' as const },
@@ -1011,7 +1063,7 @@ export default function SellerSettings() {
                     color: isSelected
                       ? colors.textPrimary
                       : colors.textSecondary,
-                    fontWeight: isSelected ? '600' : '400',
+                    fontWeight: isSelected ? '500' : '400',
                   }}
                 >
                   {method.label}

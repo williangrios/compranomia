@@ -26,5 +26,6 @@ export interface SellerSettingsPayload {
   schedule?: ScheduleDay[]
   acceptedPaymentMethods?: PaymentMethod[]
   preparationTime?: number
+  minimumOrderValue?: number
   allowOrdersWhenClosed?: boolean
 }

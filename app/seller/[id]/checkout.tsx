@@ -24,6 +24,7 @@ import { capitalizeFullName } from '@/utils/capitalizeFullName'
 import { ApiError } from '@/types'
 import { getApiErrors } from '@/utils/getApiErrors'
 import { ErrorMessage } from '@/components/ui/ErrorMessage'
+import { SuccessMessage } from '@/components/ui/SuccessMessage'
 
 // ─── Payment Labels ───────────────────────────────────────────────────────────
 
@@ -65,6 +66,11 @@ export default function Checkout() {
   const [needsChange, setNeedsChange] = useState(false)
   const [changeAmount, setChangeAmount] = useState('')
   const [apiErrors, setApiErrors] = useState<ApiError[] | null>(null)
+  const [showConfirm, setShowConfirm] = useState(false)
+  const [successMessage, setSuccessMessage] = useState<{
+    status?: 'success'
+    message?: string
+  } | null>(null)
 
   // Carregar dados do seller
   useEffect(() => {
@@ -127,6 +133,8 @@ export default function Checkout() {
 
   async function handleSubmit() {
     setApiErrors(null)
+    setSuccessMessage(null)
+
     if (!cart || cart.items.length === 0) return
     if (!selectedPayment) {
       Alert.alert('Ooops..', 'Selecione uma forma de pagamento')
@@ -137,80 +145,65 @@ export default function Checkout() {
       return
     }
 
-    Alert.alert(
-      'Confirmar Pedido',
-      `Total: R$ ${total.toFixed(2)}\nPagamento: ${PAYMENT_LABELS[selectedPayment].label}\n\nConfirma o pedido?`,
-      [
-        { text: 'Cancelar', style: 'cancel' },
-        {
-          text: 'Confirmar',
-          onPress: async () => {
-            try {
-              setIsSubmitting(true)
+    setShowConfirm(true) // abre o modal de confirmação
+  }
 
-              const payload = {
-                sellerId: id!,
-                deliveryAddress: {
-                  label: address.label || 'Casa',
-                  cep: address.cep,
-                  street: address.street,
-                  number: address.number,
-                  complement: address.complement || '',
-                  neighborhood: address.neighborhood,
-                  city: address.city,
-                  state: address.state,
-                  reference: address.reference || '',
-                  deliveryInstructions: '',
-                  location: {
-                    coordinates: [coordinates.lng, coordinates.lat] as [
-                      number,
-                      number,
-                    ],
-                  },
-                },
-                items: cart.items.map((item) => ({
-                  sellerProductId: item.sellerProductId,
-                  quantity: item.quantity,
-                  price: item.price,
-                  promotionalPrice: item.promotionalPrice ?? null,
-                })),
-                subtotal,
-                deliveryFee,
-                total,
-                paymentMethod: selectedPayment,
-                estimatedDeliveryDate: getEstimatedDeliveryDate().toISOString(),
-                observations: buildObservations(),
-              }
-              const { order } = await orderService.createOrder(payload)
+  async function handleConfirm() {
+    setShowConfirm(false) // fecha o modal antes de qualquer coisa
 
-              clearCart(id!)
+    try {
+      setIsSubmitting(true)
 
-              Alert.alert(
-                'Pedido Realizado!',
-                'Seu pedido foi enviado ao vendedor.',
-                [
-                  {
-                    text: 'Ver Pedido',
-                    onPress: () => {
-                      router.dismissAll()
-                      router.push('/orders')
-                    },
-                  },
-                ],
-              )
-            } catch (error: any) {
-              setApiErrors(getApiErrors(error))
-              // const errorKey =
-              //   error.normalizedErrors?.[0]?.message || 'GenericError'
-              // const msg = translateError(errorKey)
-              // Alert.alert('Ooops..', msg)
-            } finally {
-              setIsSubmitting(false)
-            }
+      const payload = {
+        sellerId: id!,
+        deliveryAddress: {
+          label: address!.label || 'Casa',
+          cep: address!.cep,
+          street: address!.street,
+          number: address!.number,
+          complement: address!.complement || '',
+          neighborhood: address!.neighborhood,
+          city: address!.city,
+          state: address!.state,
+          reference: address!.reference || '',
+          deliveryInstructions: '',
+          location: {
+            coordinates: [coordinates!.lng, coordinates!.lat] as [
+              number,
+              number,
+            ],
           },
         },
-      ],
-    )
+        items: cart!.items.map((item) => ({
+          sellerProductId: item.sellerProductId,
+          quantity: item.quantity,
+          price: item.price,
+          promotionalPrice: item.promotionalPrice ?? null,
+        })),
+        subtotal,
+        deliveryFee,
+        total,
+        paymentMethod: selectedPayment!,
+        estimatedDeliveryDate: getEstimatedDeliveryDate().toISOString(),
+        observations: buildObservations(),
+      }
+
+      await orderService.createOrder(payload)
+
+      setSuccessMessage({
+        status: 'success',
+        message: 'Pedido realizado! Redirecionando...',
+      })
+
+      setTimeout(() => {
+        clearCart(id!)
+        router.replace('/orders')
+      }, 1500)
+    } catch (error: any) {
+      setApiErrors(getApiErrors(error))
+    } finally {
+      setIsSubmitting(false)
+    }
   }
 
   // ─── Loading ──────────────────────────────────────────────────────────────
@@ -431,7 +424,6 @@ export default function Checkout() {
         </View>
       </ScrollView>
       {/* Bottom bar */}
-      {/* Bottom bar */}
       <View
         style={[
           s.bottomBar,
@@ -440,26 +432,55 @@ export default function Checkout() {
           },
         ]}
       >
+        <SuccessMessage success={successMessage} />
         <ErrorMessage errors={apiErrors} />
         <View style={s.bottomBarRow}>
           <View>
             <Text style={s.bottomTotal}>R$ {total.toFixed(2)}</Text>
             <Text style={s.bottomItems}>{cart.items.length} item(ns)</Text>
           </View>
-          <TouchableOpacity
-            style={[s.submitButton, isSubmitting && { opacity: 0.6 }]}
-            onPress={handleSubmit}
-            disabled={isSubmitting}
-            activeOpacity={0.8}
-          >
-            {isSubmitting ? (
-              <ActivityIndicator color="#FFF" size="small" />
-            ) : (
-              <Text style={s.submitButtonText}>Finalizar Compra</Text>
-            )}
-          </TouchableOpacity>
+          {!successMessage && (
+            <TouchableOpacity
+              style={[s.submitButton, isSubmitting && { opacity: 0.6 }]}
+              onPress={handleSubmit}
+              disabled={isSubmitting}
+              activeOpacity={0.8}
+            >
+              {isSubmitting ? (
+                <ActivityIndicator color="#FFF" size="small" />
+              ) : (
+                <Text style={s.submitButtonText}>Finalizar Compra</Text>
+              )}
+            </TouchableOpacity>
+          )}
         </View>
       </View>
+      {/* Confirm overlay */}
+      {showConfirm && (
+        <View style={s.confirmOverlay}>
+          <View style={s.confirmBox}>
+            <Text style={s.confirmTitle}>Confirmar Pedido</Text>
+            <Text style={s.confirmText}>
+              Total: R$ {total.toFixed(2)}
+              {'\n'}
+              Pagamento: {PAYMENT_LABELS[selectedPayment!].label}
+              {'\n\n'}
+              Confirmar o pedido?
+            </Text>
+            <View style={s.confirmButtons}>
+              <TouchableOpacity style={s.confirmOkBtn} onPress={handleConfirm}>
+                <Text style={s.confirmOkText}>Confirmar</Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                style={s.confirmCancelBtn}
+                onPress={() => setShowConfirm(false)}
+              >
+                <Text style={s.confirmCancelText}>Cancelar</Text>
+              </TouchableOpacity>
+            </View>
+          </View>
+        </View>
+      )}
     </View>
   )
 }
@@ -825,5 +846,62 @@ const s = StyleSheet.create({
     padding: 12,
     fontSize: 16,
     color: colors.textPrimary,
+  },
+  confirmOverlay: {
+    position: 'absolute',
+    top: 0,
+    left: 0,
+    right: 0,
+    bottom: 0,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+    zIndex: 999,
+  },
+  confirmBox: {
+    backgroundColor: colors.background,
+    borderRadius: 16,
+    padding: spacing.lg,
+    marginHorizontal: spacing.lg,
+    gap: spacing.md,
+  },
+  confirmTitle: {
+    fontSize: 17,
+    fontWeight: '700',
+    color: colors.textPrimary,
+  },
+  confirmText: {
+    fontSize: 14,
+    color: colors.textSecondary,
+    lineHeight: 22,
+  },
+  confirmButtons: {
+    flexDirection: 'column',
+    gap: spacing.sm,
+    marginTop: spacing.sm,
+  },
+  confirmCancelBtn: {
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    borderWidth: 1,
+    borderColor: colors.border,
+    alignItems: 'center',
+  },
+  confirmCancelText: {
+    fontSize: 15,
+    color: colors.textSecondary,
+  },
+  confirmOkBtn: {
+    paddingVertical: 12,
+    paddingHorizontal: 12,
+    borderRadius: 10,
+    backgroundColor: colors.primary,
+    alignItems: 'center',
+  },
+  confirmOkText: {
+    fontSize: 15,
+    fontWeight: '700',
+    color: '#FFF',
   },
 })

@@ -60,6 +60,7 @@ interface SellerProfile {
     exceptions: any[]
   }
   acceptedPaymentMethods: PaymentMethod[]
+  minimumOrderValue: number
   isActive: boolean
 }
 
@@ -428,25 +429,16 @@ export default function SellerStore() {
             </Text>
           </View>
 
-          {/* Entrega */}
-          {deliveryRange && (
+          {/* Pedido mínimo */}
+          {profile && profile.minimumOrderValue > 0 && (
             <View style={styles.headerBadge}>
-              <Icon icon="Bike" size={14} color={colors.textSecondary} />
-              {deliveryRange.fee === 0 ? (
-                <Text style={styles.headerFreeTag}>Entrega grátis</Text>
-              ) : (
-                <Text style={styles.headerBadgeText}>
-                  Entrega: R$ {deliveryRange.fee.toFixed(2)}
-                </Text>
-              )}
-            </View>
-          )}
-
-          {deliveryRange && deliveryRange.freeAbove > 0 && (
-            <View style={styles.headerBadge}>
-              <Icon icon="Gift" size={14} color={colors.success} />
-              <Text style={styles.headerFreeTag}>
-                Entrega grátis acima de R$ {deliveryRange.freeAbove.toFixed(2)}
+              <Icon
+                icon="ShoppingCart"
+                size={14}
+                color={colors.textSecondary}
+              />
+              <Text style={styles.headerBadgeText}>
+                Mín.: R$ {profile.minimumOrderValue.toFixed(2)}
               </Text>
             </View>
           )}
@@ -457,6 +449,29 @@ export default function SellerStore() {
               <Icon icon="Car" size={14} color={colors.textSecondary} />
               <Text style={styles.headerBadgeText}>
                 {deliveryRange.averageDeliveryTime} min
+              </Text>
+            </View>
+          )}
+
+          {/* Entrega */}
+          {deliveryRange && (
+            <View style={styles.headerBadge}>
+              <Icon icon="Bike" size={14} color={colors.textSecondary} />
+              {deliveryRange.fee === 0 ? (
+                <Text style={styles.headerFreeTag}>Entrega grátis</Text>
+              ) : (
+                <Text style={styles.headerBadgeText}>
+                  Entrega: R${deliveryRange.fee.toFixed(2)}
+                </Text>
+              )}
+            </View>
+          )}
+
+          {deliveryRange && deliveryRange.freeAbove > 0 && (
+            <View style={styles.headerBadge}>
+              <Icon icon="Gift" size={14} color={colors.success} />
+              <Text style={styles.headerFreeTag}>
+                Entrega grátis acima R${deliveryRange.freeAbove.toFixed(2)}
               </Text>
             </View>
           )}
@@ -719,7 +734,8 @@ export default function SellerStore() {
               {spotlightedProducts.length > 0 && (
                 <View style={styles.categorySection}>
                   <Text style={styles.categorySectionTitle}>⭐ Destaques</Text>
-                  <FlatList
+                  {/* retirado pois estava dando erro */}
+                  {/* <FlatList
                     data={spotlightedProducts}
                     keyExtractor={(item) => item.id}
                     horizontal
@@ -745,7 +761,33 @@ export default function SellerStore() {
                         />
                       </View>
                     )}
-                  />
+                  /> */}
+                  <ScrollView
+                    horizontal
+                    showsHorizontalScrollIndicator={false}
+                    contentContainerStyle={styles.categorySliderContainer}
+                  >
+                    {spotlightedProducts.map((item) => (
+                      <View key={item.id} style={{ marginRight: spacing.sm }}>
+                        <ConsumerProductCard
+                          product={item as any}
+                          size="slider"
+                          onAddToCart={(qty) =>
+                            addProductToCart(
+                              id!,
+                              {
+                                name: seller?.nickName ?? 'Vendedor',
+                                photo: seller?.profilePhoto ?? '',
+                              },
+                              item,
+                              qty,
+                            )
+                          }
+                          onPress={() => redirectToItemPage(id, item.id)}
+                        />
+                      </View>
+                    ))}
+                  </ScrollView>
                 </View>
               )}
 
@@ -757,7 +799,8 @@ export default function SellerStore() {
                 return (
                   <View key={cat} style={styles.categorySection}>
                     <Text style={styles.categorySectionTitle}>{label}</Text>
-                    <FlatList
+                    {/* retirado pois estava dando erro */}
+                    {/* <FlatList
                       data={categoryProductsList}
                       keyExtractor={(item) => item.id}
                       horizontal
@@ -783,7 +826,33 @@ export default function SellerStore() {
                           />
                         </View>
                       )}
-                    />
+                    /> */}
+                    <ScrollView
+                      horizontal
+                      showsHorizontalScrollIndicator={false}
+                      contentContainerStyle={styles.categorySliderContainer}
+                    >
+                      {categoryProductsList.map((item) => (
+                        <View key={item.id} style={{ marginRight: spacing.sm }}>
+                          <ConsumerProductCard
+                            product={item as any}
+                            size="slider"
+                            onAddToCart={(qty) =>
+                              addProductToCart(
+                                id!,
+                                {
+                                  name: seller?.nickName ?? 'Vendedor',
+                                  photo: seller?.profilePhoto ?? '',
+                                },
+                                item,
+                                qty,
+                              )
+                            }
+                            onPress={() => redirectToItemPage(id, item.id)}
+                          />
+                        </View>
+                      ))}
+                    </ScrollView>
                   </View>
                 )
               })}

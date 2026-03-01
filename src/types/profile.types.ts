@@ -27,6 +27,7 @@ export interface SellerSettings {
   deliveryRanges: DeliveryRange[]
   schedule: DaySchedule[]
   preparationTime: number
+  minimumOrderValue: number
   cutoffTime: string
   exceptions: ScheduleException[]
   tags: UserTags[]

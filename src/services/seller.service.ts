@@ -160,6 +160,7 @@ export const sellerService = {
       exceptions: any[]
     }
     acceptedPaymentMethods: PaymentMethod[]
+    minimumOrderValue: number
     isActive: boolean
   }> {
     const response = await api.get(
