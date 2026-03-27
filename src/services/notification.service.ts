@@ -1,5 +1,6 @@
 // services/notification.service.ts
 import { UserRole } from '@wrcb/cb-common'
+import { Platform } from 'react-native'
 import api from './api'
 
 export interface NotificationItem {
@@ -38,5 +39,16 @@ export const notificationService = {
 
   async markAsRead(notificationId: string): Promise<void> {
     await api.patch(`/api/notifications/${notificationId}/read`)
+  },
+
+  async registerPushToken(token: string): Promise<void> {
+    await api.post('/api/notifications/push-token', {
+      token,
+      platform: Platform.OS,
+    })
+  },
+
+  async removePushToken(token: string): Promise<void> {
+    await api.delete('/api/notifications/push-token', { data: { token } })
   },
 }

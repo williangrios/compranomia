@@ -13,7 +13,7 @@ export const tenantData = TenantDataService.getTenantData(Tenant.Compranomia)
 export const API_URL = 'https://www.privateshow.com.br'
 export const TENANT = Tenant.Compranomia
 export const CACHE_TTL = 60000 // 1 minuto
-export const APP_VERSION = '1'
+export const API_VERSION = '2'
 export const DEFAULT_IMAGE =
   'https://static.compranomia.com/defaults/product.png'
 export const DEFAULT_AVATAR =

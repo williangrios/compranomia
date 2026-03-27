@@ -1,5 +1,5 @@
 import axios from 'axios'
-import { API_URL, APP_VERSION } from '@/utils/constants'
+import { API_URL, API_VERSION } from '@/utils/constants'
 import { storageService } from './storage.service'
 import { translateError } from '@/utils/errorMessages'
 import { Alert, Linking, Platform } from 'react-native'
@@ -28,7 +28,7 @@ api.interceptors.request.use(
     }
 
     config.headers['x-tenant'] = Tenant.Compranomia
-    config.headers['x-app-version'] = APP_VERSION
+    config.headers['x-api-version'] = API_VERSION
 
     return config
   },
@@ -65,7 +65,7 @@ function showUpdateAlert() {
 
   const storeUrl = Platform.select({
     ios: 'https://apps.apple.com/app/SEU_APP_ID',
-    android: 'https://play.google.com/store/apps/details?id=SEU_PACKAGE',
+    android: 'https://play.google.com/store/apps/details?id=br.com.compranomia',
   })
 
   Alert.alert(

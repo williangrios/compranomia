@@ -8,6 +8,7 @@ import {
   type ReactNode,
 } from 'react'
 import { notificationService } from '@/services/notification.service'
+import { usePushNotifications } from '@/hooks/usePushNotifications'
 
 interface NotificationContextValue {
   hasUnread: boolean
@@ -32,6 +33,9 @@ export function NotificationProvider({ children }: { children: ReactNode }) {
       // silenciar — não quebra a UI
     }
   }, [])
+
+  // Push notifications — atualiza badge quando chega push
+  usePushNotifications(refreshUnread)
 
   useEffect(() => {
     // Busca inicial
