@@ -123,7 +123,9 @@ export default function Profile() {
         title="Política de Privacidade"
         subtitle="Como seus dados são utilizados"
         onPress={() =>
-          Linking.openURL('https://www.wrsolucoesdigitais.com.br/privacypolicy')
+          Linking.openURL(
+            'https://www.wrsolucoesdigitais.com.br/compranomia/privacypolicy',
+          )
         }
       />
 
@@ -132,7 +134,9 @@ export default function Profile() {
         title="Termos e Condições"
         subtitle="Regras de uso da plataforma"
         onPress={() =>
-          Linking.openURL('https://www.wrsolucoesdigitais.com.br/service')
+          Linking.openURL(
+            'https://www.wrsolucoesdigitais.com.br/compranomia/service',
+          )
         }
       />
 
