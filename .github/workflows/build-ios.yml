@@ -66,6 +66,8 @@ jobs:
             -archivePath $RUNNER_TEMP/Compranomia.xcarchive \
             archive \
             CODE_SIGN_STYLE=Manual \
+            PROVISIONING_PROFILE=1c1468ee-1b73-4389-8e2d-eda434a0ebe6 \
+            PROVISIONING_PROFILE_SPECIFIER="Compranomia AppStore Push" \
             -allowProvisioningUpdates
 
       - name: Create ExportOptions.plist
@@ -86,7 +88,7 @@ jobs:
             <key>provisioningProfiles</key>
             <dict>
               <key>br.com.compranomia</key>
-              <string>${{ secrets.IOS_PROVISIONING_PROFILE_NAME }}</string>
+              <string>Compranomia AppStore Push</string>
             </dict>
           </dict>
           </plist>
