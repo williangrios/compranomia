@@ -5,7 +5,9 @@
       "Bash(xargs cat:*)",
       "Bash(xargs wc:*)",
       "Bash(npx expo:*)",
-      "Bash(npx tsc:*)"
+      "Bash(npx tsc:*)",
+      "Bash(ls -la /c/Users/User/projetos/compranomia/*.aab)",
+      "Bash(find /c/Users/User/projetos/compranomia -maxdepth 2 -name *.yml -o -name *.yaml)"
     ]
   }
 }
