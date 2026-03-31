@@ -16,6 +16,16 @@
     }
   },
   "submit": {
-    "production": {}
+    "production": {
+      "android": {
+        "serviceAccountKeyPath": "./google-service-account.json",
+        "track": "production"
+      },
+      "ios": {
+        "appleId": "williangrios@yahoo.com.br",
+        "ascAppId": "6759787860",
+        "appleTeamId": "897V7DH44B"
+      }
+    }
   }
 }
