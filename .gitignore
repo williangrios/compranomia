@@ -38,6 +38,9 @@ credentials.json
 credentials/
 google-service-account.json
 
+# Configuracoes (service account keys e credenciais)
+configuracoes/
+
 # typescript
 *.tsbuildinfo
 
