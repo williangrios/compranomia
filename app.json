@@ -13,7 +13,7 @@
       "backgroundColor": "#F57C00"
     },
     "ios": {
-      "supportsTablet": true,
+      "supportsTablet": false,
       "bundleIdentifier": "br.com.compranomia",
       "buildNumber": "1",
       "infoPlist": {

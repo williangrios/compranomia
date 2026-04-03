@@ -1,4 +1,5 @@
 import 'react-native-gesture-handler'
+import { GestureHandlerRootView } from 'react-native-gesture-handler'
 import { Stack } from 'expo-router'
 import * as SplashScreen from 'expo-splash-screen'
 import { useEffect } from 'react'
@@ -22,20 +23,22 @@ export default function RootLayout() {
   }, [])
 
   return (
-    <AddressProvider>
-      <AuthProvider>
-        <NotificationProvider>
-          <CartProvider>
-            <StatusBar style="auto" />
-            <Stack screenOptions={{ headerShown: false }}>
-              <Stack.Screen name="index" />
-              <Stack.Screen name="(auth)" />
-              <Stack.Screen name="(tabs)" />
-            </Stack>
-            <Toast config={toastConfig} />
-          </CartProvider>
-        </NotificationProvider>
-      </AuthProvider>
-    </AddressProvider>
+    <GestureHandlerRootView style={{ flex: 1 }}>
+      <AddressProvider>
+        <AuthProvider>
+          <NotificationProvider>
+            <CartProvider>
+              <StatusBar style="auto" />
+              <Stack screenOptions={{ headerShown: false }}>
+                <Stack.Screen name="index" />
+                <Stack.Screen name="(auth)" />
+                <Stack.Screen name="(tabs)" />
+              </Stack>
+              <Toast config={toastConfig} />
+            </CartProvider>
+          </NotificationProvider>
+        </AuthProvider>
+      </AddressProvider>
+    </GestureHandlerRootView>
   )
 }
