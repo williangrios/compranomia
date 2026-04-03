@@ -48,7 +48,7 @@ jobs:
           token: ${{ secrets.EXPO_TOKEN }}
 
       - name: Decode Google Service Account
-        run: echo '${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }}' > google-service-account.json
+        run: echo '${{ secrets.GOOGLE_SERVICE_ACCOUNT_KEY }}' | base64 --decode > google-service-account.json
 
       - name: Build Android locally
         run: eas build --platform android --profile production --local --non-interactive --output ./Compranomia.aab
