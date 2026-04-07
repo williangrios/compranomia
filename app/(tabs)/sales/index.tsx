@@ -16,7 +16,7 @@ export default function Sales() {
       }
       emptyTitle="Nenhuma venda realizada com o status selecionado"
       emptySubtitle="Já experimentou procurar com outro status? Pode haver vendas com outro status."
-      emptyIcon="receipt-outline"
+      emptyIcon="FileText"
       onViewOrder={(id) => router.push(`/(tabs)/sales/${id}`)}
       onOpenChat={(id) => router.push(`/(tabs)/sales/${id}/chat`)}
       type="sales"

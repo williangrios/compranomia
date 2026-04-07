@@ -55,29 +55,6 @@ export default function ProfileLayout() {
         }}
       />
 
-      {/* ===== Seller ===== */}
-      <Stack.Screen
-        name="business-profile"
-        options={{
-          title: 'Perfil do negócio',
-          headerBackVisible: true,
-        }}
-      />
-
-      <Stack.Screen
-        name="seller-settings"
-        options={{
-          title: 'Configurações do vendedor',
-          headerBackVisible: true,
-        }}
-      />
-      <Stack.Screen
-        name="store-address"
-        options={{
-          title: 'Endereço da loja',
-          headerBackVisible: true,
-        }}
-      />
     </Stack>
   )
 }

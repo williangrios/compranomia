@@ -178,6 +178,7 @@ export const userTagsLabels: Record<UserTags, string> = {
   // OUTROS
   // =========================
   [UserTags.Outros]: 'Outros',
+  [UserTags.BrainrotColoring]: '',
 
   [UserTags.CityTour]: '',
   [UserTags.CulturalTour]: '',

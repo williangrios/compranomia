@@ -5,6 +5,7 @@ import api from '@/services/api'
 import { User } from '@/types'
 import { Country, Tenant, UserRole } from '@wrcb/cb-common'
 import { useAddress } from '@/contexts/AddressContext'
+import { registerPushToken } from '@/utils/registerPushToken'
 
 interface AuthContextData {
   user: User | null
@@ -122,6 +123,11 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         tenant: Tenant.Compranomia,
       })
       setUser(user)
+      if (user.isEmailVerified) {
+        registerPushToken().catch((err) =>
+          console.error('[Push] Erro ao registrar token no signin:', err),
+        )
+      }
     } catch (error: any) {
       throw error
     }
@@ -154,6 +160,9 @@ export function AuthProvider({ children }: { children: React.ReactNode }) {
         tenant: Tenant.Compranomia,
       })
       setUser(user)
+      registerPushToken().catch((err) =>
+        console.error('[Push] Erro ao registrar token no verifyEmail:', err),
+      )
     } catch (error: any) {
       throw error
     }

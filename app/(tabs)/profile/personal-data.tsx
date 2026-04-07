@@ -5,8 +5,6 @@ import {
   TextInput,
   TouchableOpacity,
   ActivityIndicator,
-  Linking,
-  Alert,
 } from 'react-native'
 import { ErrorMessage } from '@/components/ui/ErrorMessage'
 import { SuccessMessage } from '@/components/ui/SuccessMessage'
@@ -40,12 +38,10 @@ export default function PersonalData() {
   const [whatsapp, setWhatsapp] = useState('')
   const [phoneNumber, setPhoneNumber] = useState('')
   const [isLoading, setIsLoading] = useState(false)
-  const [isRefreshing, setIsRefreshing] = useState(false)
+
   const [apiErrors, setApiErrors] = useState<ApiError[] | null>(null)
   const [success, setSuccess] = useState<{ message: string } | null>(null)
   const [errors, setErrors] = useState<FormErrors>({})
-
-  const WHATSAPP_BUSINESS_NUMBER = '55' + tenantData.SITE_WHATSAPP_BOT
 
   useEffect(() => {
     if (user) {
@@ -58,9 +54,6 @@ export default function PersonalData() {
   }, [user])
 
   const isSeller = user?.role === UserRole.Seller
-  const isWhatsappSaved = !!user?.whatsapp && user.whatsapp.length > 0
-  const showVerifyButton =
-    isSeller && isWhatsappSaved && !user?.isWhatsappVerified
 
   async function handleSubmit() {
     try {
@@ -112,51 +105,6 @@ export default function PersonalData() {
       setApiErrors(getApiErrors(error))
     } finally {
       setIsLoading(false)
-    }
-  }
-
-  async function handleVerifyWhatsApp() {
-    try {
-      if (!user?.whatsapp) {
-        Alert.alert('Erro', 'Salve seu WhatsApp antes de verificar')
-        return
-      }
-
-      const message = 'Oi, quero verificar meu numero de whatsapp'
-      const url = `https://wa.me/${WHATSAPP_BUSINESS_NUMBER}?text=${encodeURIComponent(message)}`
-
-      const canOpen = await Linking.canOpenURL(url)
-      if (canOpen) {
-        await Linking.openURL(url)
-      } else {
-        Alert.alert('Erro', 'Não foi possível abrir o WhatsApp')
-      }
-    } catch (error) {
-      console.error('Erro ao abrir WhatsApp:', error)
-      Alert.alert('Erro', 'Não foi possível abrir o WhatsApp')
-    }
-  }
-
-  async function handleRefreshVerification() {
-    try {
-      setIsRefreshing(true)
-      const response = await profileService.refreshUserData()
-      updateUser(response.user)
-
-      if (response.user.isWhatsappVerified) {
-        setSuccess({
-          message: '✅ WhatsApp verificado com sucesso!',
-        })
-      } else {
-        Alert.alert(
-          'Ooops..',
-          'Seu WhatsApp ainda não foi verificado. Envie a mensagem e tente novamente.',
-        )
-      }
-    } catch (error: any) {
-      setApiErrors(getApiErrors(error))
-    } finally {
-      setIsRefreshing(false)
     }
   }
 
@@ -277,53 +225,6 @@ export default function PersonalData() {
           </Text>
         )}
       </View>
-      {/* Botão Verificar WhatsApp */}
-      {showVerifyButton && (
-        <>
-          <TouchableOpacity
-            style={[
-              components.auth.buttonPrimary,
-              {
-                backgroundColor: colors.success,
-                marginBottom: 12,
-              },
-            ]}
-            onPress={handleVerifyWhatsApp}
-            activeOpacity={0.8}
-          >
-            <Text style={components.auth.buttonText}>
-              📱 Verificar WhatsApp
-            </Text>
-          </TouchableOpacity>
-
-          {/* Botão Atualizar Status */}
-          <TouchableOpacity
-            style={[
-              components.auth.buttonPrimary,
-              {
-                backgroundColor: colors.border,
-              },
-            ]}
-            onPress={handleRefreshVerification}
-            disabled={isRefreshing}
-            activeOpacity={0.8}
-          >
-            {isRefreshing ? (
-              <ActivityIndicator color={colors.primaryDark} />
-            ) : (
-              <Text
-                style={[
-                  components.auth.buttonText,
-                  { color: colors.primaryDark },
-                ]}
-              >
-                🔄 Já enviei a mensagem
-              </Text>
-            )}
-          </TouchableOpacity>
-        </>
-      )}
-
       {/* Telefone */}
       <View style={{ marginBottom: 16 }}>
         <Text style={components.input.label}>Telefone (opcional)</Text>
@@ -349,7 +250,7 @@ export default function PersonalData() {
       <TouchableOpacity
         style={[
           components.auth.buttonPrimary,
-          { marginBottom: showVerifyButton ? 12 : 0 },
+          { marginBottom: 0 },
         ]}
         onPress={handleSubmit}
         disabled={isLoading}

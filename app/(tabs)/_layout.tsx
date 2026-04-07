@@ -1,5 +1,5 @@
 // app/(tabs)/_layout.tsx
-import { Tabs, useRouter } from 'expo-router'
+import { Tabs } from 'expo-router'
 import { Icon } from '@/components/ui/Icon'
 import { useAuth } from '@/contexts/AuthContext'
 import { UserRole } from '@wrcb/cb-common'
@@ -9,7 +9,6 @@ export default function TabsLayout() {
   const { user } = useAuth()
   const isSeller = user?.role === UserRole.Seller
   const insets = useSafeAreaInsets()
-  const router = useRouter()
 
   return (
     <Tabs
@@ -30,13 +29,6 @@ export default function TabsLayout() {
           fontSize: 11,
           fontWeight: '600',
           marginBottom: 4,
-        },
-      }}
-      screenListeners={{
-        tabPress: () => {
-          if (router.canDismiss()) {
-            router.dismissAll()
-          }
         },
       }}
     >

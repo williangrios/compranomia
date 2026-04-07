@@ -83,6 +83,7 @@ export const sellerProductService = {
       promotionalPrice?: number
     },
   ) {
+    console.log('[sellerProductService.create] payload:', JSON.stringify(payload, null, 2))
     const formData = new FormData()
 
     formData.append('name', payload.name)
@@ -141,6 +142,7 @@ export const sellerProductService = {
   },
 
   async adopt(payload: AdoptPayload) {
+    console.log('[sellerProductService.adopt] payload:', JSON.stringify(payload, null, 2))
     const { data } = await api.post(
       '/api/business/compranomia/catalog/adopt',
       payload,
@@ -149,6 +151,7 @@ export const sellerProductService = {
   },
 
   async update(id: string, payload: UpdatePayload) {
+    console.log('[sellerProductService.update] id:', id, 'payload:', JSON.stringify(payload, null, 2))
     const { data } = await api.patch(
       `/api/business/compranomia/seller-product/${id}`,
       payload,

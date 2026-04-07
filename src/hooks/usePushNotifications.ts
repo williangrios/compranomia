@@ -1,13 +1,10 @@
 import { useState, useEffect, useRef } from 'react'
-import { Platform } from 'react-native'
 import * as Notifications from 'expo-notifications'
-import * as Device from 'expo-device'
 import { useRouter } from 'expo-router'
 import { useAuth } from '@/contexts/AuthContext'
 import { notificationService } from '@/services/notification.service'
+import { registerPushToken } from '@/utils/registerPushToken'
 import { UserRole } from '@wrcb/cb-common'
-
-const EAS_PROJECT_ID = '1f09fc15-6da2-4596-973c-b44059cb2f6d'
 
 Notifications.setNotificationHandler({
   handleNotification: async () => ({
@@ -45,8 +42,18 @@ export function usePushNotifications(onPushReceived?: () => void) {
   useEffect(() => {
     if (!user || !user.isEmailVerified) return
 
-    registerForPushNotifications().then((token) => {
-      if (token) setExpoPushToken(token)
+    registerPushToken()
+      .then((token) => {
+        if (token) setExpoPushToken(token)
+      })
+      .catch((err) => console.error('[Push] Erro ao registrar token:', err))
+
+    // Cold start: app foi aberto pelo toque na notificação
+    Notifications.getLastNotificationResponseAsync().then((response) => {
+      if (response) {
+        const data = response.notification.request.content.data
+        handleNotificationNavigation(data)
+      }
     })
 
     // Notificação recebida com app aberto
@@ -55,7 +62,7 @@ export function usePushNotifications(onPushReceived?: () => void) {
         onPushReceived?.()
       })
 
-    // Usuário clicou na notificação
+    // Usuário clicou na notificação (app em background)
     responseListener.current =
       Notifications.addNotificationResponseReceivedListener((response) => {
         const data = response.notification.request.content.data
@@ -96,48 +103,4 @@ export function usePushNotifications(onPushReceived?: () => void) {
   }
 
   return { expoPushToken }
-}
-
-async function registerForPushNotifications(): Promise<string | null> {
-  if (!Device.isDevice) {
-    console.log('[Push] Notificações push requerem dispositivo físico')
-    return null
-  }
-
-  if (Platform.OS === 'android') {
-    await Notifications.setNotificationChannelAsync('default', {
-      name: 'Padrão',
-      importance: Notifications.AndroidImportance.MAX,
-      vibrationPattern: [0, 250, 250, 250],
-      sound: 'default',
-    })
-  }
-
-  const { status: existingStatus } = await Notifications.getPermissionsAsync()
-  let finalStatus = existingStatus
-
-  if (existingStatus !== 'granted') {
-    const { status } = await Notifications.requestPermissionsAsync()
-    finalStatus = status
-  }
-
-  if (finalStatus !== 'granted') {
-    console.log('[Push] Permissão de notificação negada')
-    return null
-  }
-
-  const tokenData = await Notifications.getExpoPushTokenAsync({
-    projectId: EAS_PROJECT_ID,
-  })
-
-  const token = tokenData.data
-
-  // Envia token pro backend
-  try {
-    await notificationService.registerPushToken(token)
-  } catch (error) {
-    console.error('[Push] Erro ao registrar token no backend:', error)
-  }
-
-  return token
 }
