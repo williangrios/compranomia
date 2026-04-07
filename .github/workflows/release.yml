@@ -17,9 +17,9 @@ on:
           - ios
 
 jobs:
-  # ─── Build & Submit Android ────────────────────────────────
+  # ─── Build Android ────────────────────────────────
   build-android:
-    name: Build & Submit Android
+    name: Build Android
     runs-on: ubuntu-latest
     if: ${{ github.event_name == 'push' || github.event.inputs.platform != 'ios' }}
     steps:
@@ -53,18 +53,29 @@ jobs:
       - name: Build Android locally
         run: eas build --platform android --profile production --local --non-interactive --output ./Compranomia.aab
 
-      - name: Submit to Google Play
-        run: eas submit --platform android --profile production --non-interactive --path ./Compranomia.aab
-
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: Compranomia-Android
           path: ./Compranomia.aab
 
-  # ─── Build & Submit iOS ────────────────────────────────────
+      - name: Download instructions
+        run: |
+          echo "============================================"
+          echo "  BUILD ANDROID CONCLUIDO"
+          echo "============================================"
+          echo ""
+          echo "Para baixar o AAB:"
+          echo "1. Acesse a aba Actions no GitHub"
+          echo "2. Clique neste run"
+          echo "3. Role ate a secao Artifacts"
+          echo "4. Clique em 'Compranomia-Android' para baixar"
+          echo ""
+          echo "============================================"
+
+  # ─── Build iOS ────────────────────────────────────
   build-ios:
-    name: Build & Submit iOS
+    name: Build iOS
     runs-on: macos-latest
     if: ${{ github.event_name == 'push' || github.event.inputs.platform != 'android' }}
     steps:
@@ -89,11 +100,22 @@ jobs:
       - name: Build iOS locally
         run: eas build --platform ios --profile production --local --non-interactive --output ./Compranomia.ipa
 
-      - name: Submit to App Store
-        run: eas submit --platform ios --profile production --non-interactive --path ./Compranomia.ipa
-
       - name: Upload artifact
         uses: actions/upload-artifact@v4
         with:
           name: Compranomia-iOS
           path: ./Compranomia.ipa
+
+      - name: Download instructions
+        run: |
+          echo "============================================"
+          echo "  BUILD IOS CONCLUIDO"
+          echo "============================================"
+          echo ""
+          echo "Para baixar o IPA:"
+          echo "1. Acesse a aba Actions no GitHub"
+          echo "2. Clique neste run"
+          echo "3. Role ate a secao Artifacts"
+          echo "4. Clique em 'Compranomia-iOS' para baixar"
+          echo ""
+          echo "============================================"

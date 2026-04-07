@@ -34,3 +34,17 @@ jobs:
         with:
           name: Compranomia-iOS
           path: ./Compranomia.ipa
+
+      - name: Download instructions
+        run: |
+          echo "============================================"
+          echo "  BUILD IOS CONCLUIDO"
+          echo "============================================"
+          echo ""
+          echo "Para baixar o IPA:"
+          echo "1. Acesse a aba Actions no GitHub"
+          echo "2. Clique neste run"
+          echo "3. Role ate a secao Artifacts"
+          echo "4. Clique em 'Compranomia-iOS' para baixar"
+          echo ""
+          echo "============================================"

@@ -8,7 +8,12 @@
       "Bash(npx tsc:*)",
       "Bash(ls -la /c/Users/User/projetos/compranomia/*.aab)",
       "Bash(find /c/Users/User/projetos/compranomia -maxdepth 2 -name *.yml -o -name *.yaml)",
-      "Bash(find C:/Users/User/projetos/brainrot-coloring-lab -name *service-account* -o -name *service_account* -o -name *google*.json)"
+      "Bash(find C:/Users/User/projetos/brainrot-coloring-lab -name *service-account* -o -name *service_account* -o -name *google*.json)",
+      "Bash(ls /mnt/c/Users/User/projetos/compranomia/node_modules/.bin/.node-pub*)",
+      "Bash(find /mnt/c/Users/User/projetos/compranomia/node_modules/.bin/ -name '.*' -type f -delete)",
+      "Bash(chmod -R 755 /mnt/c/Users/User/projetos/compranomia/node_modules/.bin/)",
+      "Bash(npm install:*)",
+      "Bash(node:*)"
     ]
   }
 }
